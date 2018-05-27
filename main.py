@@ -21,12 +21,12 @@ dependenciesList = helpers.dependenciesList()
 
 
 if not arg.S == None:
-    packageManager = PackageManager.Manager
-    packageManager.installPackage(packageManager, arg.S, arg.skipHash)
+    packageManager = PackageManager.Manager(arg.S, arg.skipHash)
+    packageManager.installPackage()
 
 if not arg.R == None:
-    packageManager = PackageManager.Manager
-    PackageManager.Manager.removePackage(packageManager, arg.R)
+    packageManager = PackageManager.Manager(arg.R, arg.skipHash)
+    PackageManager.Manager.removePackage()
 
 
 # if not arg.R == None:
