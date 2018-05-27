@@ -1,7 +1,7 @@
 import json
 from . import FileManager
 import helpers
-
+from Logger import Logger as log
 class Parser:
     def __init__(self, path=""):
         self.path = path
@@ -51,23 +51,31 @@ class Parser:
         except KeyError as e:
             exit(key+" does not exists")
 
-    def addNewPackage(packageName):
+    def addNewPackage(self, packageName):
         jsonFile = helpers.getCobanPath+"\\packages.json"
         with open(jsonFile, "r") as f:
             js = json.load(f)
             f.close()
-        newDict = js["installedApps"].append(packageName)
 
-        with open(jsonFile, "w") as f:
-            f.write(json.dumps(js))
-            f.close()
+        for i in js["installedApps"]:
+            if i == packageName:
+                if not self.keyExists(js["installedApps"], i):
+                    newDict = js["installedApps"].append(packageName)
+
+                    with open(jsonFile, "w") as f:
+                        f.write(json.dumps(js))
+                        f.close()
 
     def removePackage(packageName):
         jsonFile = helpers.getCobanPath + "\\packages.json"
         with open(jsonFile, "r") as f:
             js = json.load(f)
             f.close()
-        newDict = js["installedApps"].pop(packageName)
+        try:
+            newDict = js["installedApps"].remove(packageName)
+        except ValueError as e:
+            log.new(e).logError()
+            pass
 
         with open(jsonFile, "w") as f:
             f.write(json.dumps(js))
@@ -75,7 +83,14 @@ class Parser:
 
     def keyExists(array, key):
         try:
-            array[key]
-            return True
+            if isinstance(array, list):
+                for i in array:
+                    if i == key:
+                        return True
+                    else:
+                        return False
+            else:
+                array[key]
+                return True
         except KeyError as e:
             return False
