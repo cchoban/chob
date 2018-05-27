@@ -7,10 +7,11 @@ from . import hash
 
 
 class Manager:
-    def __init__(self, packageName, skipHashes):
+    def __init__(self, packageName, skipHashes, force):
         self.packageName = packageName
         self.skipHashes = skipHashes
-        self.packageScriptName = self.packageName+".cb"
+        self.forceInstallation = force
+        self.packageScriptName = self.packageName + ".cb"
         self.packagePathWithExt = helpers.packageInstallationPath + packageName + "\\" + packageName + ".cb"
         self.packagePathWithoutExt = helpers.packageInstallationPath + packageName + "\\" + packageName
 
@@ -43,8 +44,11 @@ class Manager:
     def isInstalled(self):
         if file.Manager.fileExists(self.packagePathWithExt):
             helpers.infoMessage(
-                "You already installed this package. You can upgrade it by 'coban upgrade " + self.packageName + "'")
-            exit()
+                "You already installed this package. You can upgrade it by 'coban upgrade " + self.packageName + ""
+                "' or by adding '--force' argument to force installation")
+
+            if not self.forceInstallation:
+                exit()
 
     def agreement(self):
 
@@ -76,13 +80,12 @@ class Manager:
             helpers.errorMessage(e)
             exit()
 
-
     def downloadDependencies(self):
         httpClass = http.Http
 
         loadJson = self.scriptFile
         if not file.Manager.fileExists(self.packagePathWithoutExt + "." + loadJson["fileType"]):
-            if helpers.is_os_64bit():
+            if helpers.is_os_64bit() and self.parser.keyExists(self.scriptFile, "downloadUrl64"):
                 if self.parser.keyExists(loadJson, "downloadUrl64"):
                     helpers.infoMessage("Downloading " + self.packageName + " from: " + loadJson["downloadUrl64"])
                     httpClass.download(httpClass, loadJson["downloadUrl64"], self.packagePathWithoutExt,
@@ -90,7 +93,6 @@ class Manager:
             else:
                 helpers.infoMessage("Downloading " + self.packageName + " from: " + loadJson["downloadUrl"])
                 httpClass.download(httpClass, loadJson["downloadUrl"], self.packagePathWithoutExt, loadJson["fileType"])
-
 
     def removePackage(self):
         print(helpers.colors.fg.lightgrey + "Removing following packages:" + helpers.colors.reset)
@@ -100,19 +102,13 @@ class Manager:
         self.cleanLeftOvers(self.packageName)
         helpers.successMessage("Successfully removed " + self.packageName)
 
-    def installExecutable(self, packageName):
-        parser = json.Parser
-        packagePath = helpers.packageInstallationPath + packageName + "\\" + packageName
-        loadJson = parser.fileToJson(parser, packagePath + ".cb")["packageArgs"]
-
+    def installExecutable(self):
         helpers.infoMessage(
-            "Installing " + packageName + ". This will take a moment depends on software your installing. ")
+            "Installing " + self.packageName + ". This will take a moment depends on software your installing. ")
 
-        subprocess.call(packagePath + "." + loadJson["fileType"] + " " + loadJson["silentArgs"], shell=True)
-        parser.addNewPackage(packageName)
-        helpers.successMessage("Successfully installed " + packageName)
-
-
+        subprocess.call(self.packagePathWithoutExt + "." + self.scriptFile["fileType"] + " " + self.scriptFile["silentArgs"], shell=True)
+        self.parser.addNewPackage(self.parser, self.packageName)
+        helpers.successMessage("Successfully installed " + self.packageName)
 
     def uninstallExecutable(self):
         reg = winregistry.Registry
@@ -131,7 +127,6 @@ class Manager:
             "7z": file.Manager.extract7z,
             "zip": file.Manager.extractZip
         }
-
 
         fileName = self.packageName + "." + self.scriptFile["fileType"]
         zipFile = helpers.packageInstallationPath + self.packageName + "\\" + fileName
@@ -165,4 +160,3 @@ class Manager:
                 return True
         except KeyError as e:
             pass
-

@@ -12,6 +12,7 @@ parser.add_argument("-S", type=str, help="install a package")
 parser.add_argument("-R", type=str, help="Remove a package")
 parser.add_argument("-Scc", help="Clean's unused files", action="store_true")
 parser.add_argument("-skipHash", help="Skips of checking hash for files", action="store_true")
+parser.add_argument("--force", help="Forces a installation of package", action="store_true")
 arg = parser.parse_args()
 
 programList = helpers.programList()
@@ -21,7 +22,7 @@ dependenciesList = helpers.dependenciesList()
 
 
 if not arg.S == None:
-    packageManager = PackageManager.Manager(arg.S, arg.skipHash)
+    packageManager = PackageManager.Manager(arg.S, arg.skipHash, arg.force)
     packageManager.installPackage()
 
 if not arg.R == None:
