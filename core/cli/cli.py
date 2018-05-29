@@ -19,5 +19,5 @@ class main:
         helpers.successMessage("Fixed problems..")
 
     def cleanLeftOvers(self):
-        fileManager = FileManager.Manager
+        fileManager = FileManager.Manager().cleanup()
 

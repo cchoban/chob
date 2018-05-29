@@ -13,7 +13,7 @@ class doctor:
             "packages": helpers.getCobanPath + "\\packages.json"
         }
     def createFolders(self):
-        file = FileManager.Manager
+        file = FileManager.Manager()
 
         for i in self.folders:
             if not file.fileExists(self.folders[i]):
@@ -21,7 +21,7 @@ class doctor:
                 file.createFolder(self.folders[i])
 
     def validateJsonFiles(self):
-        file = FileManager.Manager
+        file = FileManager.Manager()
         for i in self.files:
             json = JsonParser.Parser(self.files[i])
             if file.fileExists(self.files[i]):
@@ -34,7 +34,7 @@ class doctor:
                 self.createFiles()
 
     def createFiles(self):
-        file = FileManager.Manager
+        file = FileManager.Manager()
 
         for i in self.files:
             if not file.fileExists(self.files[i]):
