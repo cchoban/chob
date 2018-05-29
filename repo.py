@@ -1,6 +1,9 @@
+import helpers
+
 def repos():
     return {
-        "programList": "C:/Users/Muhammed Kaplan/Desktop/coban-package-manager/programList.json",
-        "installedApps": "C:/Users/Muhammed Kaplan/Desktop/coban-package-manager/installedList.json",
-        "dependencies": "C:/Users/Muhammed Kaplan/Desktop/coban-package-manager/dependencies.json"
+        "localProgramlist": helpers.getCobanPath+"\\programList.json",
+        "localInstalledApps": helpers.getCobanPath+"\\packages.json",
+        "dependencies": "C:/Users/Muhammed Kaplan/Desktop/coban-package-manager/dependencies.json",
+        "programList": "http://www.mrmkaplan.com/programList.json"
     }

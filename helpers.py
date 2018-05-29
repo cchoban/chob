@@ -62,7 +62,7 @@ def redColor(message):
     return print(colors.fg.red+colors.bold+message+colors.reset)
 
 def programList():
-    js = JsonParser.Parser(repo.repos()["programList"])
+    js = JsonParser.Parser(repo.repos()["localProgramlist"])
 
     if js.isValid() == True:
         return js.fileToJson()
@@ -70,7 +70,7 @@ def programList():
         exit(colors.bg.red + "JSON is not valid! Please run 'coban doctor'" + colors.reset)
 
 def installedApps():
-    js = JsonParser.Parser(repo.repos()["installedApps"])
+    js = JsonParser.Parser(repo.repos()["localInstalledApps"])
 
     if js.isValid() == True:
         return js.fileToJson()
