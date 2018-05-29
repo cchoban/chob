@@ -2,6 +2,9 @@ import os, helpers, zipfile
 from shutil import rmtree
 from Logger import Logger
 from subprocess import run, DEVNULL
+from Logger import Logger as log
+from json import dumps
+from core import JsonParser as js
 class Manager:
     def fileExists(path=""):
         try:
@@ -20,6 +23,22 @@ class Manager:
         except Exception as e:
             helpers.errorMessage(e.strerror)
             exit()
+    def createFile(path, content =""):
+        try:
+            if not os.path.exists(path):
+                with open(path, "w") as f:
+                    f.write(content)
+                    f.close()
+        except Exception as e:
+            log.new(e).logError()
+            exit()
+
+    def createJsonFile(self, path, withDict = {}):
+        try:
+            self.createFile(dumps(withDict))
+        except FileNotFoundError or PermissionError or Exception as e:
+            log.new(e).logError()
+            helpers.errorMessage(e)
 
     def removeDir(self, path):
         if self.fileExists(path):
