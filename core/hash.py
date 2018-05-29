@@ -13,11 +13,11 @@ class check:
 
     def parseHash(self, packageName):
         packagePath = helpers.packageInstallationPath + packageName + "\\" + packageName
-        parser = json.Parser
+        parser = json.Parser()
 
-        loadJson = parser.fileToJson(parser, packagePath + ".cb")["packageArgs"]
+        loadJson = parser.fileToJson(packagePath + ".cb")["packageArgs"]
         try:
-            if json.Parser.keyExists(loadJson, "downloadUrl64"):
+            if json.Parser().keyExists(loadJson, "downloadUrl64"):
                 loadJson["checksum64"]
                 loadJson["checksumType64"]
 
@@ -35,8 +35,8 @@ class check:
 
     def calculate(self, packageName):
         packagePath = helpers.packageInstallationPath + packageName + "\\" + packageName
-        parser = json.Parser
-        loadJson = parser.fileToJson(parser, packagePath + ".cb")["packageArgs"]
+        parser = json.Parser()
+        loadJson = parser.fileToJson(packagePath + ".cb")["packageArgs"]
 
         with open(packagePath + "." + loadJson["fileType"], "rb") as f:
             calculatedHash = self.hashType(f.read()).hexdigest()

@@ -4,7 +4,7 @@ from . import FileManager as file
 from . import JsonParser as json
 from windows import winregistry
 from . import hash
-
+from Logger import Logger as log
 
 class Manager:
     def __init__(self, packageName, skipHashes, force):
@@ -15,9 +15,9 @@ class Manager:
         self.packagePathWithExt = helpers.packageInstallationPath + packageName + "\\" + packageName + ".cb"
         self.packagePathWithoutExt = helpers.packageInstallationPath + packageName + "\\" + packageName
 
-        self.parser = json.Parser
+        self.parser = json.Parser()
         if file.Manager.fileExists(self.packagePathWithExt):
-            self.scriptFile = self.parser.fileToJson(self.parser, self.packagePathWithExt)["packageArgs"]
+            self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
 
     def installPackage(self):
         installable = {
@@ -32,23 +32,24 @@ class Manager:
             helpers.colors.fg.lightgrey + "By installing you accept licenses for the packages." + helpers.colors.reset)
 
         self.agreement()
-        self.isInstalled()
-        self.getInstallationScript()
-        self.downloadDependencies()
-        self.checkHash()
-
-        for i in installable:
-            if json.Parser.keyExists(self.scriptFile, i) or self.scriptFile["fileType"] == i:
-                return installable[i]()
-
-    def isInstalled(self):
-        if file.Manager.fileExists(self.packagePathWithExt):
+        if not self.isInstalled():
+            self.getInstallationScript()
+            self.downloadDependencies()
+            self.checkHash()
+            for i in installable:
+                if json.Parser().keyExists(self.scriptFile, i) or self.scriptFile["fileType"] == i:
+                    return installable[i]()
+        else:
             helpers.infoMessage(
                 "You already installed this package. You can upgrade it by 'coban upgrade " + self.packageName + ""
                 "' or by adding '--force' argument to force installation")
 
-            if not self.forceInstallation:
-                exit()
+
+    def isInstalled(self):
+        if self.parser.keyExists(helpers.installedApps()["installedApps"], self.packageName):
+            return True
+        else:
+            return False
 
     def agreement(self):
 
@@ -74,7 +75,7 @@ class Manager:
             helpers.infoMessage("Downloading Installation Script of: " + self.packageScriptName)
             http.Http.download(http.Http, packageUrl,
                                helpers.packageInstallationPath + self.packageName + "\\" + self.packageScriptName, "")
-            self.scriptFile = self.parser.fileToJson(self.parser, self.packagePathWithExt)["packageArgs"]
+            self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
         except KeyError as e:
             e = "This program does not exists on your list. Please update your lists with 'coban update' "
             helpers.errorMessage(e)
@@ -98,29 +99,37 @@ class Manager:
         print(helpers.colors.fg.lightgrey + "Removing following packages:" + helpers.colors.reset)
         helpers.redColor(self.packageName)
 
-        self.uninstallExecutable(self.packageName)
-        self.cleanLeftOvers(self.packageName)
-        helpers.successMessage("Successfully removed " + self.packageName)
+        if self.isInstalled():
+            self.uninstallExecutable()
+            helpers.successMessage("Successfully uninstalled "+ self.packageName)
+        else:
+            helpers.infoMessage("There is no packages with name of "+self.packageName)
+
 
     def installExecutable(self):
         helpers.infoMessage(
             "Installing " + self.packageName + ". This will take a moment depends on software your installing. ")
-
+        print(self.packagePathWithoutExt + "." + self.scriptFile["fileType"] + " " + self.scriptFile["silentArgs"])
         subprocess.call(self.packagePathWithoutExt + "." + self.scriptFile["fileType"] + " " + self.scriptFile["silentArgs"], shell=True)
-        self.parser.addNewPackage(self.parser, self.packageName)
+        self.parser.addNewPackage(self.packageName)
         helpers.successMessage("Successfully installed " + self.packageName)
 
     def uninstallExecutable(self):
         reg = winregistry.Registry
         package = reg.searchForSoftware(reg, self.packageName)
 
-        subprocess.call(package["UninstallString"] + " " + self.scriptFile["packageUninstallArgs"]["silentArgs"])
-        self.parser.removePackage(self.packageName)
+        if package:
+            try:
+                subprocess.call(package["UninstallString"] + " " + self.scriptFile["packageUninstallArgs"]["silentArgs"])
+                helpers.successMessage("Successfully removed " + self.packageName)
 
-    def cleanLeftOvers(self):
-        packagePath = helpers.packageInstallationPath + self.packageName
-        fileManager = file.Manager
-        fileManager.removeDir(fileManager, packagePath)
+            except KeyError or Exception as e:
+                log.new(e).logError()
+            self.parser.removePackage()
+        else:
+            helpers.infoMessage("Skipping uninstaller process - No registry key found.")
+            helpers.infoMessage("Cleanup left overs..")
+            self.parser.removePackage(self.packageName)
 
     def unzipPackage(self):
         extensions = {
@@ -149,7 +158,7 @@ class Manager:
 
     def checkHash(self):
         try:
-            if json.Parser.keyExists(self.scriptFile, "downloadUrl64"):
+            if json.Parser().keyExists(self.scriptFile, "downloadUrl64"):
                 hashedKey = self.scriptFile["checksum64"]
             else:
                 hashedKey = self.scriptFile["checksum"]
