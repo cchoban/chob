@@ -2,6 +2,8 @@ import json
 from . import FileManager
 import helpers
 from Logger import Logger as log
+
+
 class Parser:
     def __init__(self, path=""):
         self.path = path
@@ -16,8 +18,10 @@ class Parser:
                     return convertToJSON
 
                 except Exception as e:
-                    helpers.errorMessage("Could not parse JSON file while trying to convert it: "+ path, True)
-                    exit()
+                    log.new(e).logError()
+                    helpers.errorMessage("Could not parse JSON file while trying to convert it: " + path, True)
+                    return False
+
         else:
             with open(self.path, "r") as f:
                 try:
@@ -25,14 +29,17 @@ class Parser:
                     return convertToJSON
 
                 except Exception as e:
-                    helpers.errorMessage("Could not parse JSON file while trying to convert it: "+path, True)
-                    exit()
+                    log.new(e).logError()
+                    helpers.errorMessage("Could not parse JSON file while trying to convert it: " + path, True)
+                    return False
 
     def isValid(self):
         try:
-            self.fileToJson()
-            return True
-        except ValueError as e:
+            if self.fileToJson():
+                return True
+            else:
+                return False
+        except Exception as e:
             return False
 
     def rewriteJson(self):
@@ -43,30 +50,28 @@ class Parser:
                 f.close()
         except OSError as e:
             exit(e)
+
     def getKey(self, key, path):
         dict = self.fileToJson(path)
 
         try:
             dict["packageArgs"][key]
         except KeyError as e:
-            exit(key+" does not exists")
+            exit(key + " does not exists")
 
     def addNewPackage(self, packageName):
-        jsonFile = helpers.getCobanPath+"\\packages.json"
-        with open(jsonFile, "r") as f:
-            js = json.load(f)
-            f.close()
+        jsonFile = helpers.getCobanPath + "\\packages.json"
+        js = helpers.installedApps()
 
-        for i in js["installedApps"]:
-            if i == packageName:
-                if not self.keyExists(js["installedApps"], i):
-                    newDict = js["installedApps"].append(packageName)
+        if not packageName in js["installedApps"]:
+            print(js)
+            js["installedApps"].append(packageName)
 
-                    with open(jsonFile, "w") as f:
-                        f.write(json.dumps(js))
-                        f.close()
+            with open(jsonFile, "w") as f:
+                f.write(json.dumps(js))
+                f.close()
 
-    def removePackage(packageName):
+    def removePackage(self, packageName):
         jsonFile = helpers.getCobanPath + "\\packages.json"
         with open(jsonFile, "r") as f:
             js = json.load(f)
@@ -81,16 +86,8 @@ class Parser:
             f.write(json.dumps(js))
             f.close()
 
-    def keyExists(array, key):
-        try:
-            if isinstance(array, list):
-                for i in array:
-                    if i == key:
-                        return True
-                    else:
-                        return False
-            else:
-                array[key]
-                return True
-        except KeyError as e:
+    def keyExists(self, array, key):
+        if key in array:
+            return True
+        else:
             return False
