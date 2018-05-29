@@ -1,10 +1,7 @@
-import subprocess, sys, hashlib, helpers
-from . import http
+import helpers
 from . import FileManager as file
 from . import JsonParser as json
-from windows import winregistry
 from . import hash
-from Logger import Logger as log
 
 class Manager:
     def __init__(self, packageName, skipHashes, force):
@@ -16,34 +13,8 @@ class Manager:
         self.packagePathWithoutExt = helpers.packageInstallationPath + packageName + "\\" + packageName
 
         self.parser = json.Parser()
-        if file.Manager.fileExists(self.packagePathWithExt):
+        if file.Manager().fileExists(self.packagePathWithExt):
             self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
-
-    def installPackage(self):
-        installable = {
-            "exe": self.installExecutable,
-            "msi": self.installExecutable,
-            "unzip": self.unzipPackage
-        }
-
-        print(helpers.colors.fg.lightgrey + "Installing following packages:" + helpers.colors.reset)
-        helpers.successMessage(self.packageName)
-        print(
-            helpers.colors.fg.lightgrey + "By installing you accept licenses for the packages." + helpers.colors.reset)
-
-        self.agreement()
-        if not self.isInstalled():
-            self.getInstallationScript()
-            self.downloadDependencies()
-            self.checkHash()
-            for i in installable:
-                if json.Parser().keyExists(self.scriptFile, i) or self.scriptFile["fileType"] == i:
-                    return installable[i]()
-        else:
-            helpers.infoMessage(
-                "You already installed this package. You can upgrade it by 'coban upgrade " + self.packageName + ""
-                "' or by adding '--force' argument to force installation")
-
 
     def isInstalled(self):
         if self.parser.keyExists(helpers.installedApps()["installedApps"], self.packageName):
@@ -51,110 +22,18 @@ class Manager:
         else:
             return False
 
-    def agreement(self):
+    def agreement(self, action="install"):
 
         yes = {'yes', 'y', 'ye', ''}
         no = {'no', 'n'}
 
-        choice = input("Do you want to install " + self.packageName + "? [Y/N]").lower()
+        choice = input("Do you want to " + action + " " + self.packageName + "? [Y/N]").lower()
         if choice in yes:
             return True
         elif choice in no:
-            exit()
+            return False
         else:
-            sys.stdout.write("Please respond with 'yes' or 'no'")
-            exit()
-
-    def getInstallationScript(self):
-        try:
-            if self.isInstalled():
-                return self.packagePathWithExt
-
-            packageUrl = helpers.programList()[self.packageName]
-            file.Manager.createFolder(helpers.packageInstallationPath + self.packageName)
-            helpers.infoMessage("Downloading Installation Script of: " + self.packageScriptName)
-            http.Http.download(http.Http, packageUrl,
-                               helpers.packageInstallationPath + self.packageName + "\\" + self.packageScriptName, "")
-            self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
-        except KeyError as e:
-            e = "This program does not exists on your list. Please update your lists with 'coban update' "
-            helpers.errorMessage(e)
-            exit()
-
-    def downloadDependencies(self):
-        httpClass = http.Http
-
-        loadJson = self.scriptFile
-        if not file.Manager.fileExists(self.packagePathWithoutExt + "." + loadJson["fileType"]):
-            if helpers.is_os_64bit() and self.parser.keyExists(self.scriptFile, "downloadUrl64"):
-                if self.parser.keyExists(loadJson, "downloadUrl64"):
-                    helpers.infoMessage("Downloading " + self.packageName + " from: " + loadJson["downloadUrl64"])
-                    httpClass.download(httpClass, loadJson["downloadUrl64"], self.packagePathWithoutExt,
-                                       loadJson["fileType"])
-            else:
-                helpers.infoMessage("Downloading " + self.packageName + " from: " + loadJson["downloadUrl"])
-                httpClass.download(httpClass, loadJson["downloadUrl"], self.packagePathWithoutExt, loadJson["fileType"])
-
-    def removePackage(self):
-        print(helpers.colors.fg.lightgrey + "Removing following packages:" + helpers.colors.reset)
-        helpers.redColor(self.packageName)
-
-        if self.isInstalled():
-            self.uninstallExecutable()
-            helpers.successMessage("Successfully uninstalled "+ self.packageName)
-        else:
-            helpers.infoMessage("There is no packages with name of "+self.packageName)
-
-
-    def installExecutable(self):
-        helpers.infoMessage(
-            "Installing " + self.packageName + ". This will take a moment depends on software your installing. ")
-        print(self.packagePathWithoutExt + "." + self.scriptFile["fileType"] + " " + self.scriptFile["silentArgs"])
-        subprocess.call(self.packagePathWithoutExt + "." + self.scriptFile["fileType"] + " " + self.scriptFile["silentArgs"], shell=True)
-        self.parser.addNewPackage(self.packageName)
-        helpers.successMessage("Successfully installed " + self.packageName)
-
-    def uninstallExecutable(self):
-        reg = winregistry.Registry
-        package = reg.searchForSoftware(reg, self.packageName)
-
-        if package:
-            try:
-                subprocess.call(package["UninstallString"] + " " + self.scriptFile["packageUninstallArgs"]["silentArgs"])
-                helpers.successMessage("Successfully removed " + self.packageName)
-
-            except KeyError or Exception as e:
-                log.new(e).logError()
-            self.parser.removePackage()
-        else:
-            helpers.infoMessage("Skipping uninstaller process - No registry key found.")
-            helpers.infoMessage("Cleanup left overs..")
-            self.parser.removePackage(self.packageName)
-
-    def unzipPackage(self):
-        extensions = {
-            "7z": file.Manager.extract7z,
-            "zip": file.Manager.extractZip
-        }
-
-        fileName = self.packageName + "." + self.scriptFile["fileType"]
-        zipFile = helpers.packageInstallationPath + self.packageName + "\\" + fileName
-
-        for i in extensions:
-            if i == self.scriptFile["fileType"]:
-                if (self.parser.keyExists(self.scriptFile, "unzipPath")):
-                    helpers.infoMessage(
-                        "Unzipping  " + fileName + " to " + helpers.getToolsPath + "\\" + self.packageName)
-                    extensions[i](zipFile, self.scriptFile["unzipPath"])
-                    helpers.successMessage(
-                        "Sucessfully unzipped " + fileName)
-                else:
-                    helpers.infoMessage(
-                        "Unzipping  " + fileName + " to " + helpers.getToolsPath + "\\" + self.packageName)
-                    extensions[i](zipFile, helpers.getToolsPath + "\\" + self.packageName)
-
-                    helpers.successMessage(
-                        "Sucessfully unzipped " + fileName)
+            exit("Please respond with 'yes' or 'no'")
 
     def checkHash(self):
         try:
@@ -169,3 +48,4 @@ class Manager:
                 return True
         except KeyError as e:
             pass
+
