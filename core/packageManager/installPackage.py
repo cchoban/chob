@@ -90,7 +90,7 @@ class main(PackageManager.Manager):
     def installExecutable(self):
         helpers.infoMessage(
             "Installing " + self.packageName + ". This will take a moment depends on software your installing. ")
-        print(self.packagePathWithoutExt + "." + self.scriptFile["fileType"] + " " + self.scriptFile["silentArgs"])
+
         subprocess.call(
             self.packagePathWithoutExt + "." + self.scriptFile["fileType"] + " " + self.scriptFile["silentArgs"],
             shell=True)

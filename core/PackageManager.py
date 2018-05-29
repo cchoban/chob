@@ -27,7 +27,9 @@ class Manager:
         yes = {'yes', 'y', 'ye', ''}
         no = {'no', 'n'}
 
-        choice = input("Do you want to " + action + " " + self.packageName + "? [Y/N]").lower()
+        text = helpers.infoMessage("Do you want to " + action + " " + self.packageName + "? [Y/N]")
+        print(text)
+        choice = input("").lower()
         if choice in yes:
             return True
         elif choice in no:
