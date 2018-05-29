@@ -1,9 +1,10 @@
 import errno, os, winreg, re
+from Logger import Logger as log
 
 
 class Registry:
 
-    def installedSoftware():
+    def installedSoftware(self):
         properties = {}
         key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", 0,
                              winreg.KEY_READ)
@@ -29,16 +30,19 @@ class Registry:
 
     def searchForSoftware(self, packageName):
         data = {}
-        for prod in self.installedSoftware():
+        for prod in self.installedSoftware(self):
+            try:
+                m = re.search("\b"+packageName.lower()+"\b", str(prod.lower()))
 
-            m = re.search(packageName.lower(), prod.lower())
+                if m:
+                    print(m.group())
+                    newData = {
+                        "PackageName": prod,
+                        "UninstallString": self.installedSoftware(self)[prod]
+                    }
 
-            if m:
-                newData = {
-                    "PackageName": prod,
-                    "UninstallString": self.installedSoftware()[prod]
-                }
-
-                data.update(newData)
-
-        return data
+                    data.update(newData)
+                    return data
+            except Exception as e:
+                log.new(e).logError()
+                pass
