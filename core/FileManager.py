@@ -4,26 +4,26 @@ from Logger import Logger
 from subprocess import run, DEVNULL
 from Logger import Logger as log
 from json import dumps
-from core import JsonParser as js
+
+
 class Manager:
-    def fileExists(path=""):
+    def fileExists(self, path=""):
         try:
             if os.path.exists(path):
                 return True
             else:
                 return False
         except FileNotFoundError as e:
-            helpers.errorMessage(e.strerror)
             exit()
 
-    def createFolder(path):
+    def createFolder(self, path):
         try:
             if not os.path.exists(path):
                 os.makedirs(path)
         except Exception as e:
-            helpers.errorMessage(e.strerror)
             exit()
-    def createFile(path, content =""):
+
+    def createFile(self, path, content=""):
         try:
             if not os.path.exists(path):
                 with open(path, "w") as f:
@@ -31,14 +31,12 @@ class Manager:
                     f.close()
         except Exception as e:
             log.new(e).logError()
-            exit()
 
-    def createJsonFile(self, path, withDict = {}):
+    def createJsonFile(self, path, withDict={}):
         try:
             self.createFile(dumps(withDict))
         except FileNotFoundError or PermissionError or Exception as e:
             log.new(e).logError()
-            helpers.errorMessage(e)
 
     def removeDir(self, path):
         if self.fileExists(path):
@@ -46,25 +44,40 @@ class Manager:
                 rmtree(path)
                 os.removedirs(path)
             except FileNotFoundError or WindowsError or PermissionError or Exception as e:
-                helpers.errorMessage(e.strerror, True)
-                exit()
+                log.new(e).logError()
         else:
-            helpers.infoMessage("Path does not exists while trying to remove it: "+path, True)
+            helpers.infoMessage("Path does not exists while trying to remove it: " + path, True)
 
-    def extractZip(zip, dest):
+    def extractZip(self, zip, dest):
         try:
+            helpers.infoMessage("Unzipping " + zip + " to " + dest)
             zf = zipfile.ZipFile(zip, "r")
             zf = zipfile.ZipFile.extractall(dest)
+            helpers.successMessage("Successfully unzipped " + zip + " to " + dest)
         except WindowsError or PermissionError or FileNotFoundError as e:
             Logger.new(e).logError()
-            helpers.errorMessage(e.strerror)
             exit()
 
-    def extract7z(zip, dest):
+    def extract7z(self, zip, dest):
         try:
-            processArgs = helpers.getCobanBinFolder+"7z.exe e "+zip+" -o"+dest+" -y"
+            processArgs = helpers.getCobanBinFolder + "7z.exe e " + zip + " -o" + dest + " -y"
+            helpers.infoMessage("Unzipping " + zip + " to " + dest)
             runProcess = run(processArgs, stdout=DEVNULL, stderr=DEVNULL)
+            helpers.successMessage("Successfully unzipped " + zip + " to " + dest)
         except WindowsError or PermissionError or FileNotFoundError as e:
             Logger.new(e).logError()
-            helpers.errorMessage(e.strerror)
             exit()
+
+    def cleanup(self):
+        packagesPath = helpers.getCobanPath+"\\packages\\"
+        for i in helpers.installedApps()["installedApps"]:
+            path = packagesPath+i
+            if self.fileExists(path):
+                self.removeDir(path)
+                helpers.successMessage("Removed: " + i)
+
+        for i in os.listdir(packagesPath):
+            path = packagesPath+i
+            if not i in helpers.installedApps()["installedApps"]:
+                self.removeDir(path)
+                helpers.successMessage("Removed: "+i)
