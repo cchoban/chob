@@ -5,6 +5,7 @@ from core import http
 from core import FileManager as file
 from Logger import Logger as log
 
+
 class main(PackageManager.Manager):
 
     def isInstallable(self):
@@ -25,20 +26,21 @@ class main(PackageManager.Manager):
             log.new(e).logError()
 
     def installer(self):
-            if self.agreement() == True:
-                if not self.isInstalled():
-                    self.getInstallationScript()
-                    if self.isInstallable():
+        if self.agreement() == True:
+            if not self.isInstalled():
+                self.getInstallationScript()
+                if self.isInstallable():
+                    self.download()
+                    self.checkHash()
+                    if self.checkForDependencies():
                         self.downloadDependencies()
-                        self.checkHash()
-                        self.beginAction()
-                    else:
-                        exit("This kind of package is not installable.")
+                    self.beginAction()
                 else:
-                    helpers.alreadyInstalled(self.packageName)
+                    exit("This kind of package is not installable.")
             else:
-                exit("You need to accept to contiune installation.")
-
+                helpers.alreadyInstalled(self.packageName)
+        else:
+            exit("You need to accept to contiune installation.")
 
     def getInstallationScript(self):
         try:
@@ -48,7 +50,7 @@ class main(PackageManager.Manager):
             packageUrl = helpers.programList()[self.packageName]
             file.Manager().createFolder(helpers.packageInstallationPath + self.packageName)
             helpers.infoMessage("Downloading Installation Script of: " + self.packageScriptName)
-            #TODO: fix http self
+            # TODO: fix http self
             http.Http.download(http.Http, packageUrl,
                                helpers.packageInstallationPath + self.packageName + "\\" + self.packageScriptName, "")
             self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
@@ -57,12 +59,14 @@ class main(PackageManager.Manager):
             helpers.errorMessage(e)
             exit()
 
-    def downloadDependencies(self):
+    def download(self):
         httpClass = http.Http
 
         loadJson = self.scriptFile
+        print(loadJson)
         if not file.Manager().fileExists(self.packagePathWithoutExt + "." + loadJson["fileType"]):
             if helpers.is_os_64bit() and self.parser.keyExists(self.scriptFile, "downloadUrl64"):
+                # FIXME: wrong detection
                 if self.parser.keyExists(loadJson, "downloadUrl64"):
                     helpers.infoMessage("Downloading " + self.packageName + " from: " + loadJson["downloadUrl64"])
                     httpClass.download(httpClass, loadJson["downloadUrl64"], self.packagePathWithoutExt,
@@ -101,3 +105,24 @@ class main(PackageManager.Manager):
         for i in self.installable:
             if json.Parser().keyExists(self.scriptFile, i) or self.scriptFile["fileType"] == i:
                 return self.installable[i]()
+
+    def checkForDependencies(self):
+        if self.parser.keyExists(self.scriptFile, "dependencies"):
+            for i in self.scriptFile["dependencies"]:
+                if i in helpers.programList() and i not in helpers.installedApps()["installedApps"]:
+                    helpers.infoMessage("Found dependencies: " + i)
+                    self.oldPackageName = self.packageName
+                    self.packageName = i
+                    return True
+
+    def downloadDependencies(self):
+        downloadDependencies(self.packageName, self.skipHashes, self.forceInstallation).run(self.oldPackageName)
+
+class downloadDependencies(main):
+    def run(self, oldPackageName):
+        try:
+            installer = self.installer()
+            self.packageName = oldPackageName
+            self.installer()
+        except Exception as e:
+            log.new(e).logError()

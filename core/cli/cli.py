@@ -11,7 +11,7 @@ class main:
         http.Http.download(http.Http, repo.repos()["programList"], helpers.getCobanPath+"\\programList", "json")
 
     def doctor(self):
-        self.update(self)
+        self.update()
         doc = doctor.doctor()
         doc.createFolders()
         doc.validateJsonFiles()

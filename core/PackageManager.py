@@ -2,10 +2,11 @@ import helpers
 from . import FileManager as file
 from . import JsonParser as json
 from . import hash
-
+from core.packageManager import installPackage
 class Manager:
     def __init__(self, packageName, skipHashes, force):
         self.packageName = packageName
+        self.oldPackageName = None
         self.skipHashes = skipHashes
         self.forceInstallation = force
         self.packageScriptName = self.packageName + ".cb"
@@ -50,4 +51,3 @@ class Manager:
                 return True
         except KeyError as e:
             pass
-
