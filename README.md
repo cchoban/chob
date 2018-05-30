@@ -2,10 +2,8 @@
 It's a basic package manager inspired from Arch Linux pacman, built with Python for Windows platform. You can easily install, remove, upgrade packages with only few commands.
 
 ## What Packages Are Available?
-1. Type `brew search` for a list.
-2. Or visit [formulae.brew.sh](https://formulae.brew.sh) to browse packages online.
-3. Or use `brew search --desc <keyword>` to browse packages from the command line.
-
+1. Type `main.py --packages` for a list.
+2. Type `main.py -Ss <packageName>` for searching a specific package.
 ## More Documentation
 It will be available soon with the first release.
 
