@@ -40,7 +40,6 @@ class check:
 
         with open(packagePath + "." + loadJson["fileType"], "rb") as f:
             calculatedHash = self.hashType(f.read()).hexdigest()
-            print(self.hash)
 
         if not self.hash.lower() == calculatedHash:
             if not self.skipHashes == True:

@@ -6,7 +6,7 @@ from urllib.request import urlretrieve
 
 class Http:
 
-    def __init__(self, url, path):
+    def __init__(self, url="", path=""):
         self.url = url
         self.path = path
 

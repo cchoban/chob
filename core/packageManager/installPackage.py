@@ -48,22 +48,23 @@ class main(PackageManager.Manager):
                 return self.packagePathWithExt
 
             packageUrl = helpers.programList()[self.packageName]
-            file.Manager().createFolder(helpers.packageInstallationPath + self.packageName)
+
+            if not file.Manager().fileExists(helpers.packageInstallationPath + self.packageName):
+                file.Manager().createFolder(helpers.packageInstallationPath + self.packageName)
             helpers.infoMessage("Downloading Installation Script of: " + self.packageScriptName)
             # TODO: fix http self
             http.Http.download(http.Http, packageUrl,
                                helpers.packageInstallationPath + self.packageName + "\\" + self.packageScriptName, "")
             self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
-        except KeyError as e:
-            e = "This program does not exists on your list. Please update your lists with 'coban update' "
-            helpers.errorMessage(e)
-            exit()
+
+        except Exception as e:
+            log.new(e).logError()
 
     def download(self):
         httpClass = http.Http
 
         loadJson = self.scriptFile
-        print(loadJson)
+
         if not file.Manager().fileExists(self.packagePathWithoutExt + "." + loadJson["fileType"]):
             if helpers.is_os_64bit() and self.parser.keyExists(self.scriptFile, "downloadUrl64"):
                 # FIXME: wrong detection
@@ -116,13 +117,25 @@ class main(PackageManager.Manager):
                     return True
 
     def downloadDependencies(self):
-        downloadDependencies(self.packageName, self.skipHashes, self.forceInstallation).run(self.oldPackageName)
+        downloadDependencies(self.packageName, self.skipHashes, self.forceInstallation, True).run()
+        downloadDependencies(self.oldPackageName, self.skipHashes, self.forceInstallation, True).installPackage()
+
+        try:
+            super(main(self.oldPackageName, self.skipHashes, self.forceInstallation, True).installer())
+        except Exception as e:
+            log.new(e).logError()
+
 
 class downloadDependencies(main):
-    def run(self, oldPackageName):
+    def run(self):
         try:
             installer = self.installer()
-            self.packageName = oldPackageName
-            self.installer()
+        except Exception as e:
+            log.new(e).logError()
+
+    def installPackage(self):
+        try:
+            self.packageName = self.oldPackageName
+            installer = self.installer()
         except Exception as e:
             log.new(e).logError()

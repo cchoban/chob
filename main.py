@@ -12,6 +12,7 @@ parser.add_argument("-S", type=str, help="Install a package")
 parser.add_argument("--update", action="store_true", help="Update package repo list to get updated.")
 parser.add_argument("--doctor", action="store_true", help="Fixes common problems.")
 parser.add_argument("--clean", action="store_true", help="Cleans caching of packages.")
+parser.add_argument("-y", action="store_true", help="Skips agreements")
 
 # parser.add_argument("-Ss", nargs='+', help="install a package")
 #TODO: add multiple installation of packages
@@ -25,10 +26,10 @@ arg = parser.parse_args()
 
 
 if arg.S:
-    installPackage.main(arg.S, arg.skipHash, arg.force).installer()
+    installPackage.main(arg.S, arg.skipHash, arg.force, arg.y).installer()
 
 if arg.R:
-    removePackage.main(arg.R, arg.skipHash, arg.force).uninstaller()
+    removePackage.main(arg.R, arg.skipHash, arg.force, arg.y).uninstaller()
 
 if arg.doctor:
     cli.main().doctor()

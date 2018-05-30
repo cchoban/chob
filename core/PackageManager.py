@@ -2,12 +2,14 @@ import helpers
 from . import FileManager as file
 from . import JsonParser as json
 from . import hash
-from core.packageManager import installPackage
+
+
 class Manager:
-    def __init__(self, packageName, skipHashes, force):
+    def __init__(self, packageName, skipHashes, force, agreements):
         self.packageName = packageName
         self.oldPackageName = None
         self.skipHashes = skipHashes
+        self.skipAgreements = agreements
         self.forceInstallation = force
         self.packageScriptName = self.packageName + ".cb"
         self.packagePathWithExt = helpers.packageInstallationPath + packageName + "\\" + packageName + ".cb"
@@ -15,7 +17,8 @@ class Manager:
 
         self.parser = json.Parser()
         if file.Manager().fileExists(self.packagePathWithExt):
-            self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
+            if json.Parser(self.packagePathWithExt).isValid():
+                self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
 
     def isInstalled(self):
         if self.parser.keyExists(helpers.installedApps()["installedApps"], self.packageName):
@@ -24,6 +27,9 @@ class Manager:
             return False
 
     def agreement(self, action="install"):
+        if self.skipAgreements:
+            return True
+
 
         yes = {'yes', 'y', 'ye', ''}
         no = {'no', 'n'}
