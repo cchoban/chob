@@ -13,6 +13,7 @@ parser.add_argument("--update", action="store_true", help="Update package repo l
 parser.add_argument("--doctor", action="store_true", help="Fixes common problems.")
 parser.add_argument("--clean", action="store_true", help="Cleans caching of packages.")
 parser.add_argument("-y", action="store_true", help="Skips agreements")
+parser.add_argument("--packages", action="store_true", help="Lists all available packages.")
 
 # parser.add_argument("-Ss", nargs='+', help="install a package")
 #TODO: add multiple installation of packages
@@ -39,7 +40,9 @@ if arg.update:
 
 if arg.clean:
    cli.main().cleanLeftOvers()
-   
+
+if arg.packages:
+    cli.main().packages()
 # elif arg.cmd == "install":
 #     packageInstallation(arg.cmd)
 # elif arg.cmd == "remove":
