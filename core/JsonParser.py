@@ -19,7 +19,7 @@ class Parser:
 
                 except Exception as e:
                     log.new(e).logError()
-                    helpers.errorMessage("Could not parse JSON file while trying to convert it: " + path, True)
+                    helpers.errorMessage("Could not parse JSON file while trying to convert it: " + self.path, True)
                     return False
 
         else:
@@ -30,7 +30,7 @@ class Parser:
 
                 except Exception as e:
                     log.new(e).logError()
-                    helpers.errorMessage("Could not parse JSON file while trying to convert it: " + path, True)
+                    helpers.errorMessage("Could not parse JSON file while trying to convert it: " + self.path, True)
                     return False
 
     def isValid(self):
