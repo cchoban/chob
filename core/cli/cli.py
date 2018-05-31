@@ -45,3 +45,13 @@ class main:
             if regex:
                 helpers.successMessage("Found this package(s): ")
                 print(i)
+
+    def downloadScript(self, packageName):
+        packageUrl = helpers.programList()[packageName]
+
+        if not FileManager.Manager().fileExists(helpers.packageInstallationPath + packageName):
+            FileManager.Manager().createFolder(helpers.packageInstallationPath + packageName)
+        helpers.infoMessage("Downloading Installation Script of: " + packageName + ".cb")
+
+        http.Http.download(http.Http, packageUrl,
+                           helpers.packageInstallationPath + packageName + "\\" + packageName, "cb")

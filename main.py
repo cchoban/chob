@@ -1,6 +1,8 @@
 import argparse, helpers
 from core.cli import cli
 from core.packageManager import installPackage, removePackage
+from core import PackageManager 
+
 
 if not helpers.has_admin():
     helpers.errorMessage("You need admin permissions to be able use this program.")
@@ -9,6 +11,7 @@ if not helpers.has_admin():
 parser = argparse.ArgumentParser(description="Coban Package manager")
 parser.add_argument("-S", type=str, help="Install a package")
 parser.add_argument("-Ss", type=str, help="Search packages")
+parser.add_argument("--downloadScript", type=str, help="Downloads script for specific package.")
 parser.add_argument("--update", action="store_true", help="Update package repo list to get updated.")
 parser.add_argument("--doctor", action="store_true", help="Fixes common problems.")
 parser.add_argument("--clean", action="store_true", help="Cleans caching of packages.")
@@ -44,3 +47,6 @@ if arg.packages:
 
 if arg.Ss:
     cli.main().searchInPackages(arg.Ss)
+
+if arg.downloadScript:
+    cli.main().downloadScript(arg.downloadScript)
