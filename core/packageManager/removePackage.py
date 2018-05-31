@@ -2,7 +2,7 @@ from core import PackageManager, FileManager
 import helpers, subprocess
 from windows import winregistry
 from Logger import Logger as log
-
+from ..cli.cli import main as cli
 
 class main(PackageManager.Manager):
 
@@ -18,6 +18,13 @@ class main(PackageManager.Manager):
     def uninstallExecutable(self):
         reg = winregistry.Registry
         package = reg.searchForSoftware(reg, self.packageName)
+
+        try:
+            self.scriptFile
+        except AttributeError as e:
+            cli().downloadScript(self.packageName)
+
+
         self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)
         if package:
             try:
@@ -32,12 +39,13 @@ class main(PackageManager.Manager):
         else:
             helpers.infoMessage("Skipping uninstaller process - No registry key found.")
             helpers.infoMessage("Cleanup left overs..")
+            FileManager.Manager().cleanup()
             self.parser.removePackage(self.packageName)
 
     def uninstallFromTools(self):
         file = FileManager.Manager()
         path = helpers.getToolsPath
         if file.fileExists(path + "\\" + self.packageName):
-            print("toolsda mevcut ")
+            file.removeDir(file.fileExists(path + "\\" + self.packageName))
         else:
-            print("toolsda mevcut deil")
+            return False
