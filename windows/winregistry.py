@@ -32,7 +32,7 @@ class Registry:
         data = {}
         for prod in self.installedSoftware(self):
             try:
-                m = re.search("\b"+packageName.lower()+"\b", str(prod.lower()))
+                m = re.search(packageName.lower(), str(prod.lower()))
 
                 if m:
                     print(m.group())
