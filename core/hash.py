@@ -20,9 +20,9 @@ class check:
             if json.Parser().keyExists(loadJson, "downloadUrl64"):
                 loadJson["checksum64"]
                 loadJson["checksumType64"]
-
-            loadJson["checksum"]
-            loadJson["checksum64"]
+            else:
+                loadJson["checksum"]
+                loadJson["checksumType"]
         except KeyError as e:
             log.new(e).logError()
             helpers.errorMessage("Checksum keys are missing! Aborting.")
