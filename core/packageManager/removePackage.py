@@ -39,7 +39,7 @@ class main(PackageManager.Manager):
         else:
             helpers.infoMessage("Skipping uninstaller process - No registry key found.")
             helpers.infoMessage("Cleanup left overs..")
-            FileManager.Manager().cleanup()
+            FileManager.Manager().cleanup(self.packageName)
             self.parser.removePackage(self.packageName)
 
     def uninstallFromTools(self):

@@ -68,8 +68,13 @@ class Manager:
             Logger.new(e).logError()
             exit()
 
-    def cleanup(self):
-        packagesPath = helpers.getCobanPath+"\\packages\\"
+    def cleanup(self, packageName=""):
+        packagesPath = helpers.getCobanPath+"\\packages\\"+packageName
+
+        if packageName != "":
+            return self.removeDir(packagesPath)
+
+
         for i in helpers.installedApps()["installedApps"]:
             path = packagesPath+i
             if self.fileExists(path):
