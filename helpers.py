@@ -1,6 +1,7 @@
 from core import JsonParser
 import repo, math, os, platform, sys
 from colorama import init, AnsiToWin32, Fore, Style
+from Logger import Logger as log
 
 packageInstallationPath = os.getenv("programdata") + "\\coban\\packages\\"
 getCobanPath = os.getenv("cobanPath")
@@ -28,10 +29,31 @@ def successMessage(message):
 def redColor(message):
     return print(Fore.RED + "INFO: " + message + Style.RESET_ALL, file=stream)
 
-def alreadyInstalled(packageName):
-    return infoMessage(
-        "You already installed this package. You can upgrade it by 'coban upgrade " + packageName + ""
-                                                                                                    "' or by adding '--force' argument to force installation")
+
+def messages(type, template, packageName):
+    messages = {
+        "info": {
+            "alreadyInstalled": "You already installed this package. You can upgrade it by 'coban upgrade " + packageName + ""
+                                                                                                                            "' or by adding '--force' argument to force installation"
+        },
+
+        "error": {
+            "isNotInstalled": packageName + " is not installed on your computer."
+        }
+    }
+
+    if type in messages and template in messages[type]:
+        if type == "error":
+            return errorMessage(messages["error"][template])
+        elif type == "info":
+            return infoMessage(messages["error"][template])
+    else:
+        log.new("Messages: Key does not exists").logError()
+
+
+# def alreadyInstalled(packageName):
+#     return infoMessage(
+#         ")
 
 
 def programList():

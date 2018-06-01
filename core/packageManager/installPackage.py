@@ -38,7 +38,7 @@ class main(PackageManager.Manager):
                 else:
                     exit("This kind of package is not installable.")
             else:
-                helpers.alreadyInstalled(self.packageName)
+                helpers.messages("info", "alreadyInstalled", self.packageName)
         else:
             exit("You need to accept to contiune installation.")
 
