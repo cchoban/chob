@@ -99,7 +99,7 @@ class main(PackageManager.Manager):
         subprocess.call(
             self.packagePathWithoutExt + "." + self.scriptFile["fileType"] + " " + self.scriptFile["silentArgs"],
             shell=True)
-        self.parser.addNewPackage(self.packageName)
+        self.parser.addNewPackage(self.packageName, self.scriptFile["version"])
         helpers.successMessage("Successfully installed " + self.packageName)
 
     def beginAction(self):

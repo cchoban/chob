@@ -59,13 +59,20 @@ class Parser:
         except KeyError as e:
             exit(key + " does not exists")
 
-    def addNewPackage(self, packageName):
+    def addNewPackage(self, packageName, version):
         jsonFile = helpers.getCobanPath + "\\packages.json"
         js = helpers.installedApps()
 
         if not packageName in js["installedApps"]:
-            print(js)
-            js["installedApps"].append(packageName)
+            newPackage = {
+                packageName: {
+                    "version": version
+                }
+            }
+
+            dict = {**js["installedApps"], **newPackage}
+
+            js["installedApps"].update(dict)
 
             with open(jsonFile, "w") as f:
                 f.write(json.dumps(js))
@@ -77,7 +84,7 @@ class Parser:
             js = json.load(f)
             f.close()
         try:
-            newDict = js["installedApps"].remove(packageName)
+            newDict = js["installedApps"].pop(packageName)
         except ValueError as e:
             log.new(e).logError()
             pass
