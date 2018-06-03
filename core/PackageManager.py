@@ -39,6 +39,14 @@ class Manager:
 
             remove.main(i, self.skipHashes, self.forceInstallation, self.skipAgreements).uninstaller()
 
+    def upgradePackage(self):
+        from .packageManager import upgradePackage as upgrade
+        for i in self.packageName:
+            self.packageName = i
+            self.packageScriptName = i + ".cb"
+
+            upgrade.main(i, self.skipHashes, self.forceInstallation, self.skipAgreements).run()
+
     def isInstalled(self):
         if self.parser.keyExists(helpers.installedApps()["installedApps"], self.packageName):
             return True
