@@ -33,8 +33,7 @@ def redColor(message):
 def messages(type, template, packageName):
     messages = {
         "info": {
-            "alreadyInstalled": "You already installed this package. You can upgrade it by 'coban upgrade " + packageName + ""
-                                                                                                                            "' or by adding '--force' argument to force installation"
+            "alreadyInstalled": "You already installed this package. You can upgrade it by 'coban upgrade " + packageName + ""                                                                                                        "' or by adding '--force' argument to force installation"
         },
 
         "error": {
@@ -46,14 +45,9 @@ def messages(type, template, packageName):
         if type == "error":
             return errorMessage(messages["error"][template])
         elif type == "info":
-            return infoMessage(messages["error"][template])
+            return infoMessage(messages["info"][template])
     else:
         log.new("Messages: Key does not exists").logError()
-
-
-# def alreadyInstalled(packageName):
-#     return infoMessage(
-#         ")
 
 
 def programList():
@@ -109,13 +103,3 @@ def is_os_64bit():
         return True
     else:
         return False
-
-
-def convert_size(size_bytes):
-    if size_bytes == 0:
-        return "0B"
-    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-    i = int(math.floor(math.log(size_bytes, 1024)))
-    p = math.pow(1024, i)
-    s = round(size_bytes / p, 2)
-    return "%s %s" % (s, size_name[i])
