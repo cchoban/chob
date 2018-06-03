@@ -2,7 +2,6 @@ import helpers
 from . import FileManager as file
 from . import JsonParser as json
 from . import hash
-from .packageManager import installPackage
 
 
 class Manager:
@@ -24,12 +23,21 @@ class Manager:
                     self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
 
     def installPackage(self):
+        from .packageManager import installPackage as install
 
         for i in self.packageName:
             self.packageName = i
             self.packageScriptName = i + ".cb"
 
-            installPackage.main(i, self.skipHashes, self.forceInstallation, self.skipAgreements).installer()
+            install.main(i, self.skipHashes, self.forceInstallation, self.skipAgreements).installer()
+
+    def removePackage(self):
+        from .packageManager import removePackage as remove
+        for i in self.packageName:
+            self.packageName = i
+            self.packageScriptName = i + ".cb"
+
+            remove.main(i, self.skipHashes, self.forceInstallation, self.skipAgreements).uninstaller()
 
     def isInstalled(self):
         if self.parser.keyExists(helpers.installedApps()["installedApps"], self.packageName):
