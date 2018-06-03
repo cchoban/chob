@@ -8,7 +8,7 @@ if not helpers.has_admin():
     exit()
 
 parser = argparse.ArgumentParser(description="Coban Package manager")
-parser.add_argument("-S", type=str, help="Install a package")
+parser.add_argument("-S", nargs="*", help="Install a package")
 parser.add_argument("--upgrade", type=str, help="Upgrades package")
 parser.add_argument("-Ss", type=str, help="Search packages")
 parser.add_argument("--downloadScript", type=str, help="Downloads script for specific package.")
@@ -28,7 +28,7 @@ parser.add_argument("--force", help="Forces a installation of package", action="
 arg = parser.parse_args()
 
 if arg.S:
-    installPackage.main(arg.S, arg.skipHash, arg.force, arg.y).installer()
+    PackageManager.Manager(arg.S, arg.skipHash, arg.force, arg.y).installPackage()
 
 if arg.upgrade:
     upgradePackage.main(arg.upgrade, arg.skipHash, arg.force, arg.y).run()

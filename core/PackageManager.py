@@ -2,6 +2,7 @@ import helpers
 from . import FileManager as file
 from . import JsonParser as json
 from . import hash
+from .packageManager import installPackage
 
 
 class Manager:
@@ -11,14 +12,24 @@ class Manager:
         self.skipHashes = skipHashes
         self.skipAgreements = agreements
         self.forceInstallation = force
-        self.packageScriptName = self.packageName + ".cb"
-        self.packagePathWithExt = helpers.packageInstallationPath + packageName + "\\" + packageName + ".cb"
-        self.packagePathWithoutExt = helpers.packageInstallationPath + packageName + "\\" + packageName
-
         self.parser = json.Parser()
-        if file.Manager().fileExists(self.packagePathWithExt):
-            if json.Parser(self.packagePathWithExt).isValid():
-                self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
+
+        if not isinstance(packageName, list):
+            self.packagePathWithExt = helpers.packageInstallationPath + packageName + "\\" + packageName + ".cb"
+            self.packagePathWithoutExt = helpers.packageInstallationPath + packageName + "\\" + packageName
+            self.packageScriptName = self.packageName + ".cb"
+
+            if file.Manager().fileExists(self.packagePathWithExt):
+                if json.Parser(self.packagePathWithExt).isValid():
+                    self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
+
+    def installPackage(self):
+
+        for i in self.packageName:
+            self.packageName = i
+            self.packageScriptName = i + ".cb"
+
+            installPackage.main(i, self.skipHashes, self.forceInstallation, self.skipAgreements).installer()
 
     def isInstalled(self):
         if self.parser.keyExists(helpers.installedApps()["installedApps"], self.packageName):
@@ -29,7 +40,6 @@ class Manager:
     def agreement(self, action="install"):
         if self.skipAgreements:
             return True
-
 
         yes = {'yes', 'y', 'ye', ''}
         no = {'no', 'n'}
