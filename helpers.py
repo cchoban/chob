@@ -4,8 +4,8 @@ from colorama import init, AnsiToWin32, Fore, Style
 from Logger import Logger as log
 
 packageInstallationPath = os.getenv("programdata") + "\\coban\\packages\\"
-getCobanPath = os.getenv("cobanPath")
-getToolsPath = os.getenv("cobanTools")
+getCobanPath = os.getenv("chobanPath")
+getToolsPath = os.getenv("chobanTools")
 getCobanBinFolder = getCobanPath + "\\lib\\"
 
 print(getCobanBinFolder)
