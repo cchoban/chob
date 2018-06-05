@@ -2,6 +2,7 @@ import helpers, hashlib
 from core import JsonParser as json
 from Logger import Logger as log
 
+
 class check:
 
     def __init__(self, hash, packageName, skipHashes):
@@ -16,19 +17,20 @@ class check:
         parser = json.Parser()
 
         loadJson = parser.fileToJson(packagePath + ".cb")["packageArgs"]
+
         try:
             if json.Parser().keyExists(loadJson, "downloadUrl64"):
-                loadJson["checksum64"]
-                loadJson["checksumType64"]
+                checksum = loadJson["checksum64"]
+                checksumType = loadJson["checksumType64"]
             else:
-                loadJson["checksum"]
-                loadJson["checksumType"]
+                checksum = loadJson["checksum"]
+                checksumType = loadJson["checksumType"]
         except KeyError as e:
             log.new(e).logError()
             helpers.errorMessage("Checksum keys are missing! Aborting.")
             exit()
 
-        if loadJson["checksumType"] or loadJson["checksumType64"] == "sha256":
+        if checksumType == "sha256":
             self.hashType = hashlib.sha256
         else:
             self.hashType = hashlib.md5
