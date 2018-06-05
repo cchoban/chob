@@ -48,7 +48,7 @@ class Manager:
             upgrade.main(i, self.skipHashes, self.forceInstallation, self.skipAgreements).run()
 
     def isInstalled(self):
-        if self.parser.keyExists(helpers.installedApps()["installedApps"], self.packageName):
+        if not self.forceInstallation and self.parser.keyExists(helpers.installedApps()["installedApps"], self.packageName):
             return True
         else:
             return False
