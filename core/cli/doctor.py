@@ -1,5 +1,7 @@
 import helpers
 from core import FileManager, JsonParser
+
+
 class doctor:
     def __init__(self):
         self.folders = {
@@ -12,6 +14,7 @@ class doctor:
             "programList": helpers.getCobanPath + "\\programList.json",
             "packages": helpers.getCobanPath + "\\packages.json"
         }
+
     def createFolders(self):
         file = FileManager.Manager()
 
@@ -28,7 +31,7 @@ class doctor:
                 if json.isValid():
                     pass
                 else:
-                    helpers.infoMessage("Fixed repo: "+i)
+                    helpers.infoMessage("Fixed repo: " + i)
                     json.rewriteJson()
             else:
                 self.createFiles()

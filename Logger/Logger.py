@@ -1,7 +1,7 @@
 import logging
 
 
-logging.basicConfig(filename="coban.log")
+logging.basicConfig(filename="choban.log")
 
 class new:
     def __init__(self, message):

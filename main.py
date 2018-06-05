@@ -6,7 +6,7 @@ if not helpers.has_admin():
     helpers.errorMessage("You need admin permissions to be able use this program.")
     exit()
 
-parser = argparse.ArgumentParser(description="Coban Package manager")
+parser = argparse.ArgumentParser(description="Choban Package manager")
 parser.add_argument("-S", nargs="*", help="Install package(s)")
 parser.add_argument("-R", nargs="*", help="Remove package(s)")
 parser.add_argument("--upgrade", nargs="*", help="Upgrade package(s)")

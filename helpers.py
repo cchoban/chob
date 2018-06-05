@@ -1,17 +1,19 @@
 from core import JsonParser
 import repo, math, os, platform, sys
-from colorama import init, AnsiToWin32, Fore, Style
 from Logger import Logger as log
 
-packageInstallationPath = os.getenv("programdata") + "\\coban\\packages\\"
+try:
+    from colorama import init, AnsiToWin32, Fore, Style
+
+    init(wrap=False)
+    stream = AnsiToWin32(sys.stderr).stream
+except ModuleNotFoundError as e:
+    log.new(e).logError()
+
+packageInstallationPath = os.getenv("programdata") + "\\choban\\packages\\"
 getCobanPath = os.getenv("chobanPath")
 getToolsPath = os.getenv("chobanTools")
 getCobanBinFolder = getCobanPath + "\\lib\\"
-
-print(getCobanBinFolder)
-
-init(wrap=False)
-stream = AnsiToWin32(sys.stderr).stream
 
 
 def errorMessage(message, logging=False):
@@ -33,7 +35,7 @@ def redColor(message):
 def messages(type, template, packageName):
     messages = {
         "info": {
-            "alreadyInstalled": "You already installed this package. You can upgrade it by 'coban upgrade " + packageName + ""                                                                                                        "' or by adding '--force' argument to force installation"
+            "alreadyInstalled": "You already installed this package. You can upgrade it by 'chob upgrade " + packageName + ""                                                                                                        "' or by adding '--force' argument to force installation"
         },
 
         "error": {
@@ -56,7 +58,7 @@ def programList():
     if js.isValid() == True:
         return js.fileToJson()
     else:
-        errorMessage("JSON is not valid! Please run 'coban doctor'")
+        errorMessage("JSON is not valid! Please run 'choban doctor'")
         exit()
 
 
@@ -66,7 +68,7 @@ def installedApps():
     if js.isValid() == True:
         return js.fileToJson()
     else:
-        errorMessage("JSON is not valid! Please run 'coban doctor'")
+        errorMessage("JSON is not valid! Please run 'choban doctor'")
         exit()
 
 
@@ -76,7 +78,7 @@ def dependenciesList():
     if js.isValid() == True:
         return js.fileToJson()
     else:
-        errorMessage("JSON is not valid! Please run 'coban doctor'")
+        errorMessage("JSON is not valid! Please run 'choban doctor'")
         exit()
 
 
