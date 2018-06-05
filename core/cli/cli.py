@@ -46,6 +46,9 @@ class main:
                 helpers.successMessage("Found this package(s): ")
                 print(i)
 
+    def downloadDeps(self):
+        doctor.doctor().downloadDependencies()
+
     def downloadScript(self, packageName):
         packageUrl = helpers.programList()[packageName]
 

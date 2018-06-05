@@ -1,5 +1,6 @@
 import helpers
 from core import FileManager, JsonParser
+import pip
 
 
 class doctor:
@@ -43,3 +44,8 @@ class doctor:
             if not file.fileExists(self.files[i]):
                 helpers.infoMessage("Created: " + i)
                 file.createFolder(self.files[i])
+
+    def downloadDependencies(self):
+        dependencies = ["colorama"]
+        for i in dependencies:
+            pip.main(["install", i])
