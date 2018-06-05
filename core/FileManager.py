@@ -52,7 +52,8 @@ class Manager:
         try:
             helpers.infoMessage("Unzipping " + zip + " to " + dest)
             zf = zipfile.ZipFile(zip, "r")
-            zf = zipfile.ZipFile.extractall(dest)
+            zf.extractall(dest)
+            zf.close()
             helpers.successMessage("Successfully unzipped " + zip + " to " + dest)
         except WindowsError or PermissionError or FileNotFoundError as e:
             Logger.new(e).logError()
