@@ -1,4 +1,4 @@
-from core import PackageManager
+from core import PackageManager, FileManager as file
 from core.cli import cli
 from core.packageManager import installPackage, removePackage
 import helpers
@@ -8,6 +8,7 @@ class main(PackageManager.Manager):
 
     def run(self):
         cli.main().downloadScript(self.packageName)
+        self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
 
         if self.isInstalled():
             if self.__checkForUpgrade():
