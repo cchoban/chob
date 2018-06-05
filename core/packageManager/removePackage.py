@@ -16,8 +16,8 @@ class main(PackageManager.Manager):
             exit()
 
     def uninstallExecutable(self):
-        reg = winregistry.Registry
-        package = reg.searchForSoftware(reg, self.packageName)
+        reg = winregistry.Registry()
+        package = reg.searchForSoftware(self.packageName)
 
         try:
             self.scriptFile
