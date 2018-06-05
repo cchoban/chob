@@ -1,7 +1,7 @@
 from tempfile import gettempdir
 import sys
 from Logger import Logger as log
-import urllib
+import urllib.request
 
 class Http:
 
