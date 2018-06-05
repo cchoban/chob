@@ -1,8 +1,7 @@
 from tempfile import gettempdir
-import helpers, sys
+import sys
 from Logger import Logger as log
-from urllib.request import urlretrieve
-
+import urllib
 
 class Http:
 
@@ -25,7 +24,10 @@ class Http:
 
     def download(self, url, path=gettempdir(), ext="exe"):
         try:
-            urlretrieve(url, path + "." + ext,self.reporthook)
+            opener = urllib.request.build_opener()
+            opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+            urllib.request.install_opener(opener)
+            urllib.request.urlretrieve(url, path + "." + ext, self.reporthook)
         except Exception as e:
             log.new(e).logError()
             pass
