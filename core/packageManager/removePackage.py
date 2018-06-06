@@ -4,6 +4,7 @@ from windows import winregistry
 from Logger import Logger as log
 from ..cli.cli import main as cli
 
+
 class main(PackageManager.Manager):
 
     def uninstaller(self):
@@ -16,18 +17,17 @@ class main(PackageManager.Manager):
             exit()
 
     def uninstallExecutable(self):
-        reg = winregistry.Registry()
-        package = reg.searchForSoftware(self.packageName)
-        if package == None:
-            package = reg.searchForSoftware64(self.packageName)
-
         try:
             self.scriptFile
         except AttributeError as e:
             cli().downloadScript(self.packageName)
+            self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)
 
+        reg = winregistry.Registry()
+        package = reg.searchForSoftware(self.scriptFile["softwareName"])
+        if package == None:
+            package = reg.searchForSoftware64(self.scriptFile["softwareName"])
 
-        self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)
         if package:
             try:
                 helpers.infoMessage("Trying to remove " + self.packageName + " with original uninstaller..")
