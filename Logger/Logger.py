@@ -1,12 +1,11 @@
-import logging
+import logging, helpers
 
-
-logging.basicConfig(filename="choban.log")
 
 class new:
     def __init__(self, message):
         self.message = message
-
+        self.path = helpers.getCobanPath + "\\choban.log"
+        logging.basicConfig(filename=self.path)
 
     def logError(self):
         logging.error(self.message)
