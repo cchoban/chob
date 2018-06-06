@@ -17,7 +17,7 @@ parser.add_argument("-S", nargs="*", help="Install package(s)")
 parser.add_argument("-R", nargs="*", help="Remove package(s)")
 parser.add_argument("--upgrade", nargs="*", help="Upgrade package(s)")
 
-parser.add_argument("-Ss", type=str, help="Search packages")
+parser.add_argument("-Ss", nargs="*", help="Search packages")
 parser.add_argument("--downloadScript", type=str, help="Downloads script for specific package.")
 parser.add_argument("--update", action="store_true", help="Update package repo list to get updated.")
 parser.add_argument("--doctor", action="store_true", help="Fixes common problems.")

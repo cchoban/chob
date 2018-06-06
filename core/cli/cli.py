@@ -30,7 +30,7 @@ class main:
 
     def packages(self):
         self.update()
-        js = helpers.installedApps()["installedApps"]
+        js = helpers.programList()
         return js
 
     def listPackages(self, local):
@@ -42,12 +42,18 @@ class main:
             print(i)
 
     def searchInPackages(self, packageName):
-        for i in self.packages():
+        foundPackages = []
+        packages = self.packages()
+        for package in packageName:
+            for i in packages:
+                regex = re.search(package.lower(), i.lower())
 
-            regex = re.search(packageName.lower(), i.lower())
+                if regex:
+                    foundPackages.append(i)
 
-            if regex:
-                helpers.successMessage("Found this package(s): ")
+        if len(foundPackages) > 0:
+            helpers.successMessage("Found this package(s): ")
+            for i in foundPackages:
                 print(i)
 
     def downloadDeps(self):
