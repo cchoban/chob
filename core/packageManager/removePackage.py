@@ -19,7 +19,8 @@ class main(PackageManager.Manager):
     def uninstallExecutable(self):
         try:
             self.scriptFile
-        except AttributeError as e:
+            self.scriptFile["softwareName"]
+        except AttributeError or KeyError as e:
             cli().downloadScript(self.packageName)
             self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)
 
