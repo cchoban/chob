@@ -1,7 +1,7 @@
 from tempfile import gettempdir
-import sys
 from Logger import Logger as log
-import urllib.request
+import requests
+
 
 class Http:
 
@@ -9,25 +9,19 @@ class Http:
         self.url = url
         self.path = path
 
-    def reporthook(blocknum, blocksize, totalsize):
-
-        readsofar = blocknum * blocksize
-        if totalsize > 0:
-            percent = readsofar * 1e2 / totalsize
-            s = "\r%5.1f%% %*d / %d" % (
-                percent, len(str(totalsize)), readsofar, totalsize)
-            sys.stderr.write(s)
-            if readsofar >= totalsize:  # near the end
-                sys.stderr.write("\n")
-        else:  # total size is unknown
-            sys.stderr.write("read %d\n" % (readsofar,))
-
     def download(self, url, path=gettempdir(), ext="exe"):
+
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Connection': 'keep-alive',
+        }
+
         try:
-            opener = urllib.request.build_opener()
-            opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-            urllib.request.install_opener(opener)
-            urllib.request.urlretrieve(url, path + "." + ext, self.reporthook)
+            with open("{0}.{1}".format(path, ext), 'wb') as f:
+                resp = requests.get(url, headers=headers)
+                f.write(resp.content)
         except Exception as e:
             log.new(e).logError()
             pass
