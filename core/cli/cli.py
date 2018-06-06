@@ -30,11 +30,15 @@ class main:
 
     def packages(self):
         self.update()
-        js = JsonParser.Parser(repo.repos()["localProgramlist"]).fileToJson()
+        js = helpers.installedApps()["installedApps"]
         return js
 
-    def listPackages(self):
-        for i in self.packages():
+    def listPackages(self, local):
+        if local == True:
+            packages = helpers.installedApps()["installedApps"]
+        else:
+            packages = self.packages()
+        for i in packages:
             print(i)
 
     def searchInPackages(self, packageName):

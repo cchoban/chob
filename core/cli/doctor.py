@@ -46,6 +46,6 @@ class doctor:
                 file.createFolder(self.files[i])
 
     def downloadDependencies(self):
-        dependencies = ["colorama"]
+        dependencies = ["colorama", "requests"]
         for i in dependencies:
             pip.main(["install", i])

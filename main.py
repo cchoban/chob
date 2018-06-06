@@ -1,7 +1,13 @@
 import argparse, helpers
 from core.cli import cli
 from core import PackageManager
+from sys import argv
 
+if len(argv) == 1:
+    print("""
+        Choban package manager
+        Type chob -h to get some help.
+    """)
 if not helpers.has_admin():
     print("You need admin permissions to be able use this program.")
     exit()
@@ -26,6 +32,7 @@ parser.add_argument("--download-chob-dependencies", action="store_true")
 parser.add_argument("-Scc", help="Clean's unused files", action="store_true")
 parser.add_argument("-skipHash", help="Skips of checking hash for files", action="store_true")
 parser.add_argument("--force", help="Forces a installation of package", action="store_true")
+parser.add_argument("--local", action="store_true")
 arg = parser.parse_args()
 
 
@@ -48,7 +55,7 @@ if arg.clean:
     cli.main().cleanLeftOvers()
 
 if arg.packages:
-    cli.main().listPackages()
+    cli.main().listPackages(arg.local)
 
 if arg.Ss:
     cli.main().searchInPackages(arg.Ss)
