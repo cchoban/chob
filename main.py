@@ -25,16 +25,11 @@ parser.add_argument("--clean", action="store_true", help="Cleans caching of pack
 parser.add_argument("-y", action="store_true", help="Skips agreements")
 parser.add_argument("--packages", action="store_true", help="Lists all available packages.")
 parser.add_argument("--download-chob-dependencies", action="store_true")
-# TODO: add multiple package search
-# TODO: add multiple installation of packages
-# TODO: --force doing some weird things??
-# TODO: add to installed list when it is installed with unzip method
 parser.add_argument("-Scc", help="Clean's unused files", action="store_true")
 parser.add_argument("-skipHash", help="Skips of checking hash for files", action="store_true")
 parser.add_argument("--force", help="Forces a installation of package", action="store_true")
 parser.add_argument("--local", action="store_true")
 arg = parser.parse_args()
-
 
 if arg.S:
     PackageManager.Manager(arg.S, arg.skipHash, arg.force, arg.y).installPackage()

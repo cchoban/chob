@@ -92,6 +92,7 @@ class main(PackageManager.Manager):
                 else:
                     extensions[i](zipFile, helpers.getToolsPath + "\\" + self.packageName)
 
+        self.parser.addNewPackage(self.packageName, self.scriptFile["version"])
     def installExecutable(self):
         helpers.infoMessage(
             "Installing " + self.packageName + ". This will take a moment depends on software your installing. ")
