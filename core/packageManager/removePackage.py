@@ -2,7 +2,6 @@ from core import PackageManager, FileManager
 import helpers, subprocess
 from windows import winregistry
 from Logger import Logger as log
-from ..cli.cli import main as cli
 
 
 class main(PackageManager.Manager):
@@ -10,6 +9,7 @@ class main(PackageManager.Manager):
     def uninstaller(self):
         if self.isInstalled():
             if self.agreement("uninstall"):
+                self.downloadScript()
                 self.uninstallExecutable()
                 self.uninstallFromTools()
         else:
@@ -17,15 +17,10 @@ class main(PackageManager.Manager):
             exit()
 
     def uninstallExecutable(self):
-        try:
-            self.scriptFile
-            self.scriptFile["softwareName"]
-        except AttributeError or KeyError as e:
-            cli().downloadScript(self.packageName)
-            self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)
 
         reg = winregistry.Registry()
         package = reg.searchForSoftware(self.scriptFile["softwareName"])
+
         if package == None:
             package = reg.searchForSoftware64(self.scriptFile["softwareName"])
 
@@ -49,6 +44,6 @@ class main(PackageManager.Manager):
         file = FileManager.Manager()
         path = helpers.getToolsPath
         if file.fileExists(path + "\\" + self.packageName):
-            file.removeDir(file.fileExists(path + "\\" + self.packageName))
+            file.removeDir(path + "\\" + self.packageName)
         else:
             return False

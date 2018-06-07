@@ -28,7 +28,7 @@ class main(PackageManager.Manager):
     def installer(self):
         if self.agreement() == True:
             if not self.isInstalled():
-                self.getInstallationScript()
+                self.downloadScript()
                 if self.isInstallable():
                     self.download()
                     self.checkHash()
@@ -41,24 +41,6 @@ class main(PackageManager.Manager):
                 helpers.messages("info", "alreadyInstalled", self.packageName)
         else:
             exit("You need to accept to contiune installation.")
-
-    def getInstallationScript(self):
-        try:
-            if self.isInstalled():
-                return self.packagePathWithExt
-
-            packageUrl = helpers.programList()[self.packageName]
-
-            if not file.Manager().fileExists(helpers.packageInstallationPath + self.packageName):
-                file.Manager().createFolder(helpers.packageInstallationPath + self.packageName)
-            helpers.infoMessage("Downloading Installation Script of: " + self.packageScriptName)
-            # TODO: fix http self
-            http.Http.download(http.Http, packageUrl,
-                               helpers.packageInstallationPath + self.packageName + "\\" + self.packageScriptName, "")
-            self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
-
-        except Exception as e:
-            log.new(e).logError()
 
     def download(self):
         httpClass = http.Http
@@ -93,6 +75,7 @@ class main(PackageManager.Manager):
                     extensions[i](zipFile, helpers.getToolsPath + "\\" + self.packageName)
 
         self.parser.addNewPackage(self.packageName, self.scriptFile["version"])
+
     def installExecutable(self):
         helpers.infoMessage(
             "Installing " + self.packageName + ". This will take a moment depends on software your installing. ")
