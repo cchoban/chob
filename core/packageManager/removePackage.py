@@ -1,5 +1,6 @@
 from core import PackageManager, FileManager
-import helpers, subprocess
+import helpers
+from subprocess import call as callExe
 from windows import winregistry
 from Logger import Logger as log
 
@@ -10,14 +11,14 @@ class main(PackageManager.Manager):
         if self.isInstalled():
             if self.agreement("uninstall"):
                 self.downloadScript()
-                self.uninstallExecutable()
+                if not self.__findReg() == False:
+                    self.uninstallExecutable()
                 self.uninstallFromTools()
         else:
             helpers.infoMessage("There is no packages with name of " + self.packageName)
             exit()
 
-    def uninstallExecutable(self):
-
+    def __findReg(self):
         reg = winregistry.Registry()
         package = reg.searchForSoftware(self.scriptFile["softwareName"])
 
@@ -25,20 +26,27 @@ class main(PackageManager.Manager):
             package = reg.searchForSoftware64(self.scriptFile["softwareName"])
 
         if package:
-            try:
-                helpers.infoMessage("Trying to remove " + self.packageName + " with original uninstaller..")
-                subprocess.call(
-                    package["UninstallString"] + " " + self.scriptFile["packageUninstallArgs"]["silentArgs"])
-                helpers.successMessage("Successfully removed: " + self.packageName)
-
-            except KeyError or Exception as e:
-                log.new(e).logError()
-            self.parser.removePackage(self.packageName)
+            return package
         else:
             helpers.infoMessage("Skipping uninstaller process - No registry key found.")
             helpers.infoMessage("Cleanup left overs..")
             FileManager.Manager().cleanup(self.packageName)
             self.parser.removePackage(self.packageName)
+            return False
+
+    def uninstallExecutable(self):
+        package = self.__findReg()
+        try:
+            helpers.infoMessage("Trying to remove {0} with original uninstaller..".format(self.packageName))
+            callExe(
+                "{0} {1}".format(package["UninstallString"], self.scriptFile["packageUninstallArgs"]["silentArgs"]))
+            helpers.successMessage("Successfully removed: " + self.packageName)
+            self.parser.removePackage(self.packageName)
+
+        except KeyError or Exception as e:
+            log.new(e).logError()
+        self.parser.removePackage(self.packageName)
+
 
     def uninstallFromTools(self):
         file = FileManager.Manager()
