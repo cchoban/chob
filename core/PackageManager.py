@@ -2,6 +2,7 @@ import helpers
 from . import FileManager as file
 from . import JsonParser as json
 from . import hash
+from .cli import cli
 
 
 class Manager:
@@ -48,10 +49,19 @@ class Manager:
             upgrade.main(i, self.skipHashes, self.forceInstallation, self.skipAgreements).run()
 
     def isInstalled(self):
-        if not self.forceInstallation and self.parser.keyExists(helpers.installedApps()["installedApps"], self.packageName):
+        if not self.forceInstallation and self.parser.keyExists(helpers.installedApps()["installedApps"],
+                                                                self.packageName):
             return True
         else:
             return False
+
+    def downloadScript(self):
+        try:
+            self.scriptFile
+            self.scriptFile["softwareName"]
+        except AttributeError or KeyError as e:
+            cli.main().downloadScript(self.packageName)
+            self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
 
     def agreement(self, action="install"):
         if self.skipAgreements:
