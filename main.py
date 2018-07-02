@@ -3,11 +3,14 @@ from core.cli import cli
 from core import PackageManager
 from sys import argv
 
+#TODO: make local packages be installable
 if len(argv) == 1:
     print("""
         Choban package manager
         Type chob -h to get some help.
     """)
+
+
 if not helpers.has_admin():
     print("You need admin permissions to be able use this program.")
     exit()
@@ -16,7 +19,7 @@ parser = argparse.ArgumentParser(description="Choban Package manager")
 parser.add_argument("-S", nargs="*", help="Install package(s)")
 parser.add_argument("-R", nargs="*", help="Remove package(s)")
 parser.add_argument("--upgrade", nargs="*", help="Upgrade package(s)")
-
+parser.add_argument("--test-package", type=str, help="This command helps you to test your package before you push to our servers.")
 parser.add_argument("-Ss", nargs="*", help="Search packages")
 parser.add_argument("--downloadScript", type=str, help="Downloads script for specific package.")
 parser.add_argument("--update", action="store_true", help="Update package repo list to get updated.")
@@ -29,10 +32,22 @@ parser.add_argument("-Scc", help="Clean's unused files", action="store_true")
 parser.add_argument("-skipHash", help="Skips of checking hash for files", action="store_true")
 parser.add_argument("--force", help="Forces a installation of package", action="store_true")
 parser.add_argument("--local", action="store_true")
+parser.add_argument("--create", type=str, help="Generates package for you")
+parser.add_argument("--flatfile", action="store_true")
+parser.add_argument("--packit", action="store_true")
+parser.add_argument("--push", action="store_true")
+parser.add_argument("--authenticate", type=str, help="Your token key")
+parser.add_argument("--verbose", action="store_true", help="Turning on verbose mode")
 arg = parser.parse_args()
+
 
 if arg.S:
     PackageManager.Manager(arg.S, arg.skipHash, arg.force, arg.y).installPackage()
+
+if arg.test_package:
+    # PackageManager.Manager(arg.test_package, arg.skipHash, arg.force, arg.y).testPackage()
+    PackageManager.Manager(arg.test_package, arg.skipHash, arg.force, arg.y).testPackage()
+
 
 if arg.R:
     PackageManager.Manager(arg.R, arg.skipHash, arg.force, arg.y).removePackage()
@@ -60,3 +75,15 @@ if arg.downloadScript:
 
 if arg.download_chob_dependencies:
     cli.main().downloadDeps()
+
+if arg.create:
+    cli.main().packageGenerator(arg.create, arg.flatfile)
+
+if arg.packit:
+    cli.main().packit()
+
+if arg.push:
+    cli.main().push()
+
+if arg.authenticate:
+    cli.main().auth(arg.authenticate)

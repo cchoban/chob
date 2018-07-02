@@ -10,10 +10,12 @@ class main(PackageManager.Manager):
     def uninstaller(self):
         if self.isInstalled():
             if self.agreement("uninstall"):
-                self.downloadScript()
-                if not self.__findReg() == False:
+                if not FileManager.Manager().fileExists(self.packagePathWithExt):
+                    self.downloadScript()
+                if self.__findReg():
                     self.uninstallExecutable()
                 self.uninstallFromTools()
+                self.__remove_symlinks()
         else:
             helpers.infoMessage("There is no packages with name of " + self.packageName)
             exit()
@@ -28,10 +30,7 @@ class main(PackageManager.Manager):
         if package:
             return package
         else:
-            helpers.infoMessage("Skipping uninstaller process - No registry key found.")
-            helpers.infoMessage("Cleanup left overs..")
-            FileManager.Manager().cleanup(self.packageName)
-            self.parser.removePackage(self.packageName)
+            self.__do_cleanup()
             return False
 
     def uninstallExecutable(self):
@@ -48,10 +47,26 @@ class main(PackageManager.Manager):
         self.parser.removePackage(self.packageName)
 
 
-    def uninstallFromTools(self):
+    def __remove_symlinks(self):
         file = FileManager.Manager()
-        path = helpers.getToolsPath
-        if file.fileExists(path + "\\" + self.packageName):
-            file.removeDir(path + "\\" + self.packageName)
+        symlinks = helpers.symlinkList()
+        if self.packageName in symlinks:
+            path = FileManager.Manager().os().path.join(symlinks[self.packageName])
+            unlink = file.os().unlink(path)
+            self.parser.remove_package_symlink(self.packageName)
+
+    def uninstallFromTools(self):
+        helpers.infoMessage("Removing {0} from tools folder".format(self.packageName))
+        file = FileManager.Manager()
+        path = helpers.getToolsPath + "\\" + self.packageName
+        if file.fileExists(path):
+            file.removeDir(path)
+            helpers.successMessage("Successfully removed "+self.packageName)
         else:
             return False
+
+    def __do_cleanup(self):
+        helpers.infoMessage("Skipping uninstaller process - No registry key found.")
+        helpers.infoMessage("Cleanup left overs..")
+        FileManager.Manager().cleanup(self.packageName)
+        self.parser.removePackage(self.packageName)

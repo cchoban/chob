@@ -1,13 +1,13 @@
 from core import PackageManager
 from core import JsonParser as json
-import subprocess, helpers
+import subprocess
+import helpers
 from core import http
 from core import FileManager as file
 from Logger import Logger as log
 
 
 class main(PackageManager.Manager):
-
     def isInstallable(self):
 
         self.installable = {
@@ -35,8 +35,21 @@ class main(PackageManager.Manager):
                     if self.checkForDependencies():
                         self.downloadDependencies()
                     self.beginAction()
+
+                    if not self.parser.keyExists(self.scriptFile, "unzip"):
+                        if self.valid_exit_code():
+                            self.parser.addNewPackage(self.packageName, self.scriptFile["version"])
+                            helpers.successMessage("Successfully installed " + self.packageName)
+                            return True
+                        else:
+                            helpers.errorMessage("{0} was not installed successfully.".format(self.packageName))
+                            return False
+                    else:
+                        helpers.successMessage("Successfully installed "+self.packageName)
                 else:
-                    exit("This kind of package is not installable.")
+                    exit(
+                        "This file type is not supported. Create issue if you really think it should."
+                    )
             else:
                 helpers.messages("info", "alreadyInstalled", self.packageName)
         else:
@@ -47,16 +60,23 @@ class main(PackageManager.Manager):
 
         loadJson = self.scriptFile
 
-        if not file.Manager().fileExists(self.packagePathWithoutExt + "." + loadJson["fileType"]):
-            if helpers.is_os_64bit() and self.parser.keyExists(self.scriptFile, "downloadUrl64"):
+        if not file.Manager().fileExists(self.packagePathWithoutExt + "." +
+                                         loadJson["fileType"]):
+            if helpers.is_os_64bit() and self.parser.keyExists(
+                    self.scriptFile, "downloadUrl64"):
                 # FIXME: wrong detection
                 if self.parser.keyExists(loadJson, "downloadUrl64"):
-                    helpers.infoMessage("Downloading " + self.packageName + " from: " + loadJson["downloadUrl64"])
-                    httpClass.download(httpClass, loadJson["downloadUrl64"], self.packagePathWithoutExt,
+                    helpers.infoMessage("Downloading " + self.packageName +
+                                        " from: " + loadJson["downloadUrl64"])
+                    httpClass.download(httpClass, loadJson["downloadUrl64"],
+                                       self.packagePathWithoutExt,
                                        loadJson["fileType"])
             else:
-                helpers.infoMessage("Downloading " + self.packageName + " from: " + loadJson["downloadUrl"])
-                httpClass.download(httpClass, loadJson["downloadUrl"], self.packagePathWithoutExt, loadJson["fileType"])
+                helpers.infoMessage("Downloading " + self.packageName +
+                                    " from: " + loadJson["downloadUrl"])
+                httpClass.download(httpClass, loadJson["downloadUrl"],
+                                   self.packagePathWithoutExt,
+                                   loadJson["fileType"])
 
     def unzipPackage(self):
         extensions = {
@@ -65,6 +85,8 @@ class main(PackageManager.Manager):
         }
 
         fileName = self.packageName + "." + self.scriptFile["fileType"]
+
+        #add verbose mode here
         zipFile = helpers.packageInstallationPath + self.packageName + "\\" + fileName
 
         for i in extensions:
@@ -72,27 +94,48 @@ class main(PackageManager.Manager):
                 if (self.parser.keyExists(self.scriptFile, "unzipPath")):
                     extensions[i](zipFile, self.scriptFile["unzipPath"])
                 else:
-                    extensions[i](zipFile, helpers.getToolsPath + "\\" + self.packageName)
+                    extensions[i](zipFile,helpers.getToolsPath + "\\" + self.packageName)
 
-        self.parser.addNewPackage(self.packageName, self.scriptFile["version"])
+                if (self.parser.keyExists(self.scriptFile, "createShortcut")):
+                    self.__create_shorcut()
+
+            self.parser.addNewPackage(self.packageName, self.scriptFile["version"])
+
+    def __create_shorcut(self):
+        fileName = helpers.getToolsPath + "\\{0}\\{1}".format(self.packageName, self.scriptFile["createShortcut"])
+        fileDest = helpers.getCobanBinFolder+"\\"+self.scriptFile["createShortcut"]
+
+        ask = helpers.askQuestion(
+        "Do you want to copy {0} to lib folder ( This will help you to launch app from command prompt)".
+        format(self.scriptFile["createShortcut"]))
+
+        if ask:
+
+            helpers.infoMessage("Creating shortcut for "+self.packageName)
+            createSymLink = file.Manager().createSymLink(fileName, fileDest)
+            if createSymLink:
+                json.Parser().add_new_symlink(self.packageName, fileDest)
+                helpers.successMessage("Successfully created shortcut")
+                return True
 
     def installExecutable(self):
         helpers.infoMessage(
-            "Installing " + self.packageName + ". This will take a moment depends on software your installing. ")
+            "Installing " + self.packageName +". This will take a moment depends on software your installing. ")
 
-        subprocess.call(
-            self.packagePathWithoutExt + "." + self.scriptFile["fileType"] + " " + self.scriptFile["silentArgs"],
-            shell=True)
-        self.parser.addNewPackage(self.packageName, self.scriptFile["version"])
-        helpers.successMessage("Successfully installed " + self.packageName)
+        call_exe = subprocess.Popen('"{0}.{1}" {2}'.format(
+            self.packagePathWithoutExt, self.scriptFile["fileType"],
+            self.scriptFile["silentArgs"]))
+
+        call_exe.communicate()[0]
+        self.exit_code = call_exe.returncode
 
     def beginAction(self):
         for i in self.installable:
-            if json.Parser().keyExists(self.scriptFile, i) or self.scriptFile["fileType"] == i:
+            if json.Parser().keyExists(self.scriptFile,i) or self.scriptFile["fileType"] == i:
                 return self.installable[i]()
 
     def checkForDependencies(self):
-        if self.parser.keyExists(self.scriptFile, "dependencies"):
+        if self.parser.keyExists(self.scriptFile, "d,ependencies"):
             for i in self.scriptFile["dependencies"]:
                 if i in helpers.programList() and i not in helpers.installedApps()["installedApps"]:
                     helpers.infoMessage("Found dependencies: " + i)
@@ -101,11 +144,16 @@ class main(PackageManager.Manager):
                     return True
 
     def downloadDependencies(self):
-        downloadDependencies(self.packageName, self.skipHashes, self.forceInstallation, True).run()
-        downloadDependencies(self.oldPackageName, self.skipHashes, self.forceInstallation, True).installPackage()
+        # FIXME: downloading of dependencies will not work because of
+        downloadDependencies(self.packageName, self.skipHashes,
+                             self.forceInstallation, True).run()
+        downloadDependencies(self.oldPackageName, self.skipHashes,
+                             self.forceInstallation, True).installPackage()
 
         try:
-            super(main(self.oldPackageName, self.skipHashes, self.forceInstallation, True).installer())
+            super(
+                main(self.oldPackageName, self.skipHashes,
+                     self.forceInstallation, True).installer())
         except Exception as e:
             log.new(e).logError()
 
