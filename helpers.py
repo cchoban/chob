@@ -1,5 +1,9 @@
 from core import JsonParser
-import repo, math, os, platform, sys
+import repo
+import math
+import os
+import platform
+import sys
 from Logger import Logger as log
 
 try:
@@ -53,33 +57,15 @@ def messages(type, template, packageName):
 
 
 def programList():
-    js = JsonParser.Parser(repo.repos()["localProgramlist"])
-
-    if js.isValid() == True:
-        return js.fileToJson()
-    else:
-        errorMessage("JSON is not valid! Please run 'choban doctor'")
-        exit()
+    return JsonParser.Parser().fileToJson(repo.repos()["localProgramlist"])
 
 
 def installedApps():
-    js = JsonParser.Parser(repo.repos()["localInstalledApps"])
-
-    if js.isValid() == True:
-        return js.fileToJson()
-    else:
-        errorMessage("JSON is not valid! Please run 'choban doctor'")
-        exit()
+    return JsonParser.Parser().fileToJson(repo.repos()["localInstalledApps"])
 
 
-def dependenciesList():
-    js = JsonParser.Parser(repo.repos()["dependencies"])
-
-    if js.isValid() == True:
-        return js.fileToJson()
-    else:
-        errorMessage("JSON is not valid! Please run 'choban doctor'")
-        exit()
+def symlinkList():
+    return JsonParser.Parser().fileToJson(repo.repos()["symlink"])
 
 
 def isInstalled(packageName):
@@ -92,7 +78,8 @@ def isInstalled(packageName):
 def has_admin():
     if os.name == 'nt':
         try:
-            temp = os.listdir(os.sep.join([os.environ.get('SystemRoot', 'C:\\windows'), 'temp']))
+            temp = os.listdir(os.sep.join(
+                [os.environ.get('SystemRoot', 'C:\\windows'), 'temp']))
             return True
         except:
             return False
@@ -105,3 +92,21 @@ def is_os_64bit():
         return True
     else:
         return False
+
+
+def askQuestion(question):
+    yes = {'yes', 'y', 'ye', ''}
+    no = {'no', 'n'}
+
+    text = infoMessage(question+"? [Y/N]")
+
+    if not "-y" in sys.argv:
+        choice = input("").lower()
+        if choice in yes:
+            return True
+        elif choice in no:
+            return False
+        else:
+            exit("Please respond with 'yes' or 'no'")
+    else:
+        return True

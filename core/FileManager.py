@@ -1,12 +1,23 @@
-import os, helpers, zipfile
-from shutil import rmtree
+import os
+import helpers
+import zipfile
+from shutil import rmtree, move, copy
 from Logger import Logger
-from subprocess import run, DEVNULL
+from subprocess import run, call, DEVNULL
 from Logger import Logger as log
 from json import dumps
 
 
 class Manager:
+    def os(self):
+        """
+        OS
+
+        :return object
+        """
+
+        return os
+
     def fileExists(self, path=""):
         """
         Checks if file is exists.
@@ -21,7 +32,7 @@ class Manager:
         except FileNotFoundError as e:
             exit()
 
-    def createFolder(self, path):
+    def createFolder(self, path, hidden=False):
         """
         Creates folder with specified path
         :param path:
@@ -29,10 +40,12 @@ class Manager:
         try:
             if not os.path.exists(path):
                 os.makedirs(path)
+                if hidden:
+                    call(["attrib", "+H", os.path.abspath(path)])
         except Exception as e:
             exit()
 
-    def createFile(self, path, content=""):
+    def createFile(self, path, content="", hidden=False):
         """
         Creates file with content
         :param path:
@@ -43,8 +56,26 @@ class Manager:
                 with open(path, "w") as f:
                     f.write(content)
                     f.close()
+
+                if hidden:
+                    call(["attrib", "+H", os.path.abspath(path)])
         except Exception as e:
             log.new(e).logError()
+
+    def createSymLink(self, path, dest):
+        from  win32file import CreateSymbolicLink
+        """
+        Creates symlink
+        :param path: path to file you want to create symlink
+        :param dest: path to save symlinked file
+        """
+        try:
+            CreateSymbolicLink(dest, path, 0)
+            return True
+        except OSError or PermissionError or WindowsError or FileNotFoundError or FileExistsError as e:
+            log.new(e).logError()
+            helpers.errorMessage(e.strerror)
+            return False
 
     def createJsonFile(self, path, withDict={}):
         """
@@ -69,7 +100,67 @@ class Manager:
             except FileNotFoundError or WindowsError or PermissionError or Exception as e:
                 log.new(e).logError()
         else:
-            helpers.infoMessage("Path does not exists while trying to remove it: " + path)
+            helpers.infoMessage(
+                "Path does not exists while trying to remove it: " + path)
+
+    def moveFile(self, filePath, fileDest):
+        """
+        Moves file to specific directory.
+        :param filePath:
+        :param fileDest:
+        """
+
+        if self.fileExists(filePath):
+            try:
+                move(filePath, fileDest)
+            except WindowsError or FileNotFoundError or FileExistsError as e:
+                log.new(e).logError()
+                exit(0)
+
+    def copyFile(self, filePath, fileDest):
+        """
+        Copys file to specific directory.
+        :param filePath:
+        :param fileDest:
+        """
+
+        if self.fileExists(filePath):
+            try:
+                copy(filePath, fileDest)
+            except WindowsError or FileNotFoundError or FileExistsError as e:
+                log.new(e).logError()
+                exit(0)
+
+    def __zipdir(self, path, zip, ignoreFiles=[]):
+        for file in os.listdir(path):
+            if not file in ignoreFiles:
+                if os.path.isfile(file):
+                    zip.write(file)
+
+                if os.path.isdir(file):
+                    for oss in os.listdir(os.path.join(path, file)):
+                        zip.write(file+"\\"+oss)
+
+    def makeZip(self, path, zipName, ignoreFiles=[]):
+        """
+        Creates a zip file.
+        :param path: Path where you want your zip file to be saved.
+        :param zipName: Name you zip.
+        :param ignoreFiles: Ignore specific files.
+        """
+        try:
+            zf = zipfile.ZipFile(path + "\\" + zipName,
+                                 "w", zipfile.ZIP_DEFLATED)
+            if len(os.listdir(path)) > 1:
+                self.__zipdir(path, zf, ignoreFiles)
+            else:
+                zf.write(path)
+                zf.close()
+
+            return True
+        except OSError or PermissionError or FileNotFoundError as e:
+            Logger.new(e).logError()
+            exit()
 
     def extractZip(self, zip, dest):
         """
@@ -82,7 +173,8 @@ class Manager:
             zf = zipfile.ZipFile(zip, "r")
             zf.extractall(dest)
             zf.close()
-            helpers.successMessage("Successfully unzipped " + zip + " to " + dest)
+            helpers.successMessage(
+                "Successfully unzipped " + zip + " to " + dest)
         except WindowsError or PermissionError or FileNotFoundError as e:
             Logger.new(e).logError()
             exit()
@@ -94,10 +186,13 @@ class Manager:
         :param dest:
         """
         try:
-            processArgs = helpers.getCobanBinFolder + "7za.exe x -o{0} -y {1}".format(dest, zip)
+            processArgs = helpers.getCobanBinFolder + \
+                "7za.exe x -o{0} -y {1}".format(dest, zip)
             helpers.infoMessage("Unzipping " + zip + " to " + dest)
-            runProcess = run(processArgs, stderr=DEVNULL, stdout=DEVNULL, shell=True)
-            helpers.successMessage("Successfully unzipped " + zip + " to " + dest)
+            runProcess = run(processArgs, stderr=DEVNULL,
+                             stdout=DEVNULL, shell=True)
+            helpers.successMessage(
+                "Successfully unzipped " + zip + " to " + dest)
         except WindowsError or PermissionError or FileNotFoundError as e:
             Logger.new(e).logError()
             exit()
@@ -114,6 +209,7 @@ class Manager:
 
         for i in helpers.installedApps()["installedApps"]:
             path = packagesPath + i
+            print(path)
             if self.fileExists(path):
                 self.removeDir(path)
                 helpers.successMessage("Removed: " + i)

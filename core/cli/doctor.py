@@ -13,7 +13,8 @@ class doctor:
 
         self.files = {
             "programList": helpers.getCobanPath + "\\programList.json",
-            "packages": helpers.getCobanPath + "\\packages.json"
+            "packages": helpers.getCobanPath + "\\packages.json",
+            "symlinks": helpers.getCobanPath + "\\symlinks.json"
         }
 
     def createFolders(self):
@@ -32,7 +33,7 @@ class doctor:
                 if json.isValid():
                     pass
                 else:
-                    helpers.infoMessage("Fixed repo: " + i)
+                    helpers.infoMessage("Fixed: " + i)
                     json.rewriteJson()
             else:
                 self.createFiles()
@@ -43,7 +44,7 @@ class doctor:
         for i in self.files:
             if not file.fileExists(self.files[i]):
                 helpers.infoMessage("Created: " + i)
-                file.createFolder(self.files[i])
+                file.createFile(self.files[i])
 
     def downloadDependencies(self):
         dependencies = ["colorama", "requests"]

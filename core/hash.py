@@ -1,22 +1,30 @@
-import helpers, hashlib
+import helpers
+import hashlib
 from core import JsonParser as json
 from Logger import Logger as log
+from os.path import abspath
 
 
 class check:
 
-    def __init__(self, hash, packageName, skipHashes):
+    def __init__(self, hash, packageName, skipHashes, sandboxed=False):
         self.hash = hash
         self.skipHashes = skipHashes
-        self.parseHash(packageName)
+        self.parseHash(packageName, sandboxed)
         self.calculate(packageName)
+        self.packagePath = None
         self.hashType = None
 
-    def parseHash(self, packageName):
-        packagePath = helpers.packageInstallationPath + packageName + "\\" + packageName
+    def parseHash(self, packageName, sandboxed=False):
+        if sandboxed:
+            self.packagePath = abspath(".package/{0}".format(packageName))
+        else:
+            self.packagePath = helpers.packageInstallationPath + \
+                packageName + "\\" + packageName
+
         parser = json.Parser()
 
-        loadJson = parser.fileToJson(packagePath + ".cb")["packageArgs"]
+        loadJson = parser.fileToJson(self.packagePath + ".cb")["packageArgs"]
 
         try:
             if json.Parser().keyExists(loadJson, "downloadUrl64"):
@@ -36,11 +44,10 @@ class check:
             self.hashType = hashlib.md5
 
     def calculate(self, packageName):
-        packagePath = helpers.packageInstallationPath + packageName + "\\" + packageName
         parser = json.Parser()
-        loadJson = parser.fileToJson(packagePath + ".cb")["packageArgs"]
+        loadJson = parser.fileToJson(self.packagePath + ".cb")["packageArgs"]
 
-        with open(packagePath + "." + loadJson["fileType"], "rb") as f:
+        with open(self.packagePath + "." + loadJson["fileType"], "rb") as f:
             calculatedHash = self.hashType(f.read()).hexdigest()
 
         if not self.hash.lower() == calculatedHash:

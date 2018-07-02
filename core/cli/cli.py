@@ -1,5 +1,7 @@
-import repo, helpers
-from core import http, FileManager, JsonParser
+import repo
+import helpers
+from core import http, FileManager
+from packageCreator import creator, pack, push, auth
 from Logger import Logger as log
 from . import doctor
 import re
@@ -9,11 +11,40 @@ class main:
     def __init__(self):
         pass
 
+    def packageGenerator(self, packageName, generateFlatFileOnly=False):
+        # TODO: bunu kendi classina tasi
+        print(generateFlatFileOnly)
+        if generateFlatFileOnly:
+            cls = creator.generatePackage(packageName, generateFlatFileOnly)
+            json = cls.generateJson()
+            cls.writeToFile(json)
+        else:
+            cls = creator.generatePackage(packageName, False)
+            cls.getAnswers()
+            cls.generateJson()
+            cls.writeToFile()
+
+    def packit(self):
+        return pack.main()
+
+    def push(self):
+        if auth.main().keyExists():
+            return push.main()
+        else:
+            helpers.errorMessage(
+                "You don't have authentication key. Please get one from {0}. You can activate it with --authentication".format(repo.repos()["website"]))
+
+
+    def auth(self, token):
+        return auth.main(True, token)
+
     def update(self):
-        helpers.infoMessage("Updating repo if needed " + repo.repos()["programList"])
+        helpers.infoMessage("Updating repo if needed " +
+                            repo.repos()["programList"])
         # TODO: if needed check for file size
         try:
-            http.Http.download(http.Http, repo.repos()["programList"], helpers.getCobanPath + "\\programList", "json")
+            http.Http.download(http.Http, repo.repos()[
+                               "programList"], helpers.getCobanPath + "\\programList", "json")
         except Exception as e:
             log.new(e).logError()
 
@@ -64,7 +95,8 @@ class main:
 
         if not FileManager.Manager().fileExists(helpers.packageInstallationPath + packageName):
             FileManager.Manager().createFolder(helpers.packageInstallationPath + packageName)
-        helpers.infoMessage("Downloading Installation Script of: " + packageName + ".cb")
+        helpers.infoMessage(
+            "Downloading Installation Script of: " + packageName + ".cb")
 
         http.Http.download(http.Http, packageUrl,
                            helpers.packageInstallationPath + packageName + "\\" + packageName, "cb")

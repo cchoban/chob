@@ -21,7 +21,8 @@ class Http:
         try:
             with open("{0}.{1}".format(path, ext), 'wb') as f:
                 resp = requests.get(url, headers=headers)
-                f.write(resp.content)
+                if resp:
+                    f.write(resp.content)
         except Exception as e:
             log.new(e).logError()
             pass
