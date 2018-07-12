@@ -28,7 +28,6 @@ class Manager:
 
     def installPackage(self):
         from .packageManager import installPackage as install
-
         for i in self.packageName:
             self.packageName = i
             self.packageScriptName = i + ".cb"
@@ -37,6 +36,7 @@ class Manager:
                          self.skipAgreements).installer()
 
     def removePackage(self):
+        self.uninstall = True
         from .packageManager import removePackage as remove
         for i in self.packageName:
             self.packageName = i
@@ -67,14 +67,19 @@ class Manager:
         else:
             return False
 
-    def downloadScript(self):
+    def downloadScript(self, uninstall=False):
         try:
             self.scriptFile
             self.scriptFile["softwareName"]
         except AttributeError or KeyError as e:
             cli.main().downloadScript(self.packageName)
-            self.scriptFile = self.parser.fileToJson(
-                self.packagePathWithExt)["packageArgs"]
+            if not uninstall:
+                self.scriptFile = self.parser.fileToJson(
+                    self.packagePathWithExt)["packageArgs"]
+            else:
+                self.scriptFile = self.parser.fileToJson(
+                    self.packagePathWithExt)
+                print(self.scriptFile)
 
     def agreement(self, action="install"):
         if self.skipAgreements:

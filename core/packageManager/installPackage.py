@@ -122,10 +122,15 @@ class main(PackageManager.Manager):
         helpers.infoMessage(
             "Installing " + self.packageName +". This will take a moment depends on software your installing. ")
 
-        call_exe = subprocess.Popen('"{0}.{1}" {2}'.format(
-            self.packagePathWithoutExt, self.scriptFile["fileType"],
-            self.scriptFile["silentArgs"]))
-
+        try:
+            call_exe = subprocess.Popen('"{0}.{1}" {2}'.format(
+                self.packagePathWithoutExt, self.scriptFile["fileType"],
+                self.scriptFile["silentArgs"]))
+        except OSError as e:
+            if e.winerror == 193:
+                call_exe = subprocess.Popen('"{0}.{1}" {2}'.format(
+                self.packagePathWithoutExt, self.scriptFile["fileType"],
+                self.scriptFile["silentArgs"]), shell=True)
         call_exe.communicate()[0]
         self.exit_code = call_exe.returncode
 

@@ -26,6 +26,8 @@ class main(pack.main):
                 helpers.errorMessage(
                     "You have not tested it yet. Please do it first.")
                 exit()
+            else:
+                return True
 
     def zipExists(self):
         for i in os.listdir(os.getcwd()):
@@ -42,7 +44,6 @@ class main(pack.main):
             return False
 
     def pushit(self):
-
         headers = {
             "Authorization": "Token "+self.token,
             "cache-control": "no-cache"
@@ -60,7 +61,6 @@ class main(pack.main):
 
         request = requests.post(
             "http://localhost:8000/api/push/", data=data, files=files, headers=headers)
-
         if JsonParser.Parser().is_json(request.content):
             js = json.loads(request.content)
 
