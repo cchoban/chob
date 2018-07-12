@@ -1,20 +1,23 @@
 from core import PackageManager, FileManager
 import helpers
-from subprocess import call as callExe
+from subprocess import Popen
 from windows import winregistry
 from Logger import Logger as log
 
 
 class main(PackageManager.Manager):
-
+    #FIXME: neredeyse hersey tamam sadece package printleniyor ve bi ustten gec
+    #FIXME: removePackage ncesinde biseyler paketi packagestan siliyor
     def uninstaller(self):
         if self.isInstalled():
             if self.agreement("uninstall"):
+                self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)
                 if not FileManager.Manager().fileExists(self.packagePathWithExt):
-                    self.downloadScript()
+                    self.downloadScript(True)
                 if self.__findReg():
                     self.uninstallExecutable()
-                self.uninstallFromTools()
+                else:
+                    self.uninstallFromTools()
                 self.__remove_symlinks()
         else:
             helpers.infoMessage("There is no packages with name of " + self.packageName)
@@ -22,10 +25,10 @@ class main(PackageManager.Manager):
 
     def __findReg(self):
         reg = winregistry.Registry()
-        package = reg.searchForSoftware(self.scriptFile["softwareName"])
+        package = reg.searchForSoftware(self.scriptFile["packageArgs"]["softwareName"])
 
         if package == None:
-            package = reg.searchForSoftware64(self.scriptFile["softwareName"])
+            package = reg.searchForSoftware64(self.scriptFile["packageArgs"]["softwareName"])
 
         if package:
             return package
@@ -36,15 +39,25 @@ class main(PackageManager.Manager):
     def uninstallExecutable(self):
         package = self.__findReg()
         try:
-            helpers.infoMessage("Trying to remove {0} with original uninstaller..".format(self.packageName))
-            callExe(
-                "{0} {1}".format(package["UninstallString"], self.scriptFile["packageUninstallArgs"]["silentArgs"]))
-            helpers.successMessage("Successfully removed: " + self.packageName)
-            self.parser.removePackage(self.packageName)
+            if package:
+                helpers.infoMessage("Trying to remove {0} with original uninstaller..".format(self.packageName))
+                try:
+                    call_exe = Popen('{0} {1}'.format(package["UninstallString"], self.scriptFile["packageUninstallArgs"]["silentArgs"]))
+                except OSError as e:
+                    if e.errno == 193:
+                        call_exe = Popen('{0} {1}'.format(package["UninstallString"], self.scriptFile["packageUninstallArgs"]["silentArgs"]), shell=True)
+                call_exe.communicate()[0]
+                self.exit_code = call_exe.returncode
+                self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
+
+                if self.valid_exit_code():
+                    helpers.successMessage("Successfully removed: " + self.packageName)
+                    self.parser.removePackage(self.packageName)
+                else:
+                    helpers.errorMessage("Uninstall process was not succeed.")
 
         except KeyError or Exception as e:
             log.new(e).logError()
-        self.parser.removePackage(self.packageName)
 
 
     def __remove_symlinks(self):

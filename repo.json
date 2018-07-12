@@ -1,0 +1,7 @@
+{
+    "localProgramlist": "{cobanpath}\\programList.json",
+    "localInstalledApps": "{cobanpath}\\packages.json",
+    "symlink": "{cobanpath}\\symlinks.json",
+    "programList": "http://localhost:8000/packages/repo",
+    "website": "http://localhost:8000"
+}

@@ -28,7 +28,6 @@ class Registry:
             finally:
                 skey.Close()
 
-        # print(properties)
         return properties
 
     def searchForSoftware(self, packageName):
@@ -38,7 +37,6 @@ class Registry:
                 m = re.search(packageName.lower(), str(prod.lower()))
 
                 if m:
-                    print(m.group())
                     newData = {
                         "PackageName": prod,
                         "UninstallString": self.installedSoftware(self.key)[prod]
@@ -57,7 +55,6 @@ class Registry:
                 m = re.search(packageName.lower(), str(prod.lower()))
 
                 if m:
-                    print(m.group())
                     newData = {
                         "PackageName": prod,
                         "UninstallString": self.installedSoftware(self.key64)[prod]

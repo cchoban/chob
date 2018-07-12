@@ -8,6 +8,7 @@ import re
 
 
 class main:
+
     def __init__(self):
         pass
 
@@ -34,7 +35,6 @@ class main:
             helpers.errorMessage(
                 "You don't have authentication key. Please get one from {0}. You can activate it with --authentication".format(repo.repos()["website"]))
 
-
     def auth(self, token):
         return auth.main(True, token)
 
@@ -49,11 +49,11 @@ class main:
             log.new(e).logError()
 
     def doctor(self):
-        self.update()
         doc = doctor.doctor()
         doc.createFolders()
+        doc.createFiles()
         doc.validateJsonFiles()
-
+        self.update()
         helpers.successMessage("Fixed problems..")
 
     def cleanLeftOvers(self):
@@ -100,3 +100,10 @@ class main:
 
         http.Http.download(http.Http, packageUrl,
                            helpers.packageInstallationPath + packageName + "\\" + packageName, "cb")
+    def version(self):
+        version_path = helpers.getCobanPath+"\\version.txt"
+        if FileManager.Manager().fileExists(version_path):
+            with open(version_path, "r") as f:
+                helpers.successMessage("Choban Package Manager")
+                helpers.infoMessage("Version "+f.read())
+                f.close()
