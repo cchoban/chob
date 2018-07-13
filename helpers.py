@@ -69,6 +69,7 @@ def symlinkList():
 
 
 def isInstalled(packageName):
+    #FIXME: wrong bool
     if packageName in installedApps():
         return False
     else:

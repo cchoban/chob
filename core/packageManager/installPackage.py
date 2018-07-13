@@ -57,14 +57,24 @@ class main(PackageManager.Manager):
 
     def download(self):
         httpClass = http.Http
-
         loadJson = self.scriptFile
 
         if not file.Manager().fileExists(self.packagePathWithoutExt + "." +
                                          loadJson["fileType"]):
-            if helpers.is_os_64bit() and self.parser.keyExists(
-                    self.scriptFile, "downloadUrl64"):
-                # FIXME: wrong detection
+
+            if self.parser.keyExists(self.scriptFile, "64bitonly"):
+                if not helpers.is_os_64bit():
+                    helpers.errorMessage("This package is only for 64-bit devices.")
+                    exit()
+                else:
+                    helpers.infoMessage("Downloading " + self.packageName +
+                                        " from: " + loadJson["downloadUrl64"])
+                    httpClass.download(httpClass, loadJson["downloadUrl64"],
+                                       self.packagePathWithoutExt,
+                                       loadJson["fileType"])
+                    return True
+
+            if helpers.is_os_64bit():
                 if self.parser.keyExists(loadJson, "downloadUrl64"):
                     helpers.infoMessage("Downloading " + self.packageName +
                                         " from: " + loadJson["downloadUrl64"])
@@ -122,6 +132,10 @@ class main(PackageManager.Manager):
         helpers.infoMessage(
             "Installing " + self.packageName +". This will take a moment depends on software your installing. ")
 
+        if self.parser.keyExists(self.scriptFile, "64bitonly"):
+            if not helpers.is_os_64bit():
+                helpers.errorMessage("This package is only for 64-bit devices.")
+                return False
         try:
             call_exe = subprocess.Popen('"{0}.{1}" {2}'.format(
                 self.packagePathWithoutExt, self.scriptFile["fileType"],
