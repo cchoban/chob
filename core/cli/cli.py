@@ -107,3 +107,10 @@ class main:
                 helpers.successMessage("Choban Package Manager")
                 helpers.infoMessage("Version "+f.read())
                 f.close()
+
+    def server_status(self):
+        resp = http.Http().get(repo.repos()["programList"])
+        if resp and resp.status_code == 200:
+            return {"message": resp.content, "status_code": resp.status_code}
+        else:
+            return False

@@ -110,3 +110,10 @@ def askQuestion(question):
             exit("Please respond with 'yes' or 'no'")
     else:
         return True
+
+
+def is_verbose():
+    if "--verbose" in sys.argv:
+        return True
+    else:
+        return False
