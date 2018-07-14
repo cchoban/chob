@@ -2,6 +2,8 @@ import json
 from . import FileManager
 import helpers
 from Logger import Logger as log
+from sys import argv
+
 
 class Parser:
     def __init__(self, path=""):
@@ -26,14 +28,16 @@ class Parser:
                 try:
                     convertToJSON = json.load(f)
                     self.json = convertToJSON
-                    self.merge_objects()
+                    #FIXME: can make a problem
+                    if helpers.getCobanPath+"\\packages\\" in _path or ".package\\" in _path:
+                        self.merge_objects()
                     return self.json
 
                 except Exception as e:
                     log.new(e).logError()
                     helpers.errorMessage("Could not parse JSON file while trying to convert it: " + _path, True)
                     if helpers.is_verbose():
-                        print(e)
+                        helpers.errorMessage("JsonParser.fileToJson - "+e)
                     return False
 
     def isValid(self):

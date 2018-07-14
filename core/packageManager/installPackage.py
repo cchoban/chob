@@ -58,9 +58,12 @@ class main(PackageManager.Manager):
     def download(self):
         httpClass = http.Http
         loadJson = self.scriptFile
+        download_url = loadJson["downloadUrl64"] if helpers.is_os_64bit() else loadJson["downloadUrl"]
+        download_path = self.packagePathWithoutExt = helpers.getToolsPath+"\\"+self.packageName if self.parser.keyExists(loadJson, "installFromTools") else self.packagePathWithoutExt
+        file_path = download_path+"."+loadJson["fileType"]
+        self.install_path = file_path
 
-        if not file.Manager().fileExists(self.packagePathWithoutExt + "." +
-                                         loadJson["fileType"]):
+        if not file.Manager().fileExists(file_path):
 
             if self.parser.keyExists(self.scriptFile, "64bitonly"):
                 if not helpers.is_os_64bit():
@@ -70,23 +73,16 @@ class main(PackageManager.Manager):
                     helpers.infoMessage("Downloading " + self.packageName +
                                         " from: " + loadJson["downloadUrl64"])
                     httpClass.download(httpClass, loadJson["downloadUrl64"],
-                                       self.packagePathWithoutExt,
+                                       download_path,
                                        loadJson["fileType"])
                     return True
 
-            if helpers.is_os_64bit():
-                if self.parser.keyExists(loadJson, "downloadUrl64"):
-                    helpers.infoMessage("Downloading " + self.packageName +
-                                        " from: " + loadJson["downloadUrl64"])
-                    httpClass.download(httpClass, loadJson["downloadUrl64"],
-                                       self.packagePathWithoutExt,
-                                       loadJson["fileType"])
-            else:
+            if self.parser.keyExists(loadJson, "downloadUrl64"):
                 helpers.infoMessage("Downloading " + self.packageName +
-                                    " from: " + loadJson["downloadUrl"])
-                httpClass.download(httpClass, loadJson["downloadUrl"],
-                                   self.packagePathWithoutExt,
-                                   loadJson["fileType"])
+                                    " from: " + download_url)
+                httpClass.download(httpClass, download_url,
+                                    download_path,
+                                    loadJson["fileType"])
 
     def unzipPackage(self):
         extensions = {
@@ -137,14 +133,10 @@ class main(PackageManager.Manager):
                 helpers.errorMessage("This package is only for 64-bit devices.")
                 return False
         try:
-            call_exe = subprocess.Popen('"{0}.{1}" {2}'.format(
-                self.packagePathWithoutExt, self.scriptFile["fileType"],
-                self.scriptFile["silentArgs"]))
+            call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]))
         except OSError as e:
             if e.winerror == 193:
-                call_exe = subprocess.Popen('"{0}.{1}" {2}'.format(
-                self.packagePathWithoutExt, self.scriptFile["fileType"],
-                self.scriptFile["silentArgs"]), shell=True)
+                call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]), shell=True)
         call_exe.communicate()[0]
         self.exit_code = call_exe.returncode
 
