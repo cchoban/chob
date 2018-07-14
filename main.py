@@ -3,7 +3,6 @@ from core.cli import cli
 from core import PackageManager
 from sys import argv
 
-#TODO: make local packages be installable
 if len(argv) == 1:
     print("""
         Choban package manager
