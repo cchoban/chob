@@ -2,43 +2,37 @@ import json
 from . import FileManager
 import helpers
 from Logger import Logger as log
-from sys import argv
 
 class Parser:
     def __init__(self, path=""):
         self.path = path
-        pass
+        self.json = {}
+        self.objects = {
+            "{cobanPath}": helpers.getCobanPath,
+            "{cobanTools}": helpers.getToolsPath
+        }
 
     def fileToJson(self, path=""):
         """
         Converts json file to dict.
-        :param path:
+        :param path: Json absolute path
         :return json:
         """
-        if not path == "":
-            with open(path, "r") as f:
+
+        _path = path or self.path
+        if _path:
+            with open(_path, "r") as f:
 
                 try:
                     convertToJSON = json.load(f)
-                    return convertToJSON
+                    self.json = convertToJSON
+                    self.merge_objects()
+                    return self.json
 
                 except Exception as e:
                     log.new(e).logError()
-                    helpers.errorMessage("Could not parse JSON file while trying to convert it: " + path, True)
-                    if "--verbose" in argv:
-                        print(e)
-                    return False
-
-        else:
-            with open(self.path, "r") as f:
-                try:
-                    convertToJSON = json.load(f)
-                    return convertToJSON
-
-                except Exception as e:
-                    log.new(e).logError()
-                    helpers.errorMessage("Could not parse JSON file while trying to convert it: " + self.path, True)
-                    if "--verbose" in argv:
+                    helpers.errorMessage("Could not parse JSON file while trying to convert it: " + _path, True)
+                    if helpers.is_verbose():
                         print(e)
                     return False
 
@@ -125,6 +119,11 @@ class Parser:
                 f.close()
 
     def remove_package_symlink(self, packageName):
+        """Removes already created package symlink
+
+        Arguments:
+        :param packageName: Package name for remove symlink
+        """
         jsonFile = helpers.symlinkList()
         js = helpers.getCobanPath + "\\symlinks.json"
 
@@ -136,6 +135,11 @@ class Parser:
             f.close()
 
     def removePackage(self, packageName):
+        """Removes a packagefrom packages.json
+
+        Arguments:
+        :param packageName: Package name for removing it from packages.json
+        """
         jsonFile = helpers.getCobanPath + "\\packages.json"
         with open(jsonFile, "r") as f:
             js = json.load(f)
@@ -144,13 +148,20 @@ class Parser:
             newDict = js["installedApps"].pop(packageName)
         except ValueError as e:
             log.new(e).logError()
-            pass
-
+            if helpers.is_verbose():
+                helpers.errorMessage("JsonParser.removePackage() = "+e)
         with open(jsonFile, "w") as f:
             f.write(json.dumps(js))
             f.close()
 
     def keyExists(self, array, key):
+        """Check is specified key exists in array
+
+        Arguments:
+        :param array: Array to check key if it exists or not.
+        :param key: Key to check if it exists in array
+        :return boolean:
+        """
         if key in array:
             return True
         else:
@@ -158,8 +169,22 @@ class Parser:
 
 
     def is_json(self, string):
+        """Determining if string is json
+
+        Arguments:
+        :param string: String to be controller if its json or not.
+        :return boolean:
+        """
         try:
             json.loads(string)
         except ValueError as e:
             return False
         return True
+
+    def merge_objects(self):
+        """Merge objects in json file."""
+        objects = [obj for obj in self.objects ]
+        package_args = self.json["packageArgs"]
+        for i in package_args:
+            if package_args[i] in objects:
+                package_args[i] = package_args[i].replace(package_args[i], self.objects[package_args[i]])
