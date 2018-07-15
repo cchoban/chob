@@ -5,7 +5,7 @@ from packageCreator import creator, pack, push, auth
 from Logger import Logger as log
 from . import doctor
 import re
-
+from sys import exit
 
 class main:
 

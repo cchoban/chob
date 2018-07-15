@@ -5,6 +5,9 @@ import math
 from tqdm import tqdm
 import helpers
 from core.cli import cli
+from sys import exit
+
+
 class Http:
 
     def __init__(self, url="", path=""):

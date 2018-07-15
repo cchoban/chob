@@ -1,7 +1,7 @@
 import argparse, helpers
 from core.cli import cli
 from core import PackageManager
-from sys import argv
+from sys import argv, exit
 
 if len(argv) == 1:
     print("""

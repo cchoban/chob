@@ -108,7 +108,7 @@ def askQuestion(question):
         elif choice in no:
             return False
         else:
-            exit("Please respond with 'yes' or 'no'")
+            sys.exit("Please respond with 'yes' or 'no'")
     else:
         return True
 

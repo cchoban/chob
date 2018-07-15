@@ -1,7 +1,7 @@
 from core import FileManager
 import helpers
 import hashlib
-
+from sys import exit
 
 class main:
     def __init__(self, generate=False, token=None):

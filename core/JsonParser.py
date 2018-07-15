@@ -2,7 +2,7 @@ import json
 from . import FileManager
 import helpers
 from Logger import Logger as log
-from sys import argv
+from sys import argv, exit
 
 
 class Parser:

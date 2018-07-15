@@ -3,7 +3,7 @@ import helpers
 from subprocess import Popen
 from windows import winregistry
 from Logger import Logger as log
-
+from sys import exit
 
 class main(PackageManager.Manager):
     #FIXME: neredeyse hersey tamam sadece package printleniyor ve bi ustten gec

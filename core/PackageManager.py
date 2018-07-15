@@ -3,7 +3,7 @@ from . import FileManager as file
 from . import JsonParser as json
 from . import hash
 from .cli import cli
-
+from sys import exit
 
 class Manager:
     def __init__(self, packageName, skipHashes, force, agreements):

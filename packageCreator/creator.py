@@ -3,7 +3,7 @@ import json
 import subprocess
 from core import FileManager
 import helpers
-
+from sys import exit
 
 class generateNewPackage:
     def __init__(self, packageName=None, generateFlatFileOnly=False):

@@ -3,7 +3,7 @@ import hashlib
 from core import JsonParser as json
 from Logger import Logger as log
 from os.path import abspath
-
+from sys import exit
 
 class check:
 

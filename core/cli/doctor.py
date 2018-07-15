@@ -1,7 +1,7 @@
 import helpers
 from core import FileManager, JsonParser
 import pip
-
+from sys import exit
 
 class doctor:
     def __init__(self):

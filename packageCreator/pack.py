@@ -1,7 +1,7 @@
 from core import FileManager
 import os
 import helpers
-
+from sys import exit
 
 class main():
     def __init__(self):

@@ -1,6 +1,6 @@
 import errno, winreg, re, helpers
 from Logger import Logger as log
-
+from sys import exit
 
 class Registry:
     def __init__(self):

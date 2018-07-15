@@ -5,7 +5,7 @@ import helpers
 from core import http
 from core import FileManager as file
 from Logger import Logger as log
-
+from sys import exit
 
 class main(PackageManager.Manager):
     def isInstallable(self):

@@ -2,7 +2,7 @@ from core import PackageManager, FileManager as file
 from core.cli import cli
 from core.packageManager import installPackage, removePackage
 import helpers
-
+from sys import exit
 
 class main(PackageManager.Manager):
 
