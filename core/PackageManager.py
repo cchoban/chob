@@ -61,8 +61,7 @@ class Manager:
                          self.forceInstallation, self.skipAgreements).test()
 
     def isInstalled(self):
-        if not self.forceInstallation and self.parser.keyExists(helpers.installedApps()["installedApps"],
-                                                                self.packageName):
+        if not self.forceInstallation and not helpers.isInstalled():
             return True
         else:
             return False

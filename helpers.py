@@ -69,11 +69,10 @@ def symlinkList():
 
 
 def isInstalled(packageName):
-    #FIXME: wrong bool
     if packageName in installedApps():
-        return False
-    else:
         return True
+    else:
+        return False
 
 
 def has_admin():
