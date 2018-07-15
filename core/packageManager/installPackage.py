@@ -59,7 +59,7 @@ class main(PackageManager.Manager):
     def download(self):
         httpClass = http.Http
         loadJson = self.scriptFile
-        download_url = loadJson["downloadUrl64"] if helpers.is_os_64bit() else loadJson["downloadUrl"]
+        download_url = loadJson["downloadUrl64"] if helpers.is_os_64bit() and self.parser.keyExists(self.scriptFile, "downloadUrl64") else loadJson["downloadUrl"]
         download_path = self.packagePathWithoutExt = helpers.getToolsPath+"\\"+self.packageName if self.parser.keyExists(loadJson, "installFromTools") else self.packagePathWithoutExt
         file_path = download_path+"."+loadJson["fileType"]
         self.install_path = file_path
@@ -78,12 +78,11 @@ class main(PackageManager.Manager):
                                        loadJson["fileType"])
                     return True
 
-            if self.parser.keyExists(loadJson, "downloadUrl64"):
-                helpers.infoMessage("Downloading " + self.packageName +
-                                    " from: " + download_url)
-                httpClass.download(httpClass, download_url,
-                                    download_path,
-                                    loadJson["fileType"])
+            helpers.infoMessage("Downloading " + self.packageName +
+                                " from: " + download_url)
+            httpClass.download(httpClass, download_url,
+                                download_path,
+                                loadJson["fileType"])
 
     def unzipPackage(self):
         extensions = {
