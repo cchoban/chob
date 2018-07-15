@@ -61,7 +61,7 @@ class Manager:
                          self.forceInstallation, self.skipAgreements).test()
 
     def isInstalled(self):
-        if not self.forceInstallation and not helpers.isInstalled():
+        if not self.forceInstallation and not helpers.isInstalled(self.packageName):
             return True
         else:
             return False
