@@ -32,20 +32,21 @@ class main(PackageManager.Manager):
                 if self.isInstallable():
                     self.download()
                     self.checkHash()
-                    if self.checkForDependencies():
-                        self.downloadDependencies()
                     self.beginAction()
-
                     if not self.parser.keyExists(self.scriptFile, "unzip"):
                         if self.valid_exit_code():
                             self.parser.addNewPackage(self.packageName, self.scriptFile["version"])
                             helpers.successMessage("Successfully installed " + self.packageName)
+                            if self.checkForDependencies():
+                                self.downloadDependencies()
                             return True
                         else:
                             helpers.errorMessage("{0} was not installed successfully.".format(self.packageName))
                             return False
                     else:
                         helpers.successMessage("Successfully installed "+self.packageName)
+                        if self.checkForDependencies():
+                            self.downloadDependencies()
                 else:
                     exit(
                         "This file type is not supported. Create issue if you really think it should."
@@ -136,6 +137,7 @@ class main(PackageManager.Manager):
             call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]))
         except OSError as e:
             if e.winerror == 193:
+
                 call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]), shell=True)
         call_exe.communicate()[0]
         self.exit_code = call_exe.returncode
@@ -146,39 +148,27 @@ class main(PackageManager.Manager):
                 return self.installable[i]()
 
     def checkForDependencies(self):
-        if self.parser.keyExists(self.scriptFile, "d,ependencies"):
+        if self.parser.keyExists(self.scriptFile, "dependencies"):
             for i in self.scriptFile["dependencies"]:
                 if i in helpers.programList() and i not in helpers.installedApps()["installedApps"]:
                     helpers.infoMessage("Found dependencies: " + i)
                     self.oldPackageName = self.packageName
                     self.packageName = i
                     return True
+                else:
+                    return False
 
     def downloadDependencies(self):
         # FIXME: downloading of dependencies will not work because of
         downloadDependencies(self.packageName, self.skipHashes,
                              self.forceInstallation, True).run()
         downloadDependencies(self.oldPackageName, self.skipHashes,
-                             self.forceInstallation, True).installPackage()
-
-        try:
-            super(
-                main(self.oldPackageName, self.skipHashes,
-                     self.forceInstallation, True).installer())
-        except Exception as e:
-            log.new(e).logError()
+                             self.forceInstallation, True).run()
 
 
 class downloadDependencies(main):
     def run(self):
         try:
-            installer = self.installer()
-        except Exception as e:
-            log.new(e).logError()
-
-    def installPackage(self):
-        try:
-            self.packageName = self.oldPackageName
             installer = self.installer()
         except Exception as e:
             log.new(e).logError()
