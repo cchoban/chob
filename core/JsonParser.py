@@ -30,14 +30,14 @@ class Parser:
                     self.json = convertToJSON
                     #FIXME: can make a problem
                     if helpers.getCobanPath+"\\packages\\" in _path or ".package\\" in _path:
-                        self.merge_objects()
+                        self.compile_objects()
                     return self.json
 
                 except Exception as e:
                     log.new(e).logError()
                     helpers.errorMessage("Could not parse JSON file while trying to convert it: " + _path, True)
                     if helpers.is_verbose():
-                        helpers.errorMessage("JsonParser.fileToJson - "+e)
+                        helpers.errorMessage("JsonParser.fileToJson - "+str(e))
                     return False
 
     def isValid(self):
@@ -67,7 +67,9 @@ class Parser:
                 f.write(js)
                 f.close()
         except OSError as e:
-            exit(e)
+            log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage("JsonParser.rewriteJson - "+str(e))
 
     def getKey(self, key, path):
         """
@@ -81,7 +83,9 @@ class Parser:
         try:
             dict["packageArgs"][key]
         except KeyError as e:
-            exit(key + " does not exists")
+            log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage("JsonParser.getKey - "+str(e))
 
     def addNewPackage(self, packageName, version):
         """
@@ -185,7 +189,7 @@ class Parser:
             return False
         return True
 
-    def merge_objects(self):
+    def compile_objects(self):
         """Merge objects in json file."""
         objects = [obj for obj in self.objects ]
         package_args = self.json["packageArgs"]

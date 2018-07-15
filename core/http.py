@@ -36,6 +36,7 @@ class Http:
                 helpers.errorMessage("The server is not accessible at this time.")
             else:
                 if helpers.is_verbose():
+                    helpers.errorMessage("Http.download: "+str(e))
                     print(sv["message"])
             exit()
 

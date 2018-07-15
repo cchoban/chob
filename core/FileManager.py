@@ -6,7 +6,7 @@ from Logger import Logger
 from subprocess import run, call, DEVNULL
 from Logger import Logger as log
 from json import dumps
-
+from sys import exit
 
 class Manager:
     def os(self):
@@ -30,8 +30,10 @@ class Manager:
             else:
                 return False
         except FileNotFoundError as e:
+            log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage("FileManager.fileExists - File not found: "+str(e))
             exit()
-
     def createFolder(self, path, hidden=False):
         """
         Creates folder with specified path
@@ -43,8 +45,10 @@ class Manager:
                 if hidden:
                     call(["attrib", "+H", os.path.abspath(path)])
         except Exception as e:
+            log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage("FileManager.createFolder - "+str(e))
             exit()
-
     def createFile(self, path, content="", hidden=False):
         """
         Creates file with content
@@ -61,6 +65,8 @@ class Manager:
                     call(["attrib", "+H", os.path.abspath(path)])
         except Exception as e:
             log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage("FileManager.createFile - "+str(e))
 
     def createSymLink(self, path, dest):
         from  win32file import CreateSymbolicLink
@@ -74,7 +80,8 @@ class Manager:
             return True
         except OSError or PermissionError or WindowsError or FileNotFoundError or FileExistsError as e:
             log.new(e).logError()
-            helpers.errorMessage(e.strerror)
+            if helpers.is_verbose():
+                helpers.errorMessage("FileManager.createSymlink: "+str(e.strerror))
             return False
 
     def createJsonFile(self, path, withDict={}):
@@ -87,6 +94,8 @@ class Manager:
             self.createFile(dumps(withDict))
         except FileNotFoundError or PermissionError or Exception as e:
             log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage("FileManager.createJsonFile: "+str(e.strerror))
 
     def removeDir(self, path):
         """
@@ -99,6 +108,8 @@ class Manager:
                 os.removedirs(path)
             except FileNotFoundError or WindowsError or PermissionError or Exception as e:
                 log.new(e).logError()
+                if helpers.is_verbose():
+                    helpers.errorMessage("FileManager.removeDir: "+str(e.strerror))
         else:
             helpers.infoMessage(
                 "Path does not exists while trying to remove it: " + path)
@@ -115,7 +126,9 @@ class Manager:
                 move(filePath, fileDest)
             except WindowsError or FileNotFoundError or FileExistsError as e:
                 log.new(e).logError()
-                exit(0)
+            if helpers.is_verbose():
+                helpers.errorMessage("FileManager.moveFile: "+str(e.strerror))
+                exit()
 
     def copyFile(self, filePath, fileDest):
         """
@@ -129,8 +142,9 @@ class Manager:
                 copy(filePath, fileDest)
             except WindowsError or FileNotFoundError or FileExistsError as e:
                 log.new(e).logError()
-                exit(0)
-
+                if helpers.is_verbose():
+                    helpers.errorMessage("FileManager.copyFile: "+str(e.strerror))
+                exit()
     def __zipdir(self, path, zip, ignoreFiles=[]):
         for file in os.listdir(path):
             if not file in ignoreFiles:
@@ -159,9 +173,10 @@ class Manager:
 
             return True
         except OSError or PermissionError or FileNotFoundError as e:
-            Logger.new(e).logError()
+            log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage("FileManager.makeZip: "+str(e.strerror))
             exit()
-
     def extractZip(self, zip, dest):
         """
         Extract zip
@@ -176,9 +191,10 @@ class Manager:
             helpers.successMessage(
                 "Successfully unzipped " + zip + " to " + dest)
         except WindowsError or PermissionError or FileNotFoundError as e:
-            Logger.new(e).logError()
+            log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage("FileManager.extractZip: "+str(e.strerror))
             exit()
-
     def extract7z(self, zip, dest):
         """
         Extract 7zip
@@ -194,7 +210,9 @@ class Manager:
             helpers.successMessage(
                 "Successfully unzipped " + zip + " to " + dest)
         except WindowsError or PermissionError or FileNotFoundError as e:
-            Logger.new(e).logError()
+            log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage("FileManager.extract7z: "+str(e.strerror))
             exit()
 
     def cleanup(self, packageName=""):

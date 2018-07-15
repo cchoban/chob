@@ -47,6 +47,8 @@ class main:
                                "programList"], helpers.getCobanPath + "\\programList", "json")
         except Exception as e:
             log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage("cli.cli.update: "+str(e.strerror))
 
     def doctor(self):
         doc = doctor.doctor()
