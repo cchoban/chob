@@ -15,6 +15,8 @@ class Manager:
         self.parser = json.Parser()
         self.exit_code = None
         self.install_path = ""
+        self.dependencies = None
+
         if not isinstance(packageName, list):
             self.packagePathWithoutExt = helpers.packageInstallationPath + \
                 packageName + "\\" + packageName

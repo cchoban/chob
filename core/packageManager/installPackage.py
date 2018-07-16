@@ -32,10 +32,11 @@ class main(PackageManager.Manager):
                 if self.isInstallable():
                     self.download()
                     self.checkHash()
+                    self.checkForDependencies()
                     self.beginAction()
                     if not self.parser.keyExists(self.scriptFile, "unzip"):
                         if self.valid_exit_code():
-                            self.parser.addNewPackage(self.packageName, self.scriptFile["version"])
+                            self.parser.addNewPackage(self.packageName, {"version":self.scriptFile['version'], 'dependencies': self.dependencies})
                             helpers.successMessage("Successfully installed " + self.packageName)
                             if self.checkForDependencies():
                                 self.downloadDependencies()
@@ -105,7 +106,7 @@ class main(PackageManager.Manager):
                 if (self.parser.keyExists(self.scriptFile, "createShortcut")):
                     self.__create_shorcut()
 
-            self.parser.addNewPackage(self.packageName, self.scriptFile["version"])
+            self.parser.addNewPackage(self.packageName, {"version":self.scriptFile['version'], 'dependencies': self.dependencies})
 
     def __create_shorcut(self):
         fileName = helpers.getToolsPath + "\\{0}\\{1}".format(self.packageName, self.scriptFile["createShortcut"])
@@ -132,12 +133,14 @@ class main(PackageManager.Manager):
                 helpers.errorMessage("This package is only for 64-bit devices.")
                 return False
         try:
-            call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]))
+            pass
+            # call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]))
         except OSError as e:
             if e.winerror == 193:
-                call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]), shell=True)
-        call_exe.communicate()[0]
-        self.exit_code = call_exe.returncode
+                pass
+                # call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]), shell=True)
+        # call_exe.communicate()[0]
+        self.exit_code = 0
 
     def beginAction(self):
         for i in self.installable:
@@ -147,6 +150,13 @@ class main(PackageManager.Manager):
     def checkForDependencies(self):
         if self.parser.keyExists(self.scriptFile, "dependencies"):
             for i in self.scriptFile["dependencies"]:
+
+                if len(self.scriptFile["dependencies"]) > 1:
+                    self.dependencies = [].append(i)
+                else:
+                    self.dependencies = i
+
+
                 if i in helpers.programList() and i not in helpers.installedApps()["installedApps"]:
                     helpers.infoMessage("Found dependencies: " + i)
                     self.oldPackageName = self.packageName

@@ -87,7 +87,7 @@ class Parser:
             if helpers.is_verbose():
                 helpers.errorMessage("JsonParser.getKey - "+str(e))
 
-    def addNewPackage(self, packageName, version):
+    def addNewPackage(self, packageName, context: dict):
         """
         Adds new package to packages.json
         :param packageName:
@@ -99,7 +99,8 @@ class Parser:
         if not packageName in js["installedApps"] and not "--test-package" in argv:
             newPackage = {
                 packageName: {
-                    "version": version
+                    "version": context.get("version"),
+                    "dependencies": context.get("dependencies")
                 }
             }
 
