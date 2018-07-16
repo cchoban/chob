@@ -69,7 +69,6 @@ def symlinkList():
 
 
 def isInstalled(packageName):
-    print(installedApps())
     if packageName in installedApps()["installedApps"]:
         return False
     else:

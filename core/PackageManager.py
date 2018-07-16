@@ -14,7 +14,7 @@ class Manager:
         self.forceInstallation = force
         self.parser = json.Parser()
         self.exit_code = None
-
+        self.install_path = ""
         if not isinstance(packageName, list):
             self.packagePathWithoutExt = helpers.packageInstallationPath + \
                 packageName + "\\" + packageName
@@ -78,7 +78,6 @@ class Manager:
             else:
                 self.scriptFile = self.parser.fileToJson(
                     self.packagePathWithExt)
-                print(self.scriptFile)
 
     def agreement(self, action="install"):
         if self.skipAgreements:

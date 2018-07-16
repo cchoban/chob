@@ -60,7 +60,7 @@ class main(PackageManager.Manager):
         httpClass = http.Http
         loadJson = self.scriptFile
         download_url = loadJson["downloadUrl64"] if helpers.is_os_64bit() and self.parser.keyExists(self.scriptFile, "downloadUrl64") else loadJson["downloadUrl"]
-        download_path = self.packagePathWithoutExt = helpers.getToolsPath+"\\"+self.packageName if self.parser.keyExists(loadJson, "installFromTools") else self.packagePathWithoutExt
+        download_path = self.packagePathWithoutExt
         file_path = download_path+"."+loadJson["fileType"]
         self.install_path = file_path
 
@@ -112,13 +112,13 @@ class main(PackageManager.Manager):
         fileDest = helpers.getCobanBinFolder+"\\"+self.scriptFile["createShortcut"]
 
         ask = helpers.askQuestion(
-        "Do you want to copy {0} to lib folder ( This will help you to launch app from command prompt)".
+        "Do you want to create link {0} to lib folder ( This will help you to launch app from command prompt)".
         format(self.scriptFile["createShortcut"]))
 
         if ask:
-
             helpers.infoMessage("Creating shortcut for "+self.packageName)
             createSymLink = file.Manager().createSymLink(fileName, fileDest)
+
             if createSymLink:
                 json.Parser().add_new_symlink(self.packageName, fileDest)
                 helpers.successMessage("Successfully created shortcut")
@@ -127,7 +127,6 @@ class main(PackageManager.Manager):
     def installExecutable(self):
         helpers.infoMessage(
             "Installing " + self.packageName +". This will take a moment depends on software your installing. ")
-
         if self.parser.keyExists(self.scriptFile, "64bitonly"):
             if not helpers.is_os_64bit():
                 helpers.errorMessage("This package is only for 64-bit devices.")
@@ -136,7 +135,6 @@ class main(PackageManager.Manager):
             call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]))
         except OSError as e:
             if e.winerror == 193:
-
                 call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]), shell=True)
         call_exe.communicate()[0]
         self.exit_code = call_exe.returncode
