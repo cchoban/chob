@@ -70,9 +70,9 @@ def symlinkList():
 
 def isInstalled(packageName):
     if packageName in installedApps()["installedApps"]:
-        return False
-    else:
         return True
+    else:
+        return False
 
 
 def has_admin():

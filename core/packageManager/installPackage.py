@@ -37,17 +37,15 @@ class main(PackageManager.Manager):
                     if not self.parser.keyExists(self.scriptFile, "unzip"):
                         if self.valid_exit_code():
                             self.parser.addNewPackage(self.packageName, {"version":self.scriptFile['version'], 'dependencies': self.dependencies})
-                            helpers.successMessage("Successfully installed " + self.packageName)
-                            if self.checkForDependencies():
-                                self.downloadDependencies()
+                            helpers.successMessage("Successfully installed "+ self.packageName)
+                            self.downloadDependencies()
                             return True
                         else:
                             helpers.errorMessage("{0} was not installed successfully.".format(self.packageName))
                             return False
                     else:
                         helpers.successMessage("Successfully installed "+self.packageName)
-                        if self.checkForDependencies():
-                            self.downloadDependencies()
+                        self.downloadDependencies()
                 else:
                     exit(
                         "This file type is not supported. Create issue if you really think it should."
@@ -147,35 +145,7 @@ class main(PackageManager.Manager):
             if json.Parser().keyExists(self.scriptFile,i) or self.scriptFile["fileType"] == i:
                 return self.installable[i]()
 
-    def checkForDependencies(self):
-        if self.parser.keyExists(self.scriptFile, "dependencies"):
-            for i in self.scriptFile["dependencies"]:
-
-                if len(self.scriptFile["dependencies"]) > 1:
-                    self.dependencies = [].append(i)
-                else:
-                    self.dependencies = i
-
-
-                if i in helpers.programList() and i not in helpers.installedApps()["installedApps"]:
-                    helpers.infoMessage("Found dependencies: " + i)
-                    self.oldPackageName = self.packageName
-                    self.packageName = i
-                    return True
-                else:
-                    return False
-
+    #TODO: same as removing packages
     def downloadDependencies(self):
-        # FIXME: downloading of dependencies will not work because of
-        downloadDependencies(self.packageName, self.skipHashes,
-                             self.forceInstallation, True).run()
-        downloadDependencies(self.oldPackageName, self.skipHashes,
-                             self.forceInstallation, True).run()
-
-
-class downloadDependencies(main):
-    def run(self):
-        try:
-            installer = self.installer()
-        except Exception as e:
-            log.new(e).logError()
+        self.packageName = self.dependencies
+        self.installPackage()

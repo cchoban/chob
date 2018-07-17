@@ -48,9 +48,8 @@ if arg.test_package:
     # PackageManager.Manager(arg.test_package, arg.skipHash, arg.force, arg.y).testPackage()
     PackageManager.Manager(arg.test_package, arg.skipHash, arg.force, arg.y).testPackage()
 
-
 if arg.R:
-    PackageManager.Manager(arg.R, arg.skipHash, arg.force, arg.y).removePackage()
+    PackageManager.Manager(arg.R, arg.skipHash, arg.force, arg.y, True).removePackage()
 
 if arg.upgrade:
     PackageManager.Manager(arg.upgrade, arg.skipHash, arg.force, arg.y).upgradePackage()

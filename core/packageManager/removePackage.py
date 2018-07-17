@@ -15,11 +15,16 @@ class main(PackageManager.Manager):
                     self.downloadScript(True)
                 else:
                     self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)
+
+                self.checkForDependencies()
+
                 if self.__findReg():
                     self.uninstallExecutable()
                 else:
                     self.uninstallFromTools()
                 self.__remove_symlinks()
+
+                self.remove_dependencies()
         else:
             helpers.infoMessage("There is no packages with name of " + self.packageName)
             return False
@@ -82,6 +87,21 @@ class main(PackageManager.Manager):
             helpers.successMessage("Successfully removed "+self.packageName)
         else:
             return False
+
+    def remove_dependencies(self):
+        #TODO: check dependencies if its using by another package
+        if self.dependencies:
+            # if isinstance(self.dependencies, list) and len(self.dependencies) > 1:
+            #     for dep in self.dependencies:
+            #         self.packageName.append(dep)
+
+            # for i in helpers.installedApps()['installedApps']:
+            #     if helpers.installedApps()['installedApps'][i].get(self.dependencies):
+            #         print('basakasi tarafindan kullaniliyor')
+
+            dependencies = self.dependencies if not isinstance(self.dependencies, list) else [i for i in self.dependencies]
+            self.packageName = dependencies
+            self.removePackage()
 
     def __do_cleanup(self):
         helpers.infoMessage("Skipping uninstaller process - No registry key found.")
