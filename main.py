@@ -4,15 +4,14 @@ from core import PackageManager
 from sys import argv, exit
 
 if len(argv) == 1:
-    print("""
+    exit("""
         Choban package manager
         Type chob -h to get some help.
     """)
 
 
 if not helpers.has_admin():
-    print("You need admin permissions to be able use this program.")
-    exit()
+    exit("You need admin permissions to be able use this program.")
 
 parser = argparse.ArgumentParser(description="Choban Package manager")
 parser.add_argument("-S", nargs="*", help="Install package(s)")
