@@ -14,7 +14,6 @@ class main:
 
     def packageGenerator(self, packageName, generateFlatFileOnly=False):
         # TODO: bunu kendi classina tasi
-        print(generateFlatFileOnly)
         if generateFlatFileOnly:
             cls = creator.generatePackage(packageName, generateFlatFileOnly)
             json = cls.generateJson()
