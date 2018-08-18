@@ -91,7 +91,7 @@ class main(PackageManager.Manager):
 
         fileName = self.packageName + "." + self.scriptFile["fileType"]
 
-        #add verbose mode here
+        #TODO: add verbose mode here
         zipFile = helpers.packageInstallationPath + self.packageName + "\\" + fileName
 
         for i in extensions:
@@ -143,7 +143,6 @@ class main(PackageManager.Manager):
             if json.Parser().keyExists(self.scriptFile,i) or self.scriptFile["fileType"] == i:
                 return self.installable[i]()
 
-    #TODO: same as removing packages
     def downloadDependencies(self):
         self.packageName = self.dependencies
         self.installPackage()

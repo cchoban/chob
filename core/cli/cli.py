@@ -13,7 +13,6 @@ class main:
         pass
 
     def packageGenerator(self, packageName, generateFlatFileOnly=False):
-        # TODO: bunu kendi classina tasi
         if generateFlatFileOnly:
             cls = creator.generatePackage(packageName, generateFlatFileOnly)
             json = cls.generateJson()
@@ -40,7 +39,6 @@ class main:
     def update(self):
         helpers.infoMessage("Updating repo if needed " +
                             repo.repos()["programList"])
-        # TODO: if needed check for file size
         try:
             http.Http.download(http.Http, repo.repos()[
                                "programList"], helpers.getCobanPath + "\\programList", "json")

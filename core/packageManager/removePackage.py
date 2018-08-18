@@ -6,8 +6,6 @@ from Logger import Logger as log
 from sys import exit
 
 class main(PackageManager.Manager):
-    #FIXME: neredeyse hersey tamam sadece package printleniyor ve bi ustten gec
-    #FIXME: removePackage ncesinde biseyler paketi packagestan siliyor
     def uninstaller(self):
         if self.isInstalled():
             if self.agreement("uninstall"):
