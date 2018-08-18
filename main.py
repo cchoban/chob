@@ -16,7 +16,12 @@ if not helpers.has_admin():
 
 parser = argparse.ArgumentParser(description="Choban Package manager")
 parser.add_argument("-S", nargs="*", help="Install package(s)")
+parser.add_argument("--install", nargs="*", help="Install package(s)")
+
 parser.add_argument("-R", nargs="*", help="Remove package(s)")
+parser.add_argument("--remove", nargs="*", help="Remove package(s)")
+
+
 parser.add_argument("--upgrade", nargs="*", help="Upgrade package(s)")
 parser.add_argument("--test-package", type=str, help="This command helps you to test your package before you push to our servers.")
 parser.add_argument("-Ss", nargs="*", help="Search packages")
@@ -41,15 +46,16 @@ parser.add_argument("--version", action="store_true")
 arg = parser.parse_args()
 
 
-if arg.S:
-    PackageManager.Manager(arg.S, arg.skipHash, arg.force, arg.y).installPackage()
+if arg.S or arg.install:
+    package_name = arg.S if arg.S else arg.install
+    PackageManager.Manager(package_name, arg.skipHash, arg.force, arg.y).installPackage()
 
 if arg.test_package:
-    # PackageManager.Manager(arg.test_package, arg.skipHash, arg.force, arg.y).testPackage()
     PackageManager.Manager(arg.test_package, arg.skipHash, arg.force, arg.y).testPackage()
 
-if arg.R:
-    PackageManager.Manager(arg.R, arg.skipHash, arg.force, arg.y, True).removePackage()
+if arg.R or arg.remove:
+    package_name = arg.R if arg.R else arg.remove
+    PackageManager.Manager(package_name, arg.skipHash, arg.force, arg.y, True).removePackage()
 
 if arg.upgrade:
     PackageManager.Manager(arg.upgrade, arg.skipHash, arg.force, arg.y).upgradePackage()
