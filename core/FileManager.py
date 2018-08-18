@@ -227,7 +227,6 @@ class Manager:
 
         for i in helpers.installedApps()["installedApps"]:
             path = packagesPath + i
-            print(path)
             if self.fileExists(path):
                 self.removeDir(path)
                 helpers.successMessage("Removed: " + i)
