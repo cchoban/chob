@@ -131,13 +131,11 @@ class main(PackageManager.Manager):
                 helpers.errorMessage("This package is only for 64-bit devices.")
                 return False
         try:
-            pass
-            # call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]))
+            call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]))
         except OSError as e:
             if e.winerror == 193:
-                pass
-                # call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]), shell=True)
-        # call_exe.communicate()[0]
+                call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]), shell=True)
+        call_exe.communicate()[0]
         self.exit_code = 0
 
     def beginAction(self):
