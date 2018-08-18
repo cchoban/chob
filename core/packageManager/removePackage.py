@@ -89,15 +89,13 @@ class main(PackageManager.Manager):
             return False
 
     def remove_dependencies(self):
-        #TODO: check dependencies if its using by another package
         if self.dependencies:
-            # if isinstance(self.dependencies, list) and len(self.dependencies) > 1:
-            #     for dep in self.dependencies:
-            #         self.packageName.append(dep)
-
-            # for i in helpers.installedApps()['installedApps']:
-            #     if helpers.installedApps()['installedApps'][i].get(self.dependencies):
-            #         print('basakasi tarafindan kullaniliyor')
+            installedApps = helpers.installedApps()['installedApps']
+            for i in installedApps:
+                if installedApps[i].get('dependencies'):
+                    if self.dependencies in installedApps[i].get('dependencies'):
+                        helpers.errorMessage('Skipping uninstalling "{}" as it uses by another package:  "{}"'.format(self.dependencies, i))
+                        return False
 
             dependencies = self.dependencies if not isinstance(self.dependencies, list) else [i for i in self.dependencies]
             self.packageName = dependencies
