@@ -93,7 +93,7 @@ class main:
         doctor.doctor().downloadDependencies()
 
     def downloadScript(self, packageName):
-        packageUrl = helpers.programList()[packageName]
+        packageUrl = helpers.programList()[packageName]+'?download=true'
 
         if not FileManager.Manager().fileExists(helpers.packageInstallationPath + packageName):
             FileManager.Manager().createFolder(helpers.packageInstallationPath + packageName)
