@@ -104,4 +104,3 @@ class main(PackageManager.Manager):
         helpers.infoMessage("Cleanup left overs..")
         FileManager.Manager().cleanup(self.packageName)
         self.parser.removePackage(self.packageName)
-        helpers.successMessage("Successfully removed "+self.packageName)
