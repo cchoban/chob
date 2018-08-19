@@ -46,6 +46,7 @@ class main(PackageManager.Manager):
                     else:
                         helpers.successMessage("Successfully installed "+self.packageName)
                         self.downloadDependencies()
+                        return True
                 else:
                     exit(
                         "This file type is not supported. Create issue if you really think it should."
@@ -136,7 +137,7 @@ class main(PackageManager.Manager):
             if e.winerror == 193:
                 call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]), shell=True)
         call_exe.communicate()[0]
-        self.exit_code = 0
+        self.exit_code = call_exe.returncode
 
     def beginAction(self):
         for i in self.installable:
