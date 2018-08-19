@@ -32,21 +32,21 @@ class main(PackageManager.Manager):
                 if self.isInstallable():
                     self.download()
                     self.checkHash()
+                    self.checkForDependencies()
                     self.beginAction()
                     if not self.parser.keyExists(self.scriptFile, "unzip"):
                         if self.valid_exit_code():
-                            self.parser.addNewPackage(self.packageName, self.scriptFile["version"])
-                            helpers.successMessage("Successfully installed " + self.packageName)
-                            if self.checkForDependencies():
-                                self.downloadDependencies()
+                            self.parser.addNewPackage(self.packageName, {"version":self.scriptFile['version'], 'dependencies': self.dependencies})
+                            helpers.successMessage("Successfully installed "+ self.packageName)
+                            self.downloadDependencies()
                             return True
                         else:
                             helpers.errorMessage("{0} was not installed successfully.".format(self.packageName))
                             return False
                     else:
                         helpers.successMessage("Successfully installed "+self.packageName)
-                        if self.checkForDependencies():
-                            self.downloadDependencies()
+                        self.downloadDependencies()
+                        return True
                 else:
                     exit(
                         "This file type is not supported. Create issue if you really think it should."
@@ -60,7 +60,7 @@ class main(PackageManager.Manager):
         httpClass = http.Http
         loadJson = self.scriptFile
         download_url = loadJson["downloadUrl64"] if helpers.is_os_64bit() and self.parser.keyExists(self.scriptFile, "downloadUrl64") else loadJson["downloadUrl"]
-        download_path = self.packagePathWithoutExt = helpers.getToolsPath+"\\"+self.packageName if self.parser.keyExists(loadJson, "installFromTools") else self.packagePathWithoutExt
+        download_path = self.packagePathWithoutExt
         file_path = download_path+"."+loadJson["fileType"]
         self.install_path = file_path
 
@@ -92,7 +92,7 @@ class main(PackageManager.Manager):
 
         fileName = self.packageName + "." + self.scriptFile["fileType"]
 
-        #add verbose mode here
+        #TODO: add verbose mode here
         zipFile = helpers.packageInstallationPath + self.packageName + "\\" + fileName
 
         for i in extensions:
@@ -105,20 +105,20 @@ class main(PackageManager.Manager):
                 if (self.parser.keyExists(self.scriptFile, "createShortcut")):
                     self.__create_shorcut()
 
-            self.parser.addNewPackage(self.packageName, self.scriptFile["version"])
+            self.parser.addNewPackage(self.packageName, {"version":self.scriptFile['version'], 'dependencies': self.dependencies})
 
     def __create_shorcut(self):
         fileName = helpers.getToolsPath + "\\{0}\\{1}".format(self.packageName, self.scriptFile["createShortcut"])
         fileDest = helpers.getCobanBinFolder+"\\"+self.scriptFile["createShortcut"]
 
         ask = helpers.askQuestion(
-        "Do you want to copy {0} to lib folder ( This will help you to launch app from command prompt)".
+        "Do you want to create link {0} to lib folder ( This will help you to launch app from command prompt)".
         format(self.scriptFile["createShortcut"]))
 
         if ask:
-
             helpers.infoMessage("Creating shortcut for "+self.packageName)
             createSymLink = file.Manager().createSymLink(fileName, fileDest)
+
             if createSymLink:
                 json.Parser().add_new_symlink(self.packageName, fileDest)
                 helpers.successMessage("Successfully created shortcut")
@@ -127,7 +127,6 @@ class main(PackageManager.Manager):
     def installExecutable(self):
         helpers.infoMessage(
             "Installing " + self.packageName +". This will take a moment depends on software your installing. ")
-
         if self.parser.keyExists(self.scriptFile, "64bitonly"):
             if not helpers.is_os_64bit():
                 helpers.errorMessage("This package is only for 64-bit devices.")
@@ -136,7 +135,6 @@ class main(PackageManager.Manager):
             call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]))
         except OSError as e:
             if e.winerror == 193:
-
                 call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]), shell=True)
         call_exe.communicate()[0]
         self.exit_code = call_exe.returncode
@@ -146,28 +144,6 @@ class main(PackageManager.Manager):
             if json.Parser().keyExists(self.scriptFile,i) or self.scriptFile["fileType"] == i:
                 return self.installable[i]()
 
-    def checkForDependencies(self):
-        if self.parser.keyExists(self.scriptFile, "dependencies"):
-            for i in self.scriptFile["dependencies"]:
-                if i in helpers.programList() and i not in helpers.installedApps()["installedApps"]:
-                    helpers.infoMessage("Found dependencies: " + i)
-                    self.oldPackageName = self.packageName
-                    self.packageName = i
-                    return True
-                else:
-                    return False
-
     def downloadDependencies(self):
-        # FIXME: downloading of dependencies will not work because of
-        downloadDependencies(self.packageName, self.skipHashes,
-                             self.forceInstallation, True).run()
-        downloadDependencies(self.oldPackageName, self.skipHashes,
-                             self.forceInstallation, True).run()
-
-
-class downloadDependencies(main):
-    def run(self):
-        try:
-            installer = self.installer()
-        except Exception as e:
-            log.new(e).logError()
+        self.packageName = self.dependencies
+        self.installPackage()

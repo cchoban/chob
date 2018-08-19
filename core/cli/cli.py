@@ -13,8 +13,6 @@ class main:
         pass
 
     def packageGenerator(self, packageName, generateFlatFileOnly=False):
-        # TODO: bunu kendi classina tasi
-        print(generateFlatFileOnly)
         if generateFlatFileOnly:
             cls = creator.generatePackage(packageName, generateFlatFileOnly)
             json = cls.generateJson()
@@ -41,7 +39,6 @@ class main:
     def update(self):
         helpers.infoMessage("Updating repo if needed " +
                             repo.repos()["programList"])
-        # TODO: if needed check for file size
         try:
             http.Http.download(http.Http, repo.repos()[
                                "programList"], helpers.getCobanPath + "\\programList", "json")
@@ -93,8 +90,7 @@ class main:
         doctor.doctor().downloadDependencies()
 
     def downloadScript(self, packageName):
-        packageUrl = helpers.programList()[packageName]
-
+        packageUrl = helpers.programList()[packageName]+'&download=true'
         if not FileManager.Manager().fileExists(helpers.packageInstallationPath + packageName):
             FileManager.Manager().createFolder(helpers.packageInstallationPath + packageName)
         helpers.infoMessage(

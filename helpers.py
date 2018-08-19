@@ -39,7 +39,7 @@ def redColor(message):
 def messages(type, template, packageName):
     messages = {
         "info": {
-            "alreadyInstalled": "You already installed this package. You can upgrade it by 'chob upgrade " + packageName + ""                                                                                                        "' or by adding '--force' argument to force installation"
+            "alreadyInstalled": "You already installed this package. You can upgrade it by 'chob --upgrade " + packageName + ""                                                                                                        "' or by adding '--force' argument to force installation"
         },
 
         "error": {
@@ -69,11 +69,10 @@ def symlinkList():
 
 
 def isInstalled(packageName):
-    print(installedApps())
     if packageName in installedApps()["installedApps"]:
-        return False
-    else:
         return True
+    else:
+        return False
 
 
 def has_admin():

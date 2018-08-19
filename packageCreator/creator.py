@@ -25,6 +25,7 @@ class generateNewPackage:
         self.icon = None
         self.unzip = None
         self.dict = {}
+        self.only64bit = None
         self.generateFlatFileOnly = generateFlatFileOnly
 
     def name(self):
@@ -51,12 +52,21 @@ class generateNewPackage:
         else:
             self.enable64bit = False
 
+    def only64(self):
+        package = input('Is this application 64-bit only? [Y/N]*: ')
+
+        if package == 'y':
+            self.only64bit = True
+        else:
+            self.only64bit = False
+
     def durl(self):
         if self.enable64bit:
             package64 = input("Download url for 64-bit product: ")
             self.downloadUrl64 = package64
-        package = input("Download url for 32-bit product: ")
-        self.downloadUrl = package
+        if not self.only64bit:
+            package = input("Download url for 32-bit product: ")
+            self.downloadUrl = package
 
     def ctype(self):
         if self.enable64bit:
@@ -105,11 +115,12 @@ class generatePackage(generateNewPackage):
 
     def getAnswers(self):
         if not self.generateFlatFileOnly:
-            self.name()
             self.sname()
             self.desc()
             self.ver()
-            self.is64bit()
+            self.only64()
+            if not self.only64bit:
+                self.is64bit()
             if not self.enable64bit:
                 self.isunzip()
             self.durl()
@@ -146,12 +157,11 @@ class generatePackage(generateNewPackage):
             }
         }
 
-        if self.unzip != None and self.unzip == True:
-            unzip = {
-                "unzip": True
-            }
+        if self.only64bit:
+            dict['packageArgs']['64bitonly'] = True
 
-            dict["packageArgs"].update(unzip)
+        if self.unzip != None and self.unzip == True:
+            dict['packageArgs']['unzip'] = True
 
         if self.generateFlatFileOnly or self.enable64bit:
             dict64 = {

@@ -4,8 +4,15 @@ import helpers
 from Logger import Logger as log
 from sys import argv, exit
 
+class JsonIsNotValid(Exception):
+    pass
+
+class KeyNotFound(Exception):
+    pass
+
 
 class Parser:
+
     def __init__(self, path=""):
         self.path = path
         self.json = {}
@@ -28,16 +35,19 @@ class Parser:
                 try:
                     convertToJSON = json.load(f)
                     self.json = convertToJSON
-                    #FIXME: can make a problem
-                    if helpers.getCobanPath+"\\packages\\" in _path or ".package\\" in _path:
+                    # FIXME: can make a problem
+                    if helpers.getCobanPath + "\\packages\\" in _path or ".package\\" in _path:
                         self.compile_objects()
                     return self.json
 
                 except Exception as e:
                     log.new(e).logError()
-                    helpers.errorMessage("Could not parse JSON file while trying to convert it: " + _path, True)
+                    helpers.errorMessage(
+                        "Could not parse JSON file while trying to convert it: " + _path, True)
                     if helpers.is_verbose():
-                        helpers.errorMessage("JsonParser.fileToJson - "+str(e))
+                        helpers.errorMessage(
+                            "JsonParser.fileToJson - " + str(e))
+                    raise JsonIsNotValid(e)
                     return False
 
     def isValid(self):
@@ -53,6 +63,7 @@ class Parser:
             else:
                 return False
         except Exception as e:
+            raise JsonIsNotValid(e)
             return False
 
     def rewriteJson(self):
@@ -69,7 +80,7 @@ class Parser:
         except OSError as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("JsonParser.rewriteJson - "+str(e))
+                helpers.errorMessage("JsonParser.rewriteJson - " + str(e))
 
     def getKey(self, key, path):
         """
@@ -83,11 +94,12 @@ class Parser:
         try:
             dict["packageArgs"][key]
         except KeyError as e:
+            raise KeyNotFound(e)
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("JsonParser.getKey - "+str(e))
+                helpers.errorMessage("JsonParser.getKey - " + str(e))
 
-    def addNewPackage(self, packageName, version):
+    def addNewPackage(self, packageName, context: dict):
         """
         Adds new package to packages.json
         :param packageName:
@@ -99,7 +111,8 @@ class Parser:
         if not packageName in js["installedApps"] and not "--test-package" in argv:
             newPackage = {
                 packageName: {
-                    "version": version
+                    "version": context.get("version"),
+                    "dependencies": context.get("dependencies")
                 }
             }
 
@@ -157,7 +170,7 @@ class Parser:
         except ValueError as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("JsonParser.removePackage() = "+e)
+                helpers.errorMessage("JsonParser.removePackage() = " + e)
         with open(jsonFile, "w") as f:
             f.write(json.dumps(js))
             f.close()
@@ -175,7 +188,6 @@ class Parser:
         else:
             return False
 
-
     def is_json(self, string):
         """Determining if string is json
 
@@ -186,13 +198,15 @@ class Parser:
         try:
             json.loads(string)
         except ValueError as e:
+            raise JsonIsNotValid(e)
             return False
         return True
 
     def compile_objects(self):
         """Merge objects in json file."""
-        objects = [obj for obj in self.objects ]
+        objects = [obj for obj in self.objects]
         package_args = self.json["packageArgs"]
         for i in package_args:
             if package_args[i] in objects:
-                package_args[i] = package_args[i].replace(package_args[i], self.objects[package_args[i]])
+                package_args[i] = package_args[i].replace(
+                    package_args[i], self.objects[package_args[i]])

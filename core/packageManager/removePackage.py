@@ -6,22 +6,27 @@ from Logger import Logger as log
 from sys import exit
 
 class main(PackageManager.Manager):
-    #FIXME: neredeyse hersey tamam sadece package printleniyor ve bi ustten gec
-    #FIXME: removePackage ncesinde biseyler paketi packagestan siliyor
     def uninstaller(self):
         if self.isInstalled():
             if self.agreement("uninstall"):
-                self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)
                 if not FileManager.Manager().fileExists(self.packagePathWithExt):
                     self.downloadScript(True)
+                else:
+                    self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)
+
+                self.checkForDependencies()
+
                 if self.__findReg():
                     self.uninstallExecutable()
                 else:
                     self.uninstallFromTools()
                 self.__remove_symlinks()
+
+                self.remove_dependencies()
         else:
             helpers.infoMessage("There is no packages with name of " + self.packageName)
-            exit()
+            return False
+
 
     def __findReg(self):
         reg = winregistry.Registry()
@@ -41,11 +46,14 @@ class main(PackageManager.Manager):
         try:
             if package:
                 helpers.infoMessage("Trying to remove {0} with original uninstaller..".format(self.packageName))
+
                 try:
                     call_exe = Popen('{0} {1}'.format(package["UninstallString"], self.scriptFile["packageUninstallArgs"]["silentArgs"]))
                 except OSError as e:
                     if e.errno == 193:
                         call_exe = Popen('{0} {1}'.format(package["UninstallString"], self.scriptFile["packageUninstallArgs"]["silentArgs"]), shell=True)
+
+
                 call_exe.communicate()[0]
                 self.exit_code = call_exe.returncode
                 self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
@@ -77,6 +85,19 @@ class main(PackageManager.Manager):
             helpers.successMessage("Successfully removed "+self.packageName)
         else:
             return False
+
+    def remove_dependencies(self):
+        if self.dependencies:
+            installedApps = helpers.installedApps()['installedApps']
+            for i in installedApps:
+                if installedApps[i].get('dependencies'):
+                    if self.dependencies in installedApps[i].get('dependencies'):
+                        helpers.errorMessage('Skipping uninstalling "{}" as it uses by another package:  "{}"'.format(self.dependencies, i))
+                        return False
+
+            dependencies = self.dependencies if not isinstance(self.dependencies, list) else [i for i in self.dependencies]
+            self.packageName = dependencies
+            self.removePackage()
 
     def __do_cleanup(self):
         helpers.infoMessage("Skipping uninstaller process - No registry key found.")

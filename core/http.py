@@ -23,6 +23,12 @@ class Http:
         }
         try:
             resp = requests.get(url, headers=headers, stream=True)
+
+            if resp.status_code == 404:
+                helpers.errorMessage('Server returned a broken link. Skipping this package as it\'s broken.')
+                if helpers.is_verbose():
+                    helpers.errorMessage('Http.download: Server returned 404 status code ({}).'.format(url))
+                exit()
             with open("{0}.{1}".format(path, ext), 'wb') as f:
                 total_size = int(resp.headers.get('content-length', 0));
                 block_size = 1024
