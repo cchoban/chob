@@ -1,7 +1,7 @@
 import repo
 import helpers
 from core import http, FileManager
-from packageCreator import creator, pack, push, auth
+from core.packageCreator import creator, pack, push, auth
 from Logger import Logger as log
 from . import doctor
 import re

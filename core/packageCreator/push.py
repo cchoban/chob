@@ -3,7 +3,7 @@ import helpers
 import os
 import json
 import requests
-from packageCreator import pack, auth
+from core.packageCreator import pack, auth
 from sys import exit
 
 class main(pack.main):
