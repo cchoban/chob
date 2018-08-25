@@ -14,7 +14,8 @@ class doctor:
         self.files = {
             "programList": helpers.getCobanPath + "\\programList.json",
             "packages": helpers.getCobanPath + "\\packages.json",
-            "symlinks": helpers.getCobanPath + "\\symlinks.json"
+            "symlinks": helpers.getCobanPath + "\\symlinks.json",
+            'config': helpers.getCobanPath + '\\config.json'
         }
 
     def createFolders(self):

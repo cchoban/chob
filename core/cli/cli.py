@@ -2,6 +2,7 @@ import repo
 import helpers
 from core import http, FileManager
 from core.packageCreator import creator, pack, push, auth
+from core.configurator import config
 from Logger import Logger as log
 from . import doctor
 import re
@@ -11,6 +12,10 @@ class main:
 
     def __init__(self):
         pass
+
+
+    def config(self):
+        return config.Configurator()
 
     def packageGenerator(self, packageName, generateFlatFileOnly=False):
         if generateFlatFileOnly:
