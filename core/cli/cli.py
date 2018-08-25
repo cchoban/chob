@@ -14,8 +14,8 @@ class main:
         pass
 
 
-    def config(self):
-        return config.Configurator()
+    def config(self, configFrom, configTo):
+        return config.Configurator(configFrom, configTo)
 
     def packageGenerator(self, packageName, generateFlatFileOnly=False):
         if generateFlatFileOnly:

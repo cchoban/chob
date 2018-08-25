@@ -31,9 +31,7 @@ class doctor:
         for i in self.files:
             json = JsonParser.Parser(self.files[i])
             if file.fileExists(self.files[i]):
-                if json.isValid():
-                    pass
-                else:
+                if not json.isValid():
                     helpers.infoMessage("Fixed: " + i)
                     json.rewriteJson()
             else:
@@ -46,8 +44,9 @@ class doctor:
             if not file.fileExists(self.files[i]):
                 helpers.infoMessage("Created: " + i)
                 file.createFile(self.files[i])
-
     def downloadDependencies(self):
         dependencies = ["colorama", "requests", "tqdm"]
         for i in dependencies:
             pip.main(["install", i])
+
+#TODO: add os path if choban is there or not
