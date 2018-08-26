@@ -36,7 +36,7 @@ class main:
             return push.main()
         else:
             helpers.errorMessage(
-                "You don't have authentication key. Please get one from {0}. You can activate it with --authentication".format(repo.repos()["website"]))
+                "You don't have authentication key. Please get one from {0}. You can activate it with --authenticate".format(helpers.getWebsite))
 
     def auth(self, token):
         return auth.main(True, token)
