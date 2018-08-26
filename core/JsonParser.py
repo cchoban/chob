@@ -231,3 +231,10 @@ class Parser:
             if package_args[i] in objects:
                 package_args[i] = package_args[i].replace(
                     package_args[i], self.objects[package_args[i]])
+
+
+    def dump_json(self, dict: dict, beautify=False):
+        if beautify:
+            return json.dumps(dict, indent=4, sort_keys=True)
+        else:
+            return json.dumps(dict)

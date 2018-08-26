@@ -43,10 +43,28 @@ class doctor:
         for i in self.files:
             if not file.fileExists(self.files[i]):
                 helpers.infoMessage("Created: " + i)
-                file.createFile(self.files[i])
+                if i in self.file_contents():
+                    file.createFile(self.files[i], self.file_contents()[i])
+                else:
+                    file.createFile(self.files[i])
     def downloadDependencies(self):
         dependencies = ["colorama", "requests", "tqdm"]
         for i in dependencies:
             pip.main(["install", i])
 
+    def file_contents(self):
+        __config = {
+            "config": {
+                "packages": {
+                    "skipHashByDefault": False,
+                    "skipQuestionConfirmations": False
+                }
+            }
+        }
+
+        files = {
+            "config": JsonParser.Parser().dump_json(__config, True)
+        }
+
+        return files
 #TODO: add os path if choban is there or not
