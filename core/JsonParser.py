@@ -195,7 +195,8 @@ class Parser:
         try:
             json.loads(string)
         except ValueError as e:
-            raise JsonIsNotValid(e)
+            if helpers.is_verbose():
+                raise JsonIsNotValid(e)
             return False
         return True
 
