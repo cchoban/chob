@@ -3,5 +3,5 @@
     "localInstalledApps": "{cobanpath}\\packages.json",
     "symlink": "{cobanpath}\\symlinks.json",
     "programList": "https://choban.herokuapp.com/packages/repo",
-    "website": "https://choban.herokuapp.com/packages"
+    "website": "https://choban.herokuapp.com"
 }
