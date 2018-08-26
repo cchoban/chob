@@ -3,7 +3,9 @@ from core import FileManager, JsonParser
 import pip
 from sys import exit
 
+
 class doctor:
+
     def __init__(self):
         self.folders = {
             "packages": helpers.getCobanPath + "\\packages",
@@ -32,8 +34,9 @@ class doctor:
             json = JsonParser.Parser(self.files[i])
             if file.fileExists(self.files[i]):
                 if not json.isValid():
-                    helpers.infoMessage("Fixed: " + i)
-                    json.rewriteJson()
+                    if helpers.askQuestion('Do you want to rewrite {} file. (You might lose your settings based on which file you rewritting.)'.format(i)):
+                        helpers.infoMessage("Fixed: " + i)
+                        json.rewriteJson()
             else:
                 self.createFiles()
 
@@ -47,6 +50,7 @@ class doctor:
                     file.createFile(self.files[i], self.file_contents()[i])
                 else:
                     file.createFile(self.files[i])
+
     def downloadDependencies(self):
         dependencies = ["colorama", "requests", "tqdm"]
         for i in dependencies:
@@ -67,4 +71,4 @@ class doctor:
         }
 
         return files
-#TODO: add os path if choban is there or not
+# TODO: add os path if choban is there or not
