@@ -58,12 +58,9 @@ class doctor:
 
     def file_contents(self):
         __config = {
-            "config": {
-                "packages": {
-                    "skipHashByDefault": False,
-                    "skipQuestionConfirmations": False
-                }
-            }
+            "skipHashByDefault": False,
+            "skipQuestionConfirmations": False,
+            "auth_key": ""
         }
 
         files = {

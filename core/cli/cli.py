@@ -15,7 +15,7 @@ class main:
 
 
     def config(self, configFrom, configTo):
-        return config.Configurator(configFrom, configTo)
+        return config.Configurator.setConfig(configFrom, configTo)
 
     def packageGenerator(self, packageName, generateFlatFileOnly=False):
         if generateFlatFileOnly:
@@ -38,8 +38,8 @@ class main:
             helpers.errorMessage(
                 "You don't have authentication key. Please get one from {0}. You can activate it with --authenticate".format(helpers.getWebsite))
 
-    def auth(self, token):
-        return auth.main(True, token)
+    def auth(self, token, force=False):
+        return auth.main(True, token, force)
 
     def update(self):
         helpers.infoMessage("Updating repo if needed " +

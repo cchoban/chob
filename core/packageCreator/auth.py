@@ -1,30 +1,37 @@
 from core import FileManager
+from core.cli import cli
+from core.configurator import config
 import helpers
 import hashlib
-from sys import exit
+from sys import exit, argv
+
 
 class main:
-    def __init__(self, generate=False, token=None):
+
+    def __init__(self, generate=False, token=None, force=False):
         self.isFirstTime = True
         self.token = token
 
         if self.keyExists():
             self.readToken()
-
-        if generate:
-            self.generateKey()
+            if force:
+                self.generateKey()
 
     def keyExists(self):
-        key = FileManager.Manager().fileExists(helpers.getCobanPath+"\\.key")
-        if key:
+        key = config.Configurator('auth_key')
+        if key.key_exists():
             return True
         else:
             return False
 
     def readToken(self):
-        with open(helpers.getCobanPath+"\\.key", "r") as f:
-            self.token = f.read()
-            f.close()
+        key = config.Configurator()
+        key.get_key('auth_key')
+
+        if not '--force' in argv:
+            helpers.successMessage(
+                'Your auth key is: \'{}\'. If you want to change it use --force argument'.format(key.get_key('auth_key')))
 
     def generateKey(self):
-        FileManager.Manager().createFile(helpers.getCobanPath+"\\.key", self.token, True)
+        key = config.Configurator()
+        key.setConfig('auth_key', self.token)
