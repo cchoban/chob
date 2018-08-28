@@ -210,7 +210,12 @@ class Parser:
         :return boolean:
         """
         if self.keyExists(self.json, key):
-            self.json[key] = value
+            if value == "true":
+                self.json[key] = True
+            elif value == "false":
+                self.json[key] = False
+            else:
+                self.json[key] = value
 
             try:
                 with open(self.path, "w") as f:
@@ -235,6 +240,13 @@ class Parser:
 
 
     def dump_json(self, dict: dict, beautify=False):
+        """Converts dict to json object.
+
+        Arguments:
+        :param dict: Dictionary you want convert to json object.
+        :param beautify: Beautifies json object with indent.
+        :return json:
+        """
         if beautify:
             return json.dumps(dict, indent=4, sort_keys=True)
         else:

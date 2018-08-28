@@ -16,18 +16,17 @@ class Configurator():
             helpers.errorMessage('We do not have that configuration.')
             return
 
-    def setConfig(self, config, set):
+    def setConfig(self, config, keySet):
         """
         Changes value of a key
         :return void
         """
-
         try:
             self.config = config
-            self.set = set
+            self.set = keySet
             json = parser.Parser(self.__config_file)
             json.fileToJson()
-            change = json.change_value(config, set)
+            change = json.change_value(config, keySet)
 
             return helpers.successMessage('Changed value of \'{}\' to \'{}\''.format(self.config, self.set))
         except Exception as e:

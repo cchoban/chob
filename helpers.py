@@ -5,7 +5,7 @@ import os
 import platform
 import sys
 from Logger import Logger as log
-
+from core.configurator import config
 try:
     from colorama import init, AnsiToWin32, Fore, Style
 
@@ -95,6 +95,10 @@ def is_os_64bit():
 
 
 def askQuestion(question):
+
+    if config.Configurator().get_key('skipQuestionConfirmations') == True:
+        return True
+
     yes = {'yes', 'y', 'ye', ''}
     no = {'no', 'n'}
 

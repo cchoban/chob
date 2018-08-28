@@ -15,7 +15,7 @@ class main:
 
 
     def config(self, configFrom, configTo):
-        return config.Configurator.setConfig(configFrom, configTo)
+        return config.Configurator().setConfig(configFrom, configTo)
 
     def packageGenerator(self, packageName, generateFlatFileOnly=False):
         if generateFlatFileOnly:
