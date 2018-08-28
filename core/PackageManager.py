@@ -154,4 +154,10 @@ class Manager:
                     if isinstance(self.dependencies, list) and len(self.dependencies) > 1:
                         self.packageName = self.dependencies
                 else:
-                    helpers.infoMessage('Found {0} as dependencie(s) but it is already installed on your computer. Skipping it.'.format(i))
+                    if not self.uninstall:
+                        helpers.infoMessage('Found {0} as dependencie(s) but it is already installed on your computer. Skipping it.'.format(i))
+                        self.dependencies = []
+                        return True
+                    else:
+                        helpers.infoMessage(
+                            'Found {0} as dependencie(s), will be removed as it\'s not uses from another package.' .format(i))
