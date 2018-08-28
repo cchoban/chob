@@ -101,20 +101,8 @@ class Manager:
     def agreement(self, action="install"):
         if self.skipAgreements:
             return True
+        return helpers.askQuestion("Do you want to " + action + " " + self.packageName + "? [Y / N]")
 
-        yes = {'yes', 'y', 'ye', ''}
-        no = {'no', 'n'}
-
-        text = helpers.infoMessage(
-            "Do you want to " + action + " " + self.packageName + "? [Y/N]")
-        print(text)
-        choice = input("").lower()
-        if choice in yes:
-            return True
-        elif choice in no:
-            return False
-        else:
-            exit("Please respond with 'yes' or 'no'")
 
     def checkHash(self, sandboxed=False):
         try:
