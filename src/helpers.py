@@ -5,7 +5,7 @@ import os
 import platform
 import sys
 from Logger import Logger as log
-
+from core.configurator import config
 try:
     from colorama import init, AnsiToWin32, Fore, Style
 
@@ -18,7 +18,7 @@ packageInstallationPath = os.getenv("programdata") + "\\choban\\packages\\"
 getCobanPath = os.getenv("chobanPath")
 getToolsPath = os.getenv("chobanTools")
 getCobanBinFolder = getCobanPath + "\\lib\\"
-
+getWebsite = repo.repos().get('website')
 
 def errorMessage(message, logging=False):
     return print(Fore.RED + "ERROR: " + message + Style.RESET_ALL, file=stream)
@@ -95,6 +95,11 @@ def is_os_64bit():
 
 
 def askQuestion(question):
+
+    if config.Configurator().get_key('skipQuestionConfirmations') == True:
+        infoMessage("Skipping agreements because 'skipQuestionConfirmations' is set to 'true'.")
+        return True
+
     yes = {'yes', 'y', 'ye', ''}
     no = {'no', 'n'}
 

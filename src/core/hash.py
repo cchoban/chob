@@ -4,12 +4,17 @@ from core import JsonParser as json
 from Logger import Logger as log
 from os.path import abspath
 from sys import exit
+from core.configurator import config
+
 
 class check:
 
     def __init__(self, hash, packageName, skipHashes, sandboxed=False):
         self.hash = hash
         self.skipHashes = skipHashes
+        if config.Configurator().get_key('skipHashByDefault', True):
+            helpers.redColor('Continues without checking hash. Because \'skipHashByDefault\' is set to \'true\'')
+            self.skipHashes = True
         self.parseHash(packageName, sandboxed)
         self.calculate(packageName)
         self.packagePath = None

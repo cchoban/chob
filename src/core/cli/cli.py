@@ -1,7 +1,8 @@
 import repo
 import helpers
 from core import http, FileManager
-from packageCreator import creator, pack, push, auth
+from core.packageCreator import creator, pack, push, auth
+from core.configurator import config
 from Logger import Logger as log
 from . import doctor
 import re
@@ -11,6 +12,10 @@ class main:
 
     def __init__(self):
         pass
+
+
+    def config(self, configFrom, configTo):
+        return config.Configurator().setConfig(configFrom, configTo)
 
     def packageGenerator(self, packageName, generateFlatFileOnly=False):
         if generateFlatFileOnly:
@@ -31,10 +36,10 @@ class main:
             return push.main()
         else:
             helpers.errorMessage(
-                "You don't have authentication key. Please get one from {0}. You can activate it with --authentication".format(repo.repos()["website"]))
+                "You don't have authentication key. Please get one from {0}. You can activate it with --authenticate".format(helpers.getWebsite))
 
-    def auth(self, token):
-        return auth.main(True, token)
+    def auth(self, token, force=False):
+        return auth.main(True, token, force)
 
     def update(self):
         helpers.infoMessage("Updating repo if needed " +

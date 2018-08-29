@@ -3,10 +3,12 @@ import helpers
 import os
 import json
 import requests
-from packageCreator import pack, auth
+from core.packageCreator import pack, auth
 from sys import exit
 
+
 class main(pack.main):
+
     def __init__(self):
         self.zip = None
         self.token = auth.main().token
@@ -45,11 +47,11 @@ class main(pack.main):
 
     def pushit(self):
         headers = {
-            "Authorization": "Token "+self.token,
+            "Authorization": "Token " + self.token,
             "cache-control": "no-cache"
         }
 
-        zipFile = open(os.getcwd()+"\\"+self.zip, "rb")
+        zipFile = open(os.getcwd() + "\\" + self.zip, "rb")
 
         files = {
             "package": (self.zip, zipFile)
@@ -60,7 +62,8 @@ class main(pack.main):
         }
 
         request = requests.post(
-            "http://localhost:8000/api/push/", data=data, files=files, headers=headers)
+            "{}/api/push/".format(helpers.getWebsite), data=data, files=files, headers=headers)
+
         if JsonParser.Parser().is_json(request.content):
             js = json.loads(request.content)
 

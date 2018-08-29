@@ -5,7 +5,9 @@ from . import hash
 from .cli import cli
 from sys import exit
 
+
 class Manager:
+
     def __init__(self, packageName, skipHashes, force, agreements, uninstall=False):
         self.packageName = packageName
         self.oldPackageName = None
@@ -17,7 +19,6 @@ class Manager:
         self.install_path = ""
         self.dependencies = None
         self.uninstall = uninstall
-
 
         if not isinstance(packageName, list):
             self.packagePathWithoutExt = helpers.packageInstallationPath + \
@@ -32,31 +33,38 @@ class Manager:
 
     def installPackage(self):
         from .packageManager import installPackage as install
-        packagename = self.packageName if not isinstance(self.packageName, list) else [package for package in self.packageName]
+        packagename = self.packageName if not isinstance(self.packageName, list) else [
+            package for package in self.packageName]
+
         if isinstance(self.packageName, list):
             for i in packagename:
+                if not i in helpers.programList():
+                    helpers.errorMessage(
+                        "Package '{}' was not found on our servers. But you can push it your self with argument --create! ".format(i))
+                    return False
                 self.packageName = i
                 self.packageScriptName = i + ".cb"
 
                 install.main(self.packageName, self.skipHashes, self.forceInstallation,
-                        self.skipAgreements).installer()
+                             self.skipAgreements).installer()
         else:
             self.packageName = packagename
             self.packageScriptName = packagename + ".cb"
             install.main(self.packageName, self.skipHashes, self.forceInstallation,
-                        self.skipAgreements).installer()
+                         self.skipAgreements).installer()
 
     def removePackage(self):
         self.uninstall = True
         from .packageManager import removePackage as remove
-        packagename = self.packageName if not isinstance(self.packageName, list) else [package for package in self.packageName]
+        packagename = self.packageName if not isinstance(self.packageName, list) else [
+            package for package in self.packageName]
         if isinstance(self.packageName, list):
             for i in packagename:
                 self.packageName = i
                 self.packageScriptName = i + ".cb"
 
                 remove.main(self.packageName, self.skipHashes, self.forceInstallation,
-                        self.skipAgreements, self.uninstall).uninstaller()
+                            self.skipAgreements, self.uninstall).uninstaller()
         else:
             self.packageName = packagename
             self.packageScriptName = packagename + ".cb"
@@ -101,20 +109,7 @@ class Manager:
     def agreement(self, action="install"):
         if self.skipAgreements:
             return True
-
-        yes = {'yes', 'y', 'ye', ''}
-        no = {'no', 'n'}
-
-        text = helpers.infoMessage(
-            "Do you want to " + action + " " + self.packageName + "? [Y/N]")
-        print(text)
-        choice = input("").lower()
-        if choice in yes:
-            return True
-        elif choice in no:
-            return False
-        else:
-            exit("Please respond with 'yes' or 'no'")
+        return helpers.askQuestion("Do you want to " + action + " " + self.packageName)
 
     def checkHash(self, sandboxed=False):
         try:
@@ -138,7 +133,8 @@ class Manager:
             return False
 
     def checkForDependencies(self):
-        js = self.scriptFile['packageArgs'] if self.uninstall else self.scriptFile
+        js = self.scriptFile[
+            'packageArgs'] if self.uninstall else self.scriptFile
         self.dependencies = []
         if self.parser.keyExists(js, "dependencies"):
             for i in js["dependencies"]:
@@ -154,4 +150,11 @@ class Manager:
                     if isinstance(self.dependencies, list) and len(self.dependencies) > 1:
                         self.packageName = self.dependencies
                 else:
-                    helpers.infoMessage('Found {0} as dependencie(s) but it is already installed on your computer. Skipping it.'.format(i))
+                    if not self.uninstall:
+                        helpers.infoMessage(
+                            'Found {0} as dependencie(s) but it is already installed on your computer. Skipping it.'.format(i))
+                        self.dependencies = []
+                        return True
+                    else:
+                        helpers.infoMessage(
+                            'Found {0} as dependencie(s), will be removed as it\'s not uses from another package.' .format(i))

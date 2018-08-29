@@ -40,6 +40,8 @@ parser.add_argument("--flatfile", action="store_true")
 parser.add_argument("--packit", action="store_true")
 parser.add_argument("--push", action="store_true")
 parser.add_argument("--authenticate", type=str, help="Your token key")
+parser.add_argument("--config", type=str, help="Configurator")
+parser.add_argument("--set", type=str, help="Configurator")
 parser.add_argument("--verbose", action="store_true", help="Turning on verbose mode")
 parser.add_argument("--version", action="store_true")
 arg = parser.parse_args()
@@ -91,6 +93,9 @@ if arg.push:
 
 if arg.authenticate:
     cli.main().auth(arg.authenticate)
+
+if arg.config and arg.set:
+    cli.main().config(arg.config, arg.set)
 
 if arg.version:
     cli.main().version()

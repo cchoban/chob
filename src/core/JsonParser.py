@@ -47,7 +47,7 @@ class Parser:
                     if helpers.is_verbose():
                         helpers.errorMessage(
                             "JsonParser.fileToJson - " + str(e))
-                    raise JsonIsNotValid(e)
+                        raise JsonIsNotValid(e)
                     return False
 
     def isValid(self):
@@ -58,12 +58,9 @@ class Parser:
         :return boolean:
         """
         try:
-            if self.fileToJson():
-                return True
-            else:
-                return False
+            self.fileToJson()
+            return True
         except Exception as e:
-            raise JsonIsNotValid(e)
             return False
 
     def rewriteJson(self):
@@ -92,11 +89,11 @@ class Parser:
         dict = self.fileToJson(path)
 
         try:
-            dict["packageArgs"][key]
+            return dict[key]
         except KeyError as e:
-            raise KeyNotFound(e)
-            log.new(e).logError()
+            log.new("JsonParser.getKey - " + str(e)).logError()
             if helpers.is_verbose():
+                raise KeyNotFound(e)
                 helpers.errorMessage("JsonParser.getKey - " + str(e))
 
     def addNewPackage(self, packageName, context: dict):
@@ -198,9 +195,39 @@ class Parser:
         try:
             json.loads(string)
         except ValueError as e:
-            raise JsonIsNotValid(e)
+            if helpers.is_verbose():
+                raise JsonIsNotValid(e)
             return False
         return True
+
+    def change_value(self, key, value):
+        """Changes a value of a key from json file instance.
+
+        Arguments:
+        :param key: Key you want to change value of.
+        :param value: Value to change it.
+        :usage JsonParser.Parser(path).change_value(from, to)
+        :return boolean:
+        """
+        if self.keyExists(self.json, key):
+            if value == "true":
+                self.json[key] = True
+            elif value == "false":
+                self.json[key] = False
+            else:
+                self.json[key] = value
+
+            try:
+                with open(self.path, "w") as f:
+                    f.write(json.dumps(self.json, indent=4, sort_keys=True))
+                    f.close()
+                    return True
+            except Exception as e:
+                if helpers.is_verbose():
+                    helpers.errorMessage(str(e))
+                return False
+        else:
+            return False
 
     def compile_objects(self):
         """Merge objects in json file."""
@@ -210,3 +237,17 @@ class Parser:
             if package_args[i] in objects:
                 package_args[i] = package_args[i].replace(
                     package_args[i], self.objects[package_args[i]])
+
+
+    def dump_json(self, dict: dict, beautify=False):
+        """Converts dict to json object.
+
+        Arguments:
+        :param dict: Dictionary you want convert to json object.
+        :param beautify: Beautifies json object with indent.
+        :return json:
+        """
+        if beautify:
+            return json.dumps(dict, indent=4, sort_keys=True)
+        else:
+            return json.dumps(dict)
