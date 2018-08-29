@@ -104,12 +104,8 @@ class main:
         http.Http.download(http.Http, packageUrl,
                            helpers.packageInstallationPath + packageName + "\\" + packageName, "cb")
     def version(self):
-        version_path = helpers.getCobanPath+"\\version.txt"
-        if FileManager.Manager().fileExists(version_path):
-            with open(version_path, "r") as f:
-                helpers.successMessage("Choban Package Manager")
-                helpers.infoMessage("Version "+f.read())
-                f.close()
+        helpers.successMessage("Choban Package Manager")
+        helpers.infoMessage("Version 0.5.8")
 
     def server_status(self):
         resp = http.Http().get(repo.repos()["programList"])
