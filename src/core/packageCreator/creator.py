@@ -27,6 +27,7 @@ class generateNewPackage:
         self.dict = {}
         self.only64bit = None
         self.generateFlatFileOnly = generateFlatFileOnly
+        self.dependencies = []
 
     def name(self):
         package = input("Package Name for application. Example: google-chrome*: ")
@@ -110,6 +111,10 @@ class generateNewPackage:
         if package == "y":
             self.unzip = True
 
+    def deps(self):
+        package = input(
+            "Dependencies for {}. Example: git,nodejs: ".format(self.packageName))
+        self.dependencies = package.split(",")
 
 class generatePackage(generateNewPackage):
 
@@ -127,6 +132,7 @@ class generatePackage(generateNewPackage):
             self.ctype()
             self.checks()
             self.filet()
+            self.deps()
             self.silenta()
             self.usilenta()
             self.exitCodes()
@@ -145,7 +151,8 @@ class generatePackage(generateNewPackage):
                 "checksumType": self.checksumType,
                 "fileType": self.fileType,
                 "silentArgs": self.silentArgs,
-                "validExitCodes": self.validExitCodes
+                "validExitCodes": self.validExitCodes,
+                "dependencies": self.dependencies
             },
 
             "packageUninstallArgs": {
