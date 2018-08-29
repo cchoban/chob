@@ -109,7 +109,7 @@ class Manager:
     def agreement(self, action="install"):
         if self.skipAgreements:
             return True
-        return helpers.askQuestion("Do you want to " + action + " " + self.packageName + "? [Y / N]")
+        return helpers.askQuestion("Do you want to " + action + " " + self.packageName)
 
     def checkHash(self, sandboxed=False):
         try:
