@@ -36,16 +36,22 @@ class Configurator():
                 helpers.errorMessage(
                     'Configuration.config.setConfig - ' + str(e))
 
-    def get_key(self, key):
+    def get_key(self, key, statment=None):
         """
         Reads and returns key from config file.
         :param key: Key you want to grab from config file.
+        :param statment: to check directly if key value is equal to statment.
         :return str
         """
 
         self.config = config = self.__read_config_file()
 
         if key in config:
+            if statment and isinstance(config.get(key), bool):
+                if bool(config.get(key)) == statment:
+                    return True
+                else:
+                    return False
             return config.get(key)
         else:
             if helpers.is_verbose():
