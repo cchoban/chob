@@ -114,8 +114,10 @@ class generateNewPackage:
     def deps(self):
         package = input(
             "Dependencies for {}. Example: git,nodejs: ".format(self.packageName))
-        self.dependencies = package.split(",")
-
+        if len(package) > 0:
+            self.dependencies = package.split(",")
+        else:
+            return []
 class generatePackage(generateNewPackage):
 
     def getAnswers(self):
