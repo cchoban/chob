@@ -68,6 +68,23 @@ class Manager:
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.createFile - "+str(e))
 
+    def deleteFile(self, path):
+        """
+        Deletes file
+        :param path: Path to file
+        """
+        try:
+            if os.path.exists(path):
+                if os.path.isdir(path):
+                    rmtree(path)
+                    os.remove(path)
+                else:
+                    os.remove(path)
+        except Exception as e:
+            log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage("FileManager.deleteFile - " + str(e))
+
     def createSymLink(self, path, dest):
         from  win32file import CreateSymbolicLink
         """

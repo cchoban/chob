@@ -61,12 +61,9 @@ class main(pack.main):
             "packageName": self.packageName
         }
 
-        print('qwe', self.token)
-
         request = requests.post(
             "{}/api/push/".format(helpers.getWebsite), data=data, files=files, headers=headers)
 
-        print(request.content)
         if JsonParser.Parser().is_json(request.content):
             js = json.loads(request.content)
 

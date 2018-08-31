@@ -25,6 +25,7 @@ class main():
         zipFile = self.packageName+".zip"
         ignoreFiles = [
             ".packagable",
+            '.package/',
             zipFile
         ]
 
