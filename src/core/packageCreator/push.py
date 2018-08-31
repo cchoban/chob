@@ -11,7 +11,7 @@ class main(pack.main):
 
     def __init__(self):
         self.zip = None
-        self.token = auth.main().token
+        self.token = auth.main().readToken()
         self.authenticated = False
         self.packageName = None
         if self.isPackgable():
@@ -61,9 +61,12 @@ class main(pack.main):
             "packageName": self.packageName
         }
 
+        print('qwe', self.token)
+
         request = requests.post(
             "{}/api/push/".format(helpers.getWebsite), data=data, files=files, headers=headers)
 
+        print(request.content)
         if JsonParser.Parser().is_json(request.content):
             js = json.loads(request.content)
 
