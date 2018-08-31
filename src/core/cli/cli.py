@@ -39,7 +39,7 @@ class main:
                 "You don't have authentication key. Please get one from {0}. You can activate it with --authenticate".format(helpers.getWebsite))
 
     def auth(self, token, force=False):
-        return auth.main(True, token, force)
+        return auth.main(token, force).init()
 
     def update(self):
         helpers.infoMessage("Updating repo if needed " +

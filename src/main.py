@@ -92,7 +92,7 @@ if arg.push:
     cli.main().push()
 
 if arg.authenticate:
-    cli.main().auth(arg.authenticate)
+    cli.main().auth(arg.authenticate, arg.force)
 
 if arg.config and arg.set:
     cli.main().config(arg.config, arg.set)
