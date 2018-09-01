@@ -57,7 +57,7 @@ class main(PackageManager.Manager):
             exit("You need to accept to contiune installation.")
 
     def download(self):
-        httpClass = http.Http
+        httpClass = http.Http()
         loadJson = self.scriptFile
         download_url = loadJson["downloadUrl64"] if helpers.is_os_64bit() and self.parser.keyExists(self.scriptFile, "downloadUrl64") else loadJson["downloadUrl"]
         download_path = self.packagePathWithoutExt
@@ -73,7 +73,7 @@ class main(PackageManager.Manager):
                 else:
                     helpers.infoMessage("Downloading " + self.packageName +
                                         " from: " + loadJson["downloadUrl64"])
-                    httpClass.download(httpClass, loadJson["downloadUrl64"],
+                    httpClass.download(loadJson["downloadUrl64"],
                                        download_path,
                                        loadJson["fileType"])
                     return True
