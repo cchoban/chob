@@ -1,42 +1,24 @@
 ---
-title: Choban package manager
+title: 'Choban package manager'
+media_order: choan.gif
 ---
 
-
-## Choban Package Manager
-Choban is package manager for Windows, built with Python with 💖
-![Image](https://i.hizliresim.com/r1a8n7.png)
-
-Install Choban
-=====
-Open PowerShell(as admin) and paste the code below. You are good to go!
-```
-Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/cchoban/installer/master/install.ps1'))
-```
+### Choban Software/Package Manager for Windows
+Choban is a software automation tool that focuses on simplicity, security, and scalability. You want to install/remove some packages with just a command? Then you're on right side of the page! 
 
 
-How to use Choban ?
-=====
+### Using Choban ? 
+* [Installing Choban](Install-Choban)
+* [Uninstalling Choban](Uninstall-Choban)
+* [Command reference](/Command Reference/Install Software)
 
-### How to install package with Choban?
-```
-chob -S package-name
 
-or
+### Packages
+* [Creating packages](/packages/create-package)
+* [Package Function and Variable Reference](/packages/helpers)
+* [Outdated Packages?](/packages/outdated)
 
-chob --install package-name
-```
 
-### How to remove package with Choban?
-```
-chob -R package-name
+### Show me something about Choban
 
-or
-
-chob --remove package-name
-```
-
-### How to upgrade package with Choban?
-```
-chob --upgrade package-name
-```
+![](choan.gif)
