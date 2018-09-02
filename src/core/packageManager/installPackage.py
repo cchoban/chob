@@ -108,21 +108,29 @@ class main(PackageManager.Manager):
             self.parser.addNewPackage(self.packageName, {"version":self.scriptFile['version'], 'dependencies': self.dependencies})
 
     def __create_shorcut(self):
-        fileName = helpers.getToolsPath + "\\{0}\\{1}".format(self.packageName, self.scriptFile["createShortcut"])
-        fileDest = helpers.getCobanBinFolder+"\\"+self.scriptFile["createShortcut"]
+        fileName = helpers.getToolsPath + \
+            "\\{0}\\{1}".format(
+                self.packageName, self.scriptFile["createShortcut"])
+        fileDest = helpers.getCobanBinFolder + \
+            "\\" + self.scriptFile["createShortcut"]
 
         ask = helpers.askQuestion(
-        "Do you want to create link {0} to lib folder ( This will help you to launch app from command prompt)".
-        format(self.scriptFile["createShortcut"]))
+            "Do you want to create link {0} to lib folder ( This will help you to launch app from command prompt)".
+            format(self.scriptFile["createShortcut"]))
 
         if ask:
-            helpers.infoMessage("Creating shortcut for "+self.packageName)
-            createSymLink = file.Manager().createSymLink(fileName, fileDest)
+            helpers.infoMessage("Creating shortcut for " + self.packageName)
+            if not file.Manager().fileExists(fileDest):
+                createSymLink = file.Manager().createSymLink(fileName, fileDest)
 
-            if createSymLink:
-                json.Parser().add_new_symlink(self.packageName, fileDest)
-                helpers.successMessage("Successfully created shortcut")
-                return True
+                if createSymLink:
+                    json.Parser().add_new_symlink(self.packageName, fileDest)
+                    helpers.successMessage("Successfully created shortcut")
+                    return True
+            else:
+                helpers.infoMessage('Cannot create symlink for {}. Because it already exists.'.format(
+                    self.scriptFile['createShortcut']))
+
 
     def installExecutable(self):
         helpers.infoMessage(

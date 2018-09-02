@@ -95,7 +95,7 @@ class Manager:
         try:
             CreateSymbolicLink(dest, path, 0)
             return True
-        except OSError or PermissionError or WindowsError or FileNotFoundError or FileExistsError as e:
+        except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.createSymlink: "+str(e.strerror))
