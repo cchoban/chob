@@ -105,7 +105,7 @@ class main:
                            helpers.packageInstallationPath + packageName + "\\" + packageName, "cb")
     def version(self):
         helpers.successMessage("Choban Package Manager")
-        helpers.infoMessage("Version 0.5.8")
+        helpers.infoMessage("Version 0.5.8.2")
 
     def server_status(self):
         resp = http.Http().get(repo.repos()["programList"])
