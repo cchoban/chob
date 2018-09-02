@@ -2,6 +2,7 @@ from core import PackageManager, FileManager as file
 from core.cli import cli
 from core.packageManager import installPackage, removePackage
 import helpers
+from distutils.version import LooseVersion
 from sys import exit
 
 class main(PackageManager.Manager):
@@ -22,8 +23,8 @@ class main(PackageManager.Manager):
             helpers.messages("error", "isNotInstalled", self.packageName)
 
     def __checkForUpgrade(self):
-        self.currentVersion = helpers.installedApps()["installedApps"][self.packageName]["version"]
-        self.packageVersion = self.scriptFile["version"]
+        self.currentVersion = LooseVersion(helpers.installedApps()["installedApps"][self.packageName]["version"])
+        self.packageVersion = LooseVersion(self.scriptFile["version"])
 
         if self.currentVersion < self.packageVersion:
             return True
