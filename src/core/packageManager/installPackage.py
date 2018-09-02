@@ -80,7 +80,7 @@ class main(PackageManager.Manager):
 
             helpers.infoMessage("Downloading " + self.packageName +
                                 " from: " + download_url)
-            httpClass.download(httpClass, download_url,
+            httpClass.download(download_url,
                                 download_path,
                                 loadJson["fileType"])
 
