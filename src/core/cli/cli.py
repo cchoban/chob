@@ -45,7 +45,7 @@ class main:
         helpers.infoMessage("Updating repo if needed " +
                             repo.repos()["programList"])
         try:
-            http.Http.download(http.Http, repo.repos()[
+            http.Http().download(repo.repos()[
                                "programList"], helpers.getCobanPath + "\\programList", "json")
         except Exception as e:
             log.new(e).logError()
@@ -101,7 +101,7 @@ class main:
         helpers.infoMessage(
             "Downloading Installation Script of: " + packageName + ".cb")
 
-        http.Http.download(http.Http, packageUrl,
+        http.Http().download(packageUrl,
                            helpers.packageInstallationPath + packageName + "\\" + packageName, "cb")
     def version(self):
         helpers.successMessage("Choban Package Manager")

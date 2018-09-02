@@ -46,12 +46,12 @@ class main(pack.main):
             return False
 
     def pushit(self):
+
+        zipFile = open(os.getcwd() + "\\" + self.zip, "rb")
         headers = {
             "Authorization": "Token " + self.token,
             "cache-control": "no-cache"
         }
-
-        zipFile = open(os.getcwd() + "\\" + self.zip, "rb")
 
         files = {
             "package": (self.zip, zipFile)
@@ -61,18 +61,20 @@ class main(pack.main):
             "packageName": self.packageName
         }
 
-        print('qwe', self.token)
+        post_url = "{}/api/push/".format(helpers.getWebsite)
+        resp = http.Http(True).get(
+            post_url, headers=headers, files=files, data=data)
 
-        request = requests.post(
-            "{}/api/push/".format(helpers.getWebsite), data=data, files=files, headers=headers)
-
-        print(request.content)
-        if JsonParser.Parser().is_json(request.content):
-            js = json.loads(request.content)
-
-        if request.status_code == 201:
+        if resp.status_code == 201:
             helpers.infoMessage(
                 "You successfully submitted your package. It is now under approvement period.")
-        elif request.status_code == 406:
+
+        elif resp.status_code == 406:
             helpers.errorMessage(
-                "We could not push your package. See error detail: \n {0}".format(js["error"]))
+                "We could not push your package. See error detail: \n {0}".format(resp.json().get('error')))
+
+        elif resp.status_code == 401:
+            helpers.errorMessage('Please provide correct authentication key.')
+        else:
+            helpers.errorMessage(
+                'Something happened... Please try again later..')

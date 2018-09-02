@@ -9,18 +9,23 @@ from sys import exit
 
 
 class Http:
-
-    def __init__(self, url="", path=""):
-        self.url = url
-        self.path = path
+    __headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0',
+                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                 'Accept-Language': 'en-US,en;q=0.5',
+                 'Connection': 'keep-alive',
+                 'cache-control': 'no-cache'
+                 }
+    def __init__(self, custom_headers=False):
+        self.custom_headers=custom_headers
 
     def download(self, url, path=gettempdir(), ext="exe"):
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Connection': 'keep-alive',
-        }
+        """
+        Downloading file from url.
+        :param url: URL to download file from.
+        :param path: Path to save downloaded file.
+        :param ext: File to save with custom extension.
+        """
+        headers = self.__headers
         try:
             resp = requests.get(url, headers=headers, stream=True)
 
@@ -49,18 +54,50 @@ class Http:
                     print(sv["message"])
             exit()
 
-    def get(self, url):
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Connection': 'keep-alive',
-        }
+    def get(self, url, **args):
+        """
+        Sending GET Requests.
+        :param url: URL to send GET request.
+        """
+
+        if args.get('headers') and not self.custom_headers:
+            args['headers'] = {**args.get('headers'), **self.__headers}
+
         try:
-            resp = requests.get(url, headers=headers)
+            resp = requests.get(url, **args)
             return resp
         except Exception as e:
             log.new(e).logError()
             helpers.errorMessage("Cannot request the server, for more information please use '--verbose'")
             if helpers.is_verbose():
                 helpers.errorMessage(str(e))
+
+    def post(self, url, **args):
+        """
+        Sending POST Requests.
+        :param url: URL to send POST request.
+        """
+
+        if args.get('headers') and not self.custom_headers:
+            args['headers'] = {**args.get('headers'), **self.__headers}
+
+        try:
+            self.resp = resp = requests.post(url, **args)
+            return resp
+        except Exception as e:
+            log.new(e).logError()
+            helpers.errorMessage(
+                "Cannot request the server, for more information please use '--verbose'")
+            if helpers.is_verbose():
+                helpers.errorMessage(str(e))
+
+    def json():
+        """
+        Converting json response to dict.
+        :return dict
+        """
+        import json
+        if self.resp:
+            if JsonParser.Parser().is_json(self.resp.content):
+                js = json.loads(request.content)
+                return js

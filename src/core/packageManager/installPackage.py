@@ -57,7 +57,7 @@ class main(PackageManager.Manager):
             exit("You need to accept to contiune installation.")
 
     def download(self):
-        httpClass = http.Http
+        httpClass = http.Http()
         loadJson = self.scriptFile
         download_url = loadJson["downloadUrl64"] if helpers.is_os_64bit() and self.parser.keyExists(self.scriptFile, "downloadUrl64") else loadJson["downloadUrl"]
         download_path = self.packagePathWithoutExt
@@ -73,14 +73,14 @@ class main(PackageManager.Manager):
                 else:
                     helpers.infoMessage("Downloading " + self.packageName +
                                         " from: " + loadJson["downloadUrl64"])
-                    httpClass.download(httpClass, loadJson["downloadUrl64"],
+                    httpClass.download(loadJson["downloadUrl64"],
                                        download_path,
                                        loadJson["fileType"])
                     return True
 
             helpers.infoMessage("Downloading " + self.packageName +
                                 " from: " + download_url)
-            httpClass.download(httpClass, download_url,
+            httpClass.download(download_url,
                                 download_path,
                                 loadJson["fileType"])
 
@@ -108,21 +108,29 @@ class main(PackageManager.Manager):
             self.parser.addNewPackage(self.packageName, {"version":self.scriptFile['version'], 'dependencies': self.dependencies})
 
     def __create_shorcut(self):
-        fileName = helpers.getToolsPath + "\\{0}\\{1}".format(self.packageName, self.scriptFile["createShortcut"])
-        fileDest = helpers.getCobanBinFolder+"\\"+self.scriptFile["createShortcut"]
+        fileName = helpers.getToolsPath + \
+            "\\{0}\\{1}".format(
+                self.packageName, self.scriptFile["createShortcut"])
+        fileDest = helpers.getCobanBinFolder + \
+            "\\" + self.scriptFile["createShortcut"]
 
         ask = helpers.askQuestion(
-        "Do you want to create link {0} to lib folder ( This will help you to launch app from command prompt)".
-        format(self.scriptFile["createShortcut"]))
+            "Do you want to create link {0} to lib folder ( This will help you to launch app from command prompt)".
+            format(self.scriptFile["createShortcut"]))
 
         if ask:
-            helpers.infoMessage("Creating shortcut for "+self.packageName)
-            createSymLink = file.Manager().createSymLink(fileName, fileDest)
+            helpers.infoMessage("Creating shortcut for " + self.packageName)
+            if not file.Manager().fileExists(fileDest):
+                createSymLink = file.Manager().createSymLink(fileName, fileDest)
 
-            if createSymLink:
-                json.Parser().add_new_symlink(self.packageName, fileDest)
-                helpers.successMessage("Successfully created shortcut")
-                return True
+                if createSymLink:
+                    json.Parser().add_new_symlink(self.packageName, fileDest)
+                    helpers.successMessage("Successfully created shortcut")
+                    return True
+            else:
+                helpers.infoMessage('Cannot create symlink for {}. Because it already exists.'.format(
+                    self.scriptFile['createShortcut']))
+
 
     def installExecutable(self):
         helpers.infoMessage(
