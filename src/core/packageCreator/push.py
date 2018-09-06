@@ -80,6 +80,6 @@ class main(pack.main):
                 'Something happened... Please try again later..')
             if helpers.is_verbose():
                 errors = {
-                    'error_code': resp.status_code,'
+                    'error_code': resp.status_code,
                     'response': resp.content
                 }
