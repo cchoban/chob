@@ -62,7 +62,7 @@ class main(pack.main):
         }
 
         post_url = "{}/api/push/".format(helpers.getWebsite)
-        resp = http.Http(True).get(
+        resp = http.Http(True).post(
             post_url, headers=headers, files=files, data=data)
 
         if resp.status_code == 201:
@@ -78,3 +78,8 @@ class main(pack.main):
         else:
             helpers.errorMessage(
                 'Something happened... Please try again later..')
+            if helpers.is_verbose():
+                errors = {
+                    'error_code': resp.status_code,'
+                    'response': resp.content
+                }
