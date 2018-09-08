@@ -132,6 +132,17 @@ class main(PackageManager.Manager):
                     else:
                         helpers.infoMessage('Cannot create symlink for {}. Because it already exists.'.format(
                         exeName))
+
+            if helpers.is_os_64bit() and not bit_64:
+                for exeName in bit_32:
+                    if not file.Manager().fileExists(binFolder.format(exeName)):
+                        fileDest = helpers.getCobanBinFolder + "\\" + exeName
+                        createSymLink = file.Manager().createSymLink(exeName, fileDest)
+                        json.Parser().add_new_symlink(self.packageName, bit_32)
+                    else:
+                        helpers.infoMessage('Cannot create symlink for {}. Because it already exists.'.format(
+                            exeName))
+
             if not helpers.is_os_64bit() and bit_32:
                 for exeName in bit_32:
                     if not file.Manager().fileExists(binFolder.format(exeName)):
