@@ -223,7 +223,7 @@ class Manager:
                 "7za.exe x -o{0} -y {1}".format(dest, zip)
             helpers.infoMessage("Unzipping " + zip + " to " + dest)
             runProcess = run(processArgs, stderr=DEVNULL,
-                             stdout=DEVNULL, shell=True)
+                             stdout=DEVNULL)
             helpers.successMessage(
                 "Successfully unzipped " + zip + " to " + dest)
         except WindowsError or PermissionError or FileNotFoundError as e:
