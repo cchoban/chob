@@ -15,6 +15,8 @@ class main(PackageManager.Manager):
             "msi": self.installExecutable,
             "7z": self.unzipPackage,
             "zip": self.unzipPackage,
+            'tar': self.unzipPackage,
+            'tar.xz': self.unzipPackage
         }
 
         try:
@@ -87,7 +89,9 @@ class main(PackageManager.Manager):
     def unzipPackage(self):
         extensions = {
             "7z": file.Manager().extract7z,
-            "zip": file.Manager().extractZip
+            "zip": file.Manager().extractZip,
+            'tar': file.Manager().extract7z,
+            'tar.xz': file.Manager().extract7z
         }
 
         fileName = self.packageName + "." + self.scriptFile["fileType"]
