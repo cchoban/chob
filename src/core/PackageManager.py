@@ -19,6 +19,7 @@ class Manager:
         self.install_path = ""
         self.dependencies = None
         self.uninstall = uninstall
+        self.package_has_64bit = False
 
         if not isinstance(packageName, list):
             self.packagePathWithoutExt = helpers.packageInstallationPath + \
@@ -30,6 +31,9 @@ class Manager:
                 if json.Parser(self.packagePathWithExt).isValid():
                     self.scriptFile = self.parser.fileToJson(
                         self.packagePathWithExt)["packageArgs"]
+
+                    if self.parser.keyExists(self.scriptFile, 'downloadUrl64'):
+                        self.package_has_64bit = True
 
     def installPackage(self):
         from .packageManager import installPackage as install

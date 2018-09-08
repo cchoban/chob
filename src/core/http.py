@@ -9,7 +9,7 @@ from sys import exit
 
 
 class Http:
-    __headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0',
+    __headers = {'User-Agent': 'Googlebot/2.1',
                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                  'Accept-Language': 'en-US,en;q=0.5',
                  'Connection': 'keep-alive',

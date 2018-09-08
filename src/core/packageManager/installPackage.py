@@ -108,32 +108,41 @@ class main(PackageManager.Manager):
 
                 if (self.parser.keyExists(self.scriptFile, "createShortcut")):
                     self.__create_shorcut()
-
             self.parser.addNewPackage(self.packageName, {"version":self.scriptFile['version'], 'dependencies': self.dependencies})
 
     def __create_shorcut(self):
-        fileName = helpers.getToolsPath + \
-            "\\{0}\\{1}".format(
-                self.packageName, self.scriptFile["createShortcut"])
-        fileDest = helpers.getCobanBinFolder + \
-            "\\" + self.scriptFile["createShortcut"]
-
+        bit_64 = self.scriptFile['createShortcut'].get('64bit')
+        bit_32 = self.scriptFile['createShortcut'].get('32bit')
+        filePath = helpers.getToolsPath+'\\'+self.packageName+'\\{}'
+        binFolder = helpers.getCobanBinFolder+'{}'
         ask = helpers.askQuestion(
             "Do you want to create link {0} to lib folder ( This will help you to launch app from command prompt)".
-            format(self.scriptFile["createShortcut"]))
+            format(self.packageName))
+
 
         if ask:
             helpers.infoMessage("Creating shortcut for " + self.packageName)
-            if not file.Manager().fileExists(fileDest):
-                createSymLink = file.Manager().createSymLink(fileName, fileDest)
 
-                if createSymLink:
-                    json.Parser().add_new_symlink(self.packageName, fileDest)
-                    helpers.successMessage("Successfully created shortcut")
-                    return True
-            else:
-                helpers.infoMessage('Cannot create symlink for {}. Because it already exists.'.format(
-                    self.scriptFile['createShortcut']))
+            if helpers.is_os_64bit() and bit_64:
+                for exeName in bit_64:
+                    if not file.Manager().fileExists(binFolder.format(exeName)):
+                        fileDest = helpers.getCobanBinFolder + "\\" + exeName
+                        createSymLink = file.Manager().createSymLink(filePath.format(exeName), fileDest)
+                        json.Parser().add_new_symlink(self.packageName, bit_64)
+                    else:
+                        helpers.infoMessage('Cannot create symlink for {}. Because it already exists.'.format(
+                        exeName))
+            if not helpers.is_os_64bit() and bit_32:
+                for exeName in bit_32:
+                    if not file.Manager().fileExists(binFolder.format(exeName)):
+                        fileDest = helpers.getCobanBinFolder + "\\" + exeName
+                        createSymLink = file.Manager().createSymLink(exeName, fileDest)
+                        json.Parser().add_new_symlink(self.packageName, bit_32)
+                    else:
+                        helpers.infoMessage('Cannot create symlink for {}. Because it already exists.'.format(
+                            exeName))
+
+            helpers.successMessage("Successfully created shortcut(s)")
 
 
     def installExecutable(self):
