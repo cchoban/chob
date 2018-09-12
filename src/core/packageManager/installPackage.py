@@ -124,7 +124,6 @@ class main(PackageManager.Manager):
 
         if ask:
             helpers.infoMessage("Creating shortcut for " + self.packageName)
-
             if helpers.is_os_64bit() and bit_64:
                 for exeName in bit_64:
                     if not file.Manager().fileExists(binFolder.format(exeName)):
@@ -134,6 +133,7 @@ class main(PackageManager.Manager):
                     else:
                         helpers.infoMessage('Cannot create symlink for {}. Because it already exists.'.format(
                         exeName))
+                        json.Parser().add_new_symlink(self.packageName, bit_64)
 
             if helpers.is_os_64bit() and not bit_64:
                 for exeName in bit_32:
@@ -144,6 +144,7 @@ class main(PackageManager.Manager):
                     else:
                         helpers.infoMessage('Cannot create symlink for {}. Because it already exists.'.format(
                             exeName))
+                        json.Parser().add_new_symlink(self.packageName, bit_64)
 
             if not helpers.is_os_64bit() and bit_32:
                 for exeName in bit_32:
@@ -154,9 +155,9 @@ class main(PackageManager.Manager):
                     else:
                         helpers.infoMessage('Cannot create symlink for {}. Because it already exists.'.format(
                             exeName))
+                        json.Parser().add_new_symlink(self.packageName, bit_64)
 
             helpers.successMessage("Successfully created shortcut(s)")
-
 
     def installExecutable(self):
         helpers.infoMessage(
