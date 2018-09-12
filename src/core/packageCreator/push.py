@@ -81,5 +81,10 @@ class main(pack.main):
             if helpers.is_verbose():
                 errors = {
                     'error_code': resp.status_code,
-                    'response': resp.content
+                    'response': resp.content,
+                    'error': resp.json().get('error'),
+                    'success': resp.json().get('success')
                 }
+
+                print(errors)
+                return False
