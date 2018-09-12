@@ -72,7 +72,7 @@ class main(PackageManager.Manager):
         fs = FileManager.Manager()
         symlinks = helpers.symlinkList()
         if self.packageName in symlinks:
-            for file in symlinks[self.packageName]:
+            for file in symlinks[self.packageName] if isinstance(symlinks[self.packageName], list) else []:
                 fileDest = fs.os().path.join(helpers.getCobanBinFolder, file)
                 unlink = fs.os().unlink(fileDest)
             self.parser.remove_package_symlink(self.packageName)
