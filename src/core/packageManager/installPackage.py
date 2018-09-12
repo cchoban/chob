@@ -43,7 +43,9 @@ class main(PackageManager.Manager):
                             self.downloadDependencies()
                             return True
                         else:
-                            helpers.errorMessage("{0} was not installed successfully.".format(self.packageName))
+                            helpers.errorMessage("{0} returned was not installed successfully.".format(self.packageName))
+                            if helpers.is_verbose():
+                                helpers.errorMessage('{} returned {} exit code.'.format(self.packageName, self.exit_code))
                             return False
                     else:
                         helpers.successMessage("Successfully installed "+self.packageName)

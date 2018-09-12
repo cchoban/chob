@@ -140,7 +140,7 @@ class Manager:
             return True
 
     def is_zip_package(self):
-        if self.scriptFile['unzip'] == True:
+        if self.parser.keyExists(self.scriptFile, 'unzip')  and self.scriptFile['unzip'] == True:
             return True
         else:
             return False
