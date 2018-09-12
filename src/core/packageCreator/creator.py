@@ -223,7 +223,7 @@ class generatePackage(generateNewPackage):
 
         if self.enable64bit:
             if self.unzip:
-                root['packageArgs']['createShortcut'].append({
+                root['packageArgs']['createShortcut'].update({
                     '64bit': self.createShortcut64
                 })
 
