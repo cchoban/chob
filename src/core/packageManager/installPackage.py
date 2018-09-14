@@ -116,8 +116,6 @@ class main(PackageManager.Manager):
         bit_64 = self.scriptFile['createShortcut'].get('64bit')
         bit_32 = self.scriptFile['createShortcut'].get('32bit')
         files = []
-        filePath = file.Manager().os().path.join(
-            helpers.getToolsPath, self.packageName, '{}')
         binFolder = helpers.getCobanBinFolder + '{}'
         ask = helpers.askQuestion(
             "Do you want to create link {0} to lib folder ( This will help you to launch app from command prompt)".
@@ -129,28 +127,22 @@ class main(PackageManager.Manager):
                 for exeName in bit_64:
                     if not file.Manager().fileExists(binFolder.format(exeName)):
                         extract_filename = exeName.split('\\')[-1]
-                        fileDest = file.Manager().os().path.join(
-                            helpers.getCobanBinFolder, extract_filename)
-                        createSymLink = file.Manager().createSymLink(filePath.format(exeName), fileDest)
-                        files.append(extract_filename)
+                        createSymLink = file.Manager().createSymLink(self.packageName, exeName)
+                        files.append(self.packageName + '.ps1')
 
             if helpers.is_os_64bit() and not bit_64:
                 for exeName in bit_32:
                     if not file.Manager().fileExists(binFolder.format(exeName)):
                         extract_filename = exeName.split('\\')[-1]
-                        fileDest = file.Manager().os().path.join(
-                            helpers.getCobanBinFolder, extract_filename)
-                        createSymLink = file.Manager().createSymLink(filePath.format(exeName), fileDest)
-                        files.append(extract_filename)
+                        createSymLink = file.Manager().createSymLink(self.packageName, exeName)
+                        files.append(self.packageName + '.ps1')
 
             if not helpers.is_os_64bit() and bit_32:
                 for exeName in bit_32:
                     if not file.Manager().fileExists(binFolder.format(exeName)):
                         extract_filename = exeName.split('\\')[-1]
-                        fileDest = file.Manager().os().path.join(
-                            helpers.getCobanBinFolder, extract_filename)
-                        createSymLink = file.Manager().createSymLink(filePath.format(exeName), fileDest)
-                        files.append(extract_filename)
+                        createSymLink = file.Manager().createSymLink(self.packageName, exeName)
+                        files.append(self.packageName+'.ps1')
 
 
             json.Parser().add_new_symlink(self.packageName, files)

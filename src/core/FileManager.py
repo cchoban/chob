@@ -85,25 +85,34 @@ class Manager:
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.deleteFile - " + str(e))
 
-    def createSymLink(self, path, dest):
-        from win32file import CreateSymbolicLink
+    def createSymLink(self, packageName, executable):
         """
         Creates symlink
-        :param path: path to file you want to create symlink
-        :param dest: path to save symlinked file
+        :param packageName: Name of package
+        :param executable: Executable file of package to create executable powershell script
         """
         try:
+            dest = helpers.getCobanBinFolder + '\\{}.ps1'.format(packageName)
             if not self.fileExists(dest):
-                CreateSymbolicLink(dest, path, 0)
-                return True
+                with open(helpers.getCobanPath+'\\whof.ps1', 'r') as f:
+                    content = f.read()
+
+                    if '{packageExecutable}' in content:
+                        content = content.replace('{packageExecutable}', '{}\{}'.format(packageName, executable))
+                        print(executable)
+                        with open(dest, 'w') as f:
+                            f.write(content)
+                            f.close()
+                    f.close()
             else:
                 return False
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
                 helpers.errorMessage(
-                    "FileManager.createSymlink: " + str(e.strerror))
+                    "FileManager.createSymlink: " + str(e))
             return False
+
 
     def createJsonFile(self, path, withDict={}):
         """
