@@ -86,19 +86,23 @@ class Manager:
                 helpers.errorMessage("FileManager.deleteFile - " + str(e))
 
     def createSymLink(self, path, dest):
-        from  win32file import CreateSymbolicLink
+        from win32file import CreateSymbolicLink
         """
         Creates symlink
         :param path: path to file you want to create symlink
         :param dest: path to save symlinked file
         """
         try:
-            CreateSymbolicLink(dest, path, 0)
-            return True
+            if not self.fileExists(dest):
+                CreateSymbolicLink(dest, path, 0)
+                return True
+            else:
+                return False
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("FileManager.createSymlink: "+str(e.strerror))
+                helpers.errorMessage(
+                    "FileManager.createSymlink: " + str(e.strerror))
             return False
 
     def createJsonFile(self, path, withDict={}):
