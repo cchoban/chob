@@ -99,7 +99,6 @@ class Manager:
 
                     if '{packageExecutable}' in content:
                         content = content.replace('{packageExecutable}', '{}\{}'.format(packageName, executable))
-                        print(executable)
                         with open(dest, 'w') as f:
                             f.write(content)
                             f.close()
