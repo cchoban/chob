@@ -65,7 +65,7 @@ class doctor:
             "auth_key": ""
         }
 
-        __whof = """if (!(Test-Path Variable:PSScriptRoot)) {$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent}$path = join-path "$env:chobanTools" "{packageExecutable}"if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }"""
+        __whof = """if (!(Test-Path Variable:PSScriptRoot)) {$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent}$path = join-path "$env:chobanTools" "{packageExecutable}"; if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }"""
 
         __repo = {
             "localProgramlist": "{cobanpath}\\programList.json",
