@@ -69,11 +69,12 @@ class main(PackageManager.Manager):
 
 
     def __remove_symlinks(self):
-        file = FileManager.Manager()
+        fs = FileManager.Manager()
         symlinks = helpers.symlinkList()
         if self.packageName in symlinks:
-            path = FileManager.Manager().os().path.join(symlinks[self.packageName])
-            unlink = file.os().unlink(path)
+            for file in symlinks[self.packageName] if isinstance(symlinks[self.packageName], list) else []:
+                fileDest = fs.os().path.join(helpers.getCobanBinFolder, file)
+                unlink = fs.os().unlink(fileDest)
             self.parser.remove_package_symlink(self.packageName)
 
     def uninstallFromTools(self):

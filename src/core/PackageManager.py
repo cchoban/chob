@@ -19,6 +19,7 @@ class Manager:
         self.install_path = ""
         self.dependencies = None
         self.uninstall = uninstall
+        self.package_has_64bit = False
 
         if not isinstance(packageName, list):
             self.packagePathWithoutExt = helpers.packageInstallationPath + \
@@ -30,6 +31,9 @@ class Manager:
                 if json.Parser(self.packagePathWithExt).isValid():
                     self.scriptFile = self.parser.fileToJson(
                         self.packagePathWithExt)["packageArgs"]
+
+                    if self.parser.keyExists(self.scriptFile, 'downloadUrl64'):
+                        self.package_has_64bit = True
 
     def installPackage(self):
         from .packageManager import installPackage as install
@@ -127,7 +131,16 @@ class Manager:
             pass
 
     def valid_exit_code(self):
-        if self.exit_code in self.scriptFile["validExitCodes"] or str(self.exit_code) in self.scriptFile["validExitCodes"]:
+        if not self.is_zip_package():
+            if self.exit_code in self.scriptFile["validExitCodes"] or str(self.exit_code) in self.scriptFile["validExitCodes"]:
+                return True
+            else:
+                return False
+        else:
+            return True
+
+    def is_zip_package(self):
+        if self.parser.keyExists(self.scriptFile, 'unzip')  and self.scriptFile['unzip'] == True:
             return True
         else:
             return False

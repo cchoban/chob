@@ -28,6 +28,10 @@ class generateNewPackage:
         self.only64bit = None
         self.generateFlatFileOnly = generateFlatFileOnly
         self.dependencies = []
+        self.createShortcut = None
+        self.createShortcut64 = None
+        self.author = None
+        self.lisence = None
 
     def name(self):
         package = input("Package Name for application. Example: google-chrome*: ")
@@ -118,6 +122,37 @@ class generateNewPackage:
             self.dependencies = package.split(",")
         else:
             return []
+
+    def shortcut(self):
+        package = input(
+            "Shortcuts for {}. This will help user to run command from his command line. Example: php.exe, php.ini: ".format(self.packageName))
+
+        if len(package) > 0:
+            self.createShortcut = package.split(",")
+        else:
+            return []
+
+
+        if self.enable64bit:
+            package = input(
+                "Shortcuts for {} (64-Bit). This will help user to run command from his command line. Example: php.exe, php.ini: ".format(self.packageName))
+            if len(package) > 0:
+                self.createShortcut64 = package.split(",")
+            else:
+                return []
+
+    def author_page(self):
+        package = input(
+            "Author or webpage for {}: ".format(self.packageName))
+
+        self.author = package
+
+    def package_lisence(self):
+        package = input(
+            "Package lisence for {}: ".format(self.packageName))
+
+        self.lisence = package
+
 class generatePackage(generateNewPackage):
 
     def getAnswers(self):
@@ -128,21 +163,26 @@ class generatePackage(generateNewPackage):
             self.only64()
             if not self.only64bit:
                 self.is64bit()
-            if not self.enable64bit:
-                self.isunzip()
+            self.isunzip()
             self.durl()
             self.ctype()
             self.checks()
             self.filet()
             self.deps()
-            self.silenta()
-            self.usilenta()
-            self.exitCodes()
+            if self.unzip:
+                self.shortcut()
+            self.author_page()
+            self.package_lisence()
+            if not self.unzip:
+                self.silenta()
+                self.usilenta()
+                self.exitCodes()
             self.packageIcon()
+
 
     def generateJson(self):
 
-        dict = {
+        root = {
             "packageArgs": {
                 "packageName": self.packageName,
                 "softwareName": self.softwareName,
@@ -152,13 +192,13 @@ class generatePackage(generateNewPackage):
                 "checksum": self.checksum,
                 "checksumType": self.checksumType,
                 "fileType": self.fileType,
-                "silentArgs": self.silentArgs,
-                "validExitCodes": self.validExitCodes,
-                "dependencies": self.dependencies
+                "dependencies": self.dependencies,
+                'author': self.author,
+                'lisence': self.lisence
             },
 
-            "packageUninstallArgs": {
-                "silentArgs": self.uninstallSilenArgs
+            'packageUninstallArgs': {
+                'silentArgs': self.uninstallSilenArgs
             },
 
             "server": {
@@ -166,11 +206,26 @@ class generatePackage(generateNewPackage):
             }
         }
 
+        if not self.unzip:
+            root['packageArgs']['silentArgs'] = self.silentArgs
+            root['packageArgs']['validExitCodes'] = self.validExitCodes
+
         if self.only64bit:
-            dict['packageArgs']['64bitonly'] = True
+            root['packageArgs']['64bitonly'] = True
 
         if self.unzip != None and self.unzip == True:
-            dict['packageArgs']['unzip'] = True
+            root['packageArgs']['unzip'] = True
+
+            if self.createShortcut:
+                root['packageArgs']['createShortcut'] = {
+                    '32bit': self.createShortcut
+                }
+
+        if self.enable64bit:
+            if self.unzip:
+                root['packageArgs']['createShortcut'].update({
+                    '64bit': self.createShortcut64
+                })
 
         if self.generateFlatFileOnly or self.enable64bit:
             dict64 = {
@@ -179,11 +234,11 @@ class generatePackage(generateNewPackage):
                 "checksumType64": self.checksumType64
             }
 
-            dict["packageArgs"].update(dict64)
+            root["packageArgs"].update(dict64)
 
-            self.dict = dict
+            self.dict = root
 
-        self.dict = dict
+        self.dict = root
 
         return self.dict
 
@@ -206,17 +261,13 @@ class generatePackage(generateNewPackage):
     def writeToFile(self, dict={}):
         self.__createPackageFolder(True)
         self.__createPackageFiles()
-        if self.dict:
-            dict = self.dict
-        else:
-            dict = dict
 
         if not self.packageName == None:
             path = os.getcwd() + "\\{0}\\{1}.cb".format(self.packageName, self.packageName)
         else:
             path = os.getcwd() + "\\{0}.cb".format(self.packageName)
         with open(path, "w") as f:
-            f.write(json.dumps(dict, indent=4))
+            f.write(json.dumps(self.dict, indent=4, sort_keys=True))
             f.close()
 
 #

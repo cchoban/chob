@@ -15,6 +15,8 @@ class main(PackageManager.Manager):
             "msi": self.installExecutable,
             "7z": self.unzipPackage,
             "zip": self.unzipPackage,
+            'tar': self.unzipPackage,
+            'tar.xz': self.unzipPackage
         }
 
         try:
@@ -41,7 +43,9 @@ class main(PackageManager.Manager):
                             self.downloadDependencies()
                             return True
                         else:
-                            helpers.errorMessage("{0} was not installed successfully.".format(self.packageName))
+                            helpers.errorMessage("{0} returned was not installed successfully.".format(self.packageName))
+                            if helpers.is_verbose():
+                                helpers.errorMessage('{} returned {} exit code.'.format(self.packageName, self.exit_code))
                             return False
                     else:
                         helpers.successMessage("Successfully installed "+self.packageName)
@@ -87,7 +91,9 @@ class main(PackageManager.Manager):
     def unzipPackage(self):
         extensions = {
             "7z": file.Manager().extract7z,
-            "zip": file.Manager().extractZip
+            "zip": file.Manager().extractZip,
+            'tar': file.Manager().extract7z,
+            'tar.xz': file.Manager().extract7z
         }
 
         fileName = self.packageName + "." + self.scriptFile["fileType"]
@@ -104,33 +110,43 @@ class main(PackageManager.Manager):
 
                 if (self.parser.keyExists(self.scriptFile, "createShortcut")):
                     self.__create_shorcut()
-
             self.parser.addNewPackage(self.packageName, {"version":self.scriptFile['version'], 'dependencies': self.dependencies})
 
     def __create_shorcut(self):
-        fileName = helpers.getToolsPath + \
-            "\\{0}\\{1}".format(
-                self.packageName, self.scriptFile["createShortcut"])
-        fileDest = helpers.getCobanBinFolder + \
-            "\\" + self.scriptFile["createShortcut"]
-
+        bit_64 = self.scriptFile['createShortcut'].get('64bit')
+        bit_32 = self.scriptFile['createShortcut'].get('32bit')
+        files = []
+        binFolder = helpers.getCobanBinFolder + '{}'
         ask = helpers.askQuestion(
             "Do you want to create link {0} to lib folder ( This will help you to launch app from command prompt)".
-            format(self.scriptFile["createShortcut"]))
+            format(self.packageName))
 
         if ask:
             helpers.infoMessage("Creating shortcut for " + self.packageName)
-            if not file.Manager().fileExists(fileDest):
-                createSymLink = file.Manager().createSymLink(fileName, fileDest)
+            if helpers.is_os_64bit() and bit_64:
+                for exeName in bit_64:
+                    if not file.Manager().fileExists(binFolder.format(exeName)):
+                        extract_filename = exeName.split('\\')[-1]
+                        createSymLink = file.Manager().createSymLink(self.packageName, exeName)
+                        files.append(self.packageName + '.ps1')
 
-                if createSymLink:
-                    json.Parser().add_new_symlink(self.packageName, fileDest)
-                    helpers.successMessage("Successfully created shortcut")
-                    return True
-            else:
-                helpers.infoMessage('Cannot create symlink for {}. Because it already exists.'.format(
-                    self.scriptFile['createShortcut']))
+            if helpers.is_os_64bit() and not bit_64:
+                for exeName in bit_32:
+                    if not file.Manager().fileExists(binFolder.format(exeName)):
+                        extract_filename = exeName.split('\\')[-1]
+                        createSymLink = file.Manager().createSymLink(self.packageName, exeName)
+                        files.append(self.packageName + '.ps1')
 
+            if not helpers.is_os_64bit() and bit_32:
+                for exeName in bit_32:
+                    if not file.Manager().fileExists(binFolder.format(exeName)):
+                        extract_filename = exeName.split('\\')[-1]
+                        createSymLink = file.Manager().createSymLink(self.packageName, exeName)
+                        files.append(self.packageName+'.ps1')
+
+
+            json.Parser().add_new_symlink(self.packageName, files)
+            helpers.successMessage("Successfully created shortcut(s)")
 
     def installExecutable(self):
         helpers.infoMessage(
