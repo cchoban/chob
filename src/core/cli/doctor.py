@@ -10,7 +10,8 @@ class doctor:
         self.folders = {
             "packages": getCobanPath + "\\packages",
             "lib": getCobanPath + "\\lib",
-            "tools": getToolsPath
+            "tools": getToolsPath,
+            'powershell': getCobanPath+ '\\powershell'
         }
 
         self.files = {
@@ -19,6 +20,7 @@ class doctor:
             "symlinks": getCobanPath + "\\symlinks.json",
             'config': getCobanPath + '\\config.json',
             'whof': getCobanPath + '\\whof.ps1',
+            'env': getCobanPath + '\\powershell\setenv.ps1',
             'repo': getCobanPath + '\\repo.json'
         }
 
@@ -66,7 +68,7 @@ class doctor:
         }
 
         __whof = """if (!(Test-Path Variable:PSScriptRoot)) {$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent}$path = join-path "$env:chobanTools" "{packageExecutable}"; if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }"""
-
+        __set_env = """ function AddToPath($env) {$path = [Environment]::GetEnvironmentVariable("PATH", "User"); $new_path = $path+";"+$env; $addPath = [Environment]::SetEnvironmentVariable("PATH", $new_path, [EnvironmentVariableTarget]::User)} """
         __repo = {
             "localProgramlist": "{cobanpath}\\programList.json",
             "localInstalledApps": "{cobanpath}\\packages.json",
@@ -75,10 +77,13 @@ class doctor:
             "_website": "http://localhost:8000",
             "website": "https://choban.herokuapp.com"
         }
+
+
         files = {
             "config": JsonParser.Parser().dump_json(__config, True),
             'whof': __whof,
-            'repo': JsonParser.Parser().dump_json(__repo, True)
+            'repo': JsonParser.Parser().dump_json(__repo, True),
+            'env': __set_env
         }
 
         return files

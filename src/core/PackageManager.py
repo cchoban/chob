@@ -145,6 +145,34 @@ class Manager:
         else:
             return False
 
+    #TODO: add comments
+    def set_envs(self):
+        from windows import winhelpers
+
+        if self.parser.keyExists(self.scriptFile, 'enviroments'):
+                enviroments = self.scriptFile['enviroments']
+                for env in enviroments:
+                    set_env = winhelpers.set_env(env, enviroments[env])
+
+                    if not set_env:
+                        helpers.infoMessage(
+                            'Could not set enviroment variable.')
+
+    def add_to_path_env(self):
+        #TODO: add to creator
+        from windows import winhelpers
+
+        if self.parser.keyExists(self.scriptFile, 'path_env'):
+                enviroments = self.scriptFile['path_env']
+                print(enviroments)
+                for env in enviroments:
+                    set_env = winhelpers.add_path_env(env)
+
+                    if not set_env:
+                        helpers.infoMessage(
+                            'Could not set enviroment variable.(path)')
+
+
     def checkForDependencies(self):
         js = self.scriptFile[
             'packageArgs'] if self.uninstall else self.scriptFile

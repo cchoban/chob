@@ -233,10 +233,48 @@ class Parser:
         """Merge objects in json file."""
         objects = [obj for obj in self.objects]
         package_args = self.json["packageArgs"]
+        empty_list = []
+
         for i in package_args:
             if package_args[i] in objects:
-                package_args[i] = package_args[i].replace(
-                    package_args[i], self.objects[package_args[i]])
+                package_args[i] = package_args[i].replace(package_args[i], self.objects[package_args[i]])
+
+            if isinstance(package_args[i], dict):
+                for p in package_args[i]:
+                    if package_args[i][p] in objects:
+                        package_args[i][p] = package_args[i][p].replace(package_args[i][p], self.objects[package_args[i][p]])
+                    else:
+                        gathered_object_key = self.__search_via_regex(package_args[i][p])
+                        if gathered_object_key:
+                            package_args[i][p] = package_args[i][p].replace(gathered_object_key, self.objects[gathered_object_key])
+
+            elif isinstance(package_args[i], list):
+                for p in package_args[i]:
+                    if p in objects:
+                        package_args[i] = p.replace(p, self.objects[p])
+                    else:
+                        gathered_object_key = self.__search_via_regex(p)
+                        package_args[i] = empty_list
+                        if gathered_object_key:
+                            empty_list.append(p.replace(gathered_object_key, self.objects[gathered_object_key]))
+
+            else:
+                gathered_object_key = self.__search_via_regex(package_args[i])
+                if gathered_object_key:
+                    package_args[i] = package_args[i].replace(gathered_object_key, self.objects[gathered_object_key])
+
+
+    def __search_via_regex(self, string):
+        import re
+        search = re.search('\{([^}]+)\}', str(string))
+        if search:
+            gathered_object_key = search.group(0)
+            if gathered_object_key in self.objects:
+                return gathered_object_key
+            else:
+                return False
+        else:
+            return False
 
 
     def dump_json(self, dict: dict, beautify=False):

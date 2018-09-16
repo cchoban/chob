@@ -144,6 +144,14 @@ class main(PackageManager.Manager):
                         createSymLink = file.Manager().createSymLink(self.packageName, exeName)
                         files.append(self.packageName+'.ps1')
 
+            #TODO: add enviroments to creator
+            #TODO: add enviroments key to uninstall args for deleting envs later.
+            #TODO: add post_install package args
+            #TODO: add run_from_tools package args
+            self.set_envs()
+            self.add_to_path_env()
+
+
 
             json.Parser().add_new_symlink(self.packageName, files)
             helpers.successMessage("Successfully created shortcut(s)")
