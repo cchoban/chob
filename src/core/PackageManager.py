@@ -149,10 +149,10 @@ class Manager:
     def set_envs(self):
         from windows import winhelpers
 
-        if self.parser.keyExists(self.scriptFile, 'enviroments'):
-                enviroments = self.scriptFile['enviroments']
-                for env in enviroments:
-                    set_env = winhelpers.set_env(env, enviroments[env])
+        if self.parser.keyExists(self.scriptFile, 'environments'):
+                environments = self.scriptFile['environments']
+                for env in environments:
+                    set_env = winhelpers.set_env(env, environments[env])
 
                     if not set_env:
                         helpers.infoMessage(
