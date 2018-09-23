@@ -38,8 +38,8 @@ def add_path_env(env_value: str):
 
     try:
         path = getCobanPath+'\\powershell\\setenv.ps1'
-        print('powershell -Command ". {} -env {}"'.format(path, env_value))
         set_path = call('powershell -Command ". {}; AddToPath -env \'{}\'"'.format(path, env_value))
+
         if set_path == 0:
             return True
         else:
@@ -48,4 +48,30 @@ def add_path_env(env_value: str):
         log.new(e).logError()
         if is_verbose():
             errorMessage('winheplers.add_path_env: ' + str(e))
+        return False
+
+def env_key_exists(env_name: str):
+    """
+    Check if environment key exists.
+
+    :param env_name: Environment key name to check if it exists or not.
+    :return bool:
+    """
+    if environ.get(env_name):
+        return True
+    else:
+        return False
+
+def env_path_exists(env_value: str):
+    """
+    Checks if env_value is already exists in PATH environment.
+
+    :param env_value: Path to be checked in PATH enviroment.
+    :return bool:
+    """
+    path = environ.get('PATH').split(';')
+
+    if env_value in path:
+        return True
+    else:
         return False

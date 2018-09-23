@@ -152,7 +152,10 @@ class Manager:
         if self.parser.keyExists(self.scriptFile, 'environments'):
                 environments = self.scriptFile['environments']
                 for env in environments:
-                    set_env = winhelpers.set_env(env, environments[env])
+                    if not winhelpers.env_key_exists(env):
+                        set_env = winhelpers.set_env(env, environments[env])
+                    else:
+                        helpers.verboseMessage('Skipping creating an environment key for {}. Because it already exists.'.format(env))
 
                     if not set_env:
                         helpers.infoMessage(
@@ -164,9 +167,11 @@ class Manager:
 
         if self.parser.keyExists(self.scriptFile, 'path_env'):
                 enviroments = self.scriptFile['path_env']
-                print(enviroments)
                 for env in enviroments:
-                    set_env = winhelpers.add_path_env(env)
+                    if not winhelpers.env_path_exists(env):
+                        set_env = winhelpers.add_path_env(env)
+                    else:
+                        helpers.verboseMessage('Skipping PATH:{}. Because it already exists.'.format(env))
 
                     if not set_env:
                         helpers.infoMessage(

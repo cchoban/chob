@@ -27,6 +27,9 @@ def errorMessage(message, logging=False):
 def infoMessage(message):
     return print(Fore.CYAN + "INFO: " + message + Style.RESET_ALL, file=stream)
 
+def verboseMessage(message):
+    if is_verbose():
+        return print(Fore.CYAN + "INFO: " + message + Style.RESET_ALL, file=stream)
 
 def successMessage(message):
     return print(Fore.GREEN + message + Style.RESET_ALL, file=stream)
