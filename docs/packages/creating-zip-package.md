@@ -5,7 +5,7 @@ visible: true
 
 Choban using 'JSON' as it's installation scripts serializer, which makes easier for end users to create their own packages without any coding experience.
 
-Example ZIP file: 
+Example ZIP file:
 ```
 {
   "unzip": true,
@@ -29,12 +29,31 @@ Better understand of variables? Here is the more useful documentation for what v
 
 Telling Choban that this is not a software, instead it is zip file.
 ```
-unzip: true
+"unzip": true
 ```
+
 
 This creates a shortcut file for you to use from your command line. (If you do not provide this, user need to add the php tools folder to path environment variable directly from command prompt.)
 ```
-createShortcut: "php.exe"
+"createShortcut": {
+    "32bit": ["shortcut1.exe", "shortcut2.exe"],
+    "64bit": ["shortcut1.exe", "shortcut2.exe"],
+}
+```
+Create custom environment key. This will create environment key for **current** user only.
+```
+"environments": {
+    "chobanTestKey": "chobanTestValue"
+}
 ```
 
 
+This will add specified path to your PATH environment, This is good if you have too much exe needed to be use on global scope. Other ways you have always "createShortcut method" to just use for 1-2 files.
+
+
+Add folder to path environment via Choban
+
+```
+"path_env": ["{cobanTools}\\nodejs\\bin"]
+```
+This will add specified path to your PATH environment, This is good if you have too much exe needed to be use on global scope. Other ways you have always "createShortcut method" to just use for 1-2 files.
