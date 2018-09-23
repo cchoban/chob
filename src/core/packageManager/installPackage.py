@@ -126,23 +126,26 @@ class main(PackageManager.Manager):
             if helpers.is_os_64bit() and bit_64:
                 for exeName in bit_64:
                     if not file.Manager().fileExists(binFolder.format(exeName)):
-                        extract_filename = exeName.split('\\')[-1]
-                        createSymLink = file.Manager().createSymLink(self.packageName, exeName)
-                        files.append(self.packageName + '.ps1')
+                        extract_filename = exeName.split('\\')[-1].split('.')[0]
+                        createSymLink = file.Manager().createSymLink(self.packageName, extract_filename, exeName)
+                        files.append(extract_filename + '.ps1')
 
             if helpers.is_os_64bit() and not bit_64:
                 for exeName in bit_32:
                     if not file.Manager().fileExists(binFolder.format(exeName)):
-                        extract_filename = exeName.split('\\')[-1]
-                        createSymLink = file.Manager().createSymLink(self.packageName, exeName)
-                        files.append(self.packageName + '.ps1')
+                        extract_filename = exeName.split('\\')[-1].split(
+                            '.')[0]
+                        createSymLink = file.Manager().createSymLink(self.packageName, extract_filename, exeName)
+                        files.append(extract_filename + '.ps1')
 
             if not helpers.is_os_64bit() and bit_32:
                 for exeName in bit_32:
                     if not file.Manager().fileExists(binFolder.format(exeName)):
-                        extract_filename = exeName.split('\\')[-1]
-                        createSymLink = file.Manager().createSymLink(self.packageName, exeName)
-                        files.append(self.packageName+'.ps1')
+                        extract_filename = exeName.split('\\')[-1].split(
+                            '.')[0]
+                        createSymLink = file.Manager().createSymLink(
+                            self.packageName, extract_filename, exeName)
+                        files.append(extract_filename+'.ps1')
 
             #TODO: add enviroments to creator
             #TODO: add enviroments key to uninstall args for deleting envs later.

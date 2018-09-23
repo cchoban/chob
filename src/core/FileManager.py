@@ -85,20 +85,20 @@ class Manager:
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.deleteFile - " + str(e))
 
-    def createSymLink(self, packageName, executable):
+    def createSymLink(self, package_name, shortcut_name, executable):
         """
         Creates symlink
         :param packageName: Name of package
         :param executable: Executable file of package to create executable powershell script
         """
         try:
-            dest = helpers.getCobanBinFolder + '\\{}.ps1'.format(packageName)
+            dest = helpers.getCobanBinFolder + '\\{}.ps1'.format(shortcut_name)
             if not self.fileExists(dest):
                 with open(helpers.getCobanPath+'\\whof.ps1', 'r') as f:
                     content = f.read()
 
                     if '{packageExecutable}' in content:
-                        content = content.replace('{packageExecutable}', '{}\{}'.format(packageName, executable))
+                        content = content.replace('{packageExecutable}', '{}\{}'.format(package_name, executable))
                         with open(dest, 'w') as f:
                             f.write(content)
                             f.close()
