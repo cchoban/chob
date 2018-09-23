@@ -110,6 +110,14 @@ class main(PackageManager.Manager):
 
                 if (self.parser.keyExists(self.scriptFile, "createShortcut")):
                     self.__create_shorcut()
+
+                #TODO: add enviroments to creator
+                #TODO: add enviroments key to uninstall args for deleting envs later.
+                #TODO: add post_install package args
+                #TODO: add run_from_tools package args
+                self.set_envs()
+                self.add_to_path_env()
+
             self.parser.addNewPackage(self.packageName, {"version":self.scriptFile['version'], 'dependencies': self.dependencies})
 
     def __create_shorcut(self):
@@ -146,15 +154,6 @@ class main(PackageManager.Manager):
                         createSymLink = file.Manager().createSymLink(
                             self.packageName, extract_filename, exeName)
                         files.append(extract_filename+'.ps1')
-
-            #TODO: add enviroments to creator
-            #TODO: add enviroments key to uninstall args for deleting envs later.
-            #TODO: add post_install package args
-            #TODO: add run_from_tools package args
-            self.set_envs()
-            self.add_to_path_env()
-
-
 
             json.Parser().add_new_symlink(self.packageName, files)
             helpers.successMessage("Successfully created shortcut(s)")
