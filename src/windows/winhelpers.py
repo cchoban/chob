@@ -2,7 +2,18 @@ from subprocess import call, DEVNULL
 from Logger import Logger as log
 from helpers import is_verbose, errorMessage, getCobanPath
 from os import environ, path
+import os
 
+
+def __reload_environ():
+    """
+    Reloads environments variables.
+    """
+
+    path = getCobanPath + '\\refreshenv.ps1'
+    set_path = call('powershell -Command ". {}'.format(path))
+
+__reload_environ()
 
 def set_env(env_key: str, env_value: str):
     """
@@ -70,7 +81,6 @@ def env_path_exists(env_value: str):
     :return bool:
     """
     path = environ.get('PATH').split(';')
-
     if env_value in path:
         return True
     else:

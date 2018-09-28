@@ -21,7 +21,8 @@ class doctor:
             'config': getCobanPath + '\\config.json',
             'whof': getCobanPath + '\\whof.ps1',
             'env': getCobanPath + '\\powershell\setenv.ps1',
-            'repo': getCobanPath + '\\repo.json'
+            'repo': getCobanPath + '\\repo.json',
+            'refreshenv': getCobanPath + '\\refreshenv.ps1'
         }
 
     def createFolders(self):
@@ -66,7 +67,7 @@ class doctor:
             "skipQuestionConfirmations": False,
             "auth_key": ""
         }
-
+        __refreshenv = """ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") """
         __whof = """if (!(Test-Path Variable:PSScriptRoot)) {$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent}$path = join-path "$env:chobanTools" "{packageExecutable}"; if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }"""
         __set_env = """ function AddToPath($env) {$path = [Environment]::GetEnvironmentVariable("PATH", "User"); $new_path = $path+";"+$env; $addPath = [Environment]::SetEnvironmentVariable("PATH", $new_path, [EnvironmentVariableTarget]::User)} """
         __repo = {
@@ -83,7 +84,8 @@ class doctor:
             "config": JsonParser.Parser().dump_json(__config, True),
             'whof': __whof,
             'repo': JsonParser.Parser().dump_json(__repo, True),
-            'env': __set_env
+            'env': __set_env,
+            'refreshenv': __refreshenv
         }
 
         return files
