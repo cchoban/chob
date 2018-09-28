@@ -254,8 +254,8 @@ class Parser:
                         package_args[i] = p.replace(p, self.objects[p])
                     else:
                         gathered_object_key = self.__search_via_regex(p)
-                        package_args[i] = empty_list
                         if gathered_object_key:
+                            package_args[i] = empty_list
                             empty_list.append(p.replace(gathered_object_key, self.objects[gathered_object_key]))
 
             else:
