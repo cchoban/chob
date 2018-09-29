@@ -20,6 +20,8 @@ class main(PackageManager.Manager):
                     self.uninstallExecutable()
                 else:
                     self.uninstallFromTools()
+                    self.remove_environments()
+                    self.remove_from_path_env()
                 self.__remove_symlinks()
 
                 self.remove_dependencies()
@@ -76,6 +78,32 @@ class main(PackageManager.Manager):
                 fileDest = fs.os().path.join(helpers.getCobanBinFolder, file)
                 unlink = fs.os().unlink(fileDest)
             self.parser.remove_package_symlink(self.packageName)
+
+    def remove_environments(self):
+        from windows import winhelpers
+        self.scriptFile = self.scriptFile.get('packageArgs') or self.scriptFile
+
+        try:
+            if self.parser.keyExists(self.scriptFile, 'environments'):
+                for env in self.scriptFile['environments']:
+                    winhelpers.remove_env(env)
+            else:
+                return True
+        except Exception as e:
+            print(e)
+
+    def remove_from_path_env(self):
+        from windows import winhelpers
+        self.scriptFile = self.scriptFile.get('packageArgs') or self.scriptFile
+
+        try:
+            if self.parser.keyExists(self.scriptFile, 'path_env'):
+                for path in self.scriptFile.get('path_env'):
+                    winhelpers.remove_from_path(path)
+            else:
+                return True
+        except Exception as e:
+            print(e)
 
     def uninstallFromTools(self):
         helpers.infoMessage("Removing {0} from tools folder".format(self.packageName))
