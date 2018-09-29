@@ -32,6 +32,8 @@ class generateNewPackage:
         self.createShortcut64 = None
         self.author = None
         self.lisence = None
+        self.path = []
+        self.envs = {}
 
     def name(self):
         package = input("Package Name for application. Example: google-chrome*: ")
@@ -153,6 +155,21 @@ class generateNewPackage:
 
         self.lisence = package
 
+    def path_envs(self):
+        package = input('Paths to be added to PATH environment. Example: {cobanTools}\\php\: ')
+        if len(package) > 0:
+                self.path = package.split(",")
+        else:
+            return []
+
+    def environments(self):
+        package = input('Environment keys to be added. Example: NVM_SYMLINK={cobanTools}\\php: ')
+
+        if len(package) > 0:
+            self.envs = dict(x.split('=') for x in package.split(','))
+        else:
+            return {}
+
 class generatePackage(generateNewPackage):
 
     def getAnswers(self):
@@ -171,6 +188,8 @@ class generatePackage(generateNewPackage):
             self.deps()
             if self.unzip:
                 self.shortcut()
+                self.environments()
+                self.path_envs()
             self.author_page()
             self.package_lisence()
             if not self.unzip:
@@ -194,7 +213,9 @@ class generatePackage(generateNewPackage):
                 "fileType": self.fileType,
                 "dependencies": self.dependencies,
                 'author': self.author,
-                'lisence': self.lisence
+                'lisence': self.lisence,
+                'environments': self.envs,
+                'path_env': self.path
             },
 
             'packageUninstallArgs': {

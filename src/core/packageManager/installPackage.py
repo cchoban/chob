@@ -111,8 +111,6 @@ class main(PackageManager.Manager):
                 if (self.parser.keyExists(self.scriptFile, "createShortcut")):
                     self.__create_shorcut()
 
-                #TODO: add enviroments to creator
-                #TODO: add enviroments key to uninstall args for deleting envs later.
                 #TODO: add post_install package args
                 #TODO: add run_from_tools package args
                 self.set_envs()

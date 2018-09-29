@@ -162,7 +162,6 @@ class Manager:
                             'Could not set enviroment variable.')
 
     def add_to_path_env(self):
-        #TODO: add to creator
         from windows import winhelpers
 
         if self.parser.keyExists(self.scriptFile, 'path_env'):
