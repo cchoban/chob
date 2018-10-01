@@ -121,10 +121,12 @@ class main(PackageManager.Manager):
 
         for i in extensions:
             if i == self.scriptFile["fileType"]:
+                extractFolder = self.scriptFile.get('extractFolder')
                 if (self.parser.keyExists(self.scriptFile, "unzipPath")):
-                    extensions[i](zipFile, self.scriptFile["unzipPath"])
+                    extensions[i](zipFile, self.scriptFile["unzipPath"], extractFolder)
                 else:
-                    extensions[i](zipFile,helpers.getToolsPath + "\\" + self.packageName)
+                    extensions[i](zipFile, helpers.getToolsPath +
+                                  "\\" + self.packageName, extractFolder)
 
                 if (self.parser.keyExists(self.scriptFile, "createShortcut")):
                     self.__create_shorcut()
