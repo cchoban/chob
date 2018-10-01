@@ -33,7 +33,7 @@ class main(PackageManager.Manager):
                 self.downloadScript()
                 if self.isInstallable():
                     self.download()
-                    self.checkHash()
+                    self.checkHash(False, self.arches)
                     self.checkForDependencies()
                     self.beginAction()
                     if not self.parser.keyExists(self.scriptFile, "unzip"):
@@ -63,13 +63,14 @@ class main(PackageManager.Manager):
     def download(self):
         httpClass = http.Http()
         loadJson = self.scriptFile
-        download_url = loadJson["downloadUrl64"] if helpers.is_os_64bit() and self.parser.keyExists(self.scriptFile, "downloadUrl64") else loadJson["downloadUrl"]
+        download_url = loadJson["downloadUrl64"] if helpers.is_os_64bit() and self.parser.keyExists(
+            self.scriptFile, "downloadUrl64") else loadJson["downloadUrl"]
         download_path = self.packagePathWithoutExt
-        file_path = download_path+"."+loadJson["fileType"]
-        self.install_path = file_path
+        file_path = download_path+"{}."+loadJson["fileType"]
+        self.install_path = file_path.format('')
 
-        if not file.Manager().fileExists(file_path):
-
+        if not file.Manager().fileExists(file_path.format('')):
+            #todo: downloads every time for 'arches' thing
             if self.parser.keyExists(self.scriptFile, "64bitonly"):
                 if not helpers.is_os_64bit():
                     helpers.errorMessage("This package is only for 64-bit devices.")
@@ -82,12 +83,29 @@ class main(PackageManager.Manager):
                                        loadJson["fileType"])
                     return True
 
+            if self.parser.keyExists(self.scriptFile, 'arches'):
+                #TODO: add messages
+                self.arches = True
+                self.install_path = file_path.format('x86')
+                self.install_path64 = file_path.format('x64')
+                helpers.infoMessage("Downloading " + self.packageName +
+                                    " from: " + loadJson["downloadUrl64"])
+                httpClass.download(loadJson.get('downloadUrl64'),
+                                   download_path+'x64',
+                                   loadJson["fileType"])
+                helpers.infoMessage("Downloading " + self.packageName +
+                                    " from: " + loadJson["downloadUrl"])
+                httpClass.download(loadJson.get('downloadUrl'),
+                                    download_path+'x86',
+                                    loadJson["fileType"])
+
+                return True
+
             helpers.infoMessage("Downloading " + self.packageName +
                                 " from: " + download_url)
             httpClass.download(download_url,
                                 download_path,
                                 loadJson["fileType"])
-
     def unzipPackage(self):
         extensions = {
             "7z": file.Manager().extract7z,
@@ -164,10 +182,17 @@ class main(PackageManager.Manager):
                 helpers.errorMessage("This package is only for 64-bit devices.")
                 return False
         try:
-            call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]))
+
+            call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path, self.scriptFile["silentArgs"]))
+
+            if self.arches:
+                call_exe64 = subprocess.Popen('"{0}" {1}'.format(self.install_path64, self.scriptFile["silentArgs"]))
+
         except OSError as e:
             if e.winerror == 193:
                 call_exe = subprocess.Popen('"{0}" {1}'.format(self.install_path,self.scriptFile["silentArgs"]), shell=True)
+                if self.arches:
+                    call_exe64 = subprocess.Popen('"{0}" {1}'.format(self.install_path64,self.scriptFile["silentArgs"]), shell=True)
         call_exe.communicate()[0]
         self.exit_code = call_exe.returncode
 

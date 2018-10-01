@@ -20,6 +20,7 @@ class Manager:
         self.dependencies = None
         self.uninstall = uninstall
         self.package_has_64bit = False
+        self.arches = False
 
         if not isinstance(packageName, list):
             self.packagePathWithoutExt = helpers.packageInstallationPath + \
@@ -115,7 +116,7 @@ class Manager:
             return True
         return helpers.askQuestion("Do you want to " + action + " " + self.packageName)
 
-    def checkHash(self, sandboxed=False):
+    def checkHash(self, sandboxed=False, arches=False):
         try:
             if json.Parser().keyExists(self.scriptFile, "downloadUrl64"):
                 hashedKey = self.scriptFile["checksum64"]
@@ -123,11 +124,14 @@ class Manager:
                 hashedKey = self.scriptFile["checksum"]
 
             check = hash.check(hashedKey, self.packageName,
-                               self.skipHashes, sandboxed)
+                               self.skipHashes, sandboxed, arches)
 
-            while check == True:
+            # check.calculate_package_hashes()
+
+            if check:
                 return True
         except KeyError as e:
+            #TODO: add log
             pass
 
     def valid_exit_code(self):
