@@ -1,4 +1,5 @@
-import argparse, helpers
+import argparse
+import helpers
 from core.cli import cli
 from core import PackageManager
 from sys import argv, exit
@@ -22,18 +23,26 @@ parser.add_argument("--remove", nargs="*", help="Remove package(s)")
 
 
 parser.add_argument("--upgrade", nargs="*", help="Upgrade package(s)")
-parser.add_argument("--test-package", type=str, help="This command helps you to test your package before you push to our servers.")
+parser.add_argument("--test-package", type=str,
+                    help="This command helps you to test your package before you push to our servers.")
 parser.add_argument("-Ss", nargs="*", help="Search packages")
-parser.add_argument("--downloadScript", type=str, help="Downloads script for specific package.")
-parser.add_argument("--update", action="store_true", help="Update package repo list to get updated.")
-parser.add_argument("--doctor", action="store_true", help="Fixes common problems.")
-parser.add_argument("--clean", action="store_true", help="Cleans caching of packages.")
+parser.add_argument("--downloadScript", type=str,
+                    help="Downloads script for specific package.")
+parser.add_argument("--update", action="store_true",
+                    help="Update package repo list to get updated.")
+parser.add_argument("--doctor", action="store_true",
+                    help="Fixes common problems.")
+parser.add_argument("--clean", action="store_true",
+                    help="Cleans caching of packages.")
 parser.add_argument("-y", action="store_true", help="Skips agreements")
-parser.add_argument("--packages", action="store_true", help="Lists all available packages.")
+parser.add_argument("--packages", action="store_true",
+                    help="Lists all available packages.")
 parser.add_argument("--download-chob-dependencies", action="store_true")
 parser.add_argument("-Scc", help="Clean's unused files", action="store_true")
-parser.add_argument("-skipHash", help="Skips of checking hash for files", action="store_true")
-parser.add_argument("--force", help="Forces a installation of package", action="store_true")
+parser.add_argument(
+    "-skipHash", help="Skips of checking hash for files", action="store_true")
+parser.add_argument(
+    "--force", help="Forces a installation of package", action="store_true")
 parser.add_argument("--local", action="store_true")
 parser.add_argument("--create", type=str, help="Generates package for you")
 parser.add_argument("--flatfile", action="store_true")
@@ -42,24 +51,29 @@ parser.add_argument("--push", action="store_true")
 parser.add_argument("--authenticate", type=str, help="Your token key")
 parser.add_argument("--config", type=str, help="Configurator")
 parser.add_argument("--set", type=str, help="Configurator")
-parser.add_argument("--verbose", action="store_true", help="Turning on verbose mode")
+parser.add_argument("--verbose", action="store_true",
+                    help="Turning on verbose mode")
 parser.add_argument("--version", action="store_true")
 arg = parser.parse_args()
 
 
 if arg.S or arg.install:
     package_name = arg.S if arg.S else arg.install
-    PackageManager.Manager(package_name, arg.skipHash, arg.force, arg.y).installPackage()
+    PackageManager.Manager(package_name, arg.skipHash,
+                           arg.force, arg.y).installPackage()
 
 if arg.test_package:
-    PackageManager.Manager(arg.test_package, arg.skipHash, arg.force, arg.y).testPackage()
+    PackageManager.Manager(arg.test_package, arg.skipHash,
+                           arg.force, arg.y).testPackage()
 
 if arg.R or arg.remove:
     package_name = arg.R if arg.R else arg.remove
-    PackageManager.Manager(package_name, arg.skipHash, arg.force, arg.y, True).removePackage()
+    PackageManager.Manager(package_name, arg.skipHash,
+                           arg.force, arg.y, True).removePackage()
 
 if arg.upgrade:
-    PackageManager.Manager(arg.upgrade, arg.skipHash, arg.force, arg.y).upgradePackage()
+    PackageManager.Manager(arg.upgrade, arg.skipHash,
+                           arg.force, arg.y).upgradePackage()
 
 if arg.doctor:
     cli.main().doctor()
@@ -93,6 +107,9 @@ if arg.push:
 
 if arg.authenticate:
     cli.main().auth(arg.authenticate, arg.force)
+
+if arg.config and not arg.set:
+    cli.main().config(arg.config)
 
 if arg.config and arg.set:
     cli.main().config(arg.config, arg.set)

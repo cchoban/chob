@@ -10,11 +10,10 @@ from sys import exit
 
 class main:
 
-    def __init__(self):
-        pass
+    def config(self, configFrom, configTo=None):
+        if not configTo:
+            return helpers.successMessage(str(config.Configurator().get_key(configFrom)))
 
-
-    def config(self, configFrom, configTo):
         return config.Configurator().setConfig(configFrom, configTo)
 
     def packageGenerator(self, packageName, generateFlatFileOnly=False):
