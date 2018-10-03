@@ -16,6 +16,9 @@ class main:
 
         return config.Configurator().setConfig(configFrom, configTo)
 
+    def confighelp(self):
+        return config.Configurator().config_help()
+
     def packageGenerator(self, packageName, generateFlatFileOnly=False):
         if generateFlatFileOnly:
             cls = creator.generatePackage(packageName, generateFlatFileOnly)

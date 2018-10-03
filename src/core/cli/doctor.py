@@ -63,10 +63,19 @@ class doctor:
 
     def file_contents(self):
         __config = {
-            "skipHashByDefault": False,
-            "skipQuestionConfirmations": False,
-            "auth_key": ""
+            "skipHashByDefault": {
+                'help': 'Skipping checking of hash(s) if enabled.',
+                'value': False
+            },
+            "skipQuestionConfirmations": {
+                'help': 'Skip agreements [Y/N].',
+                'value': False
+            },
+            "auth_key": {
+                'help': 'Authentication key to connect with Choban services.'
+            }
         }
+
         __refreshenv = """ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") """
         __whof = """if (!(Test-Path Variable:PSScriptRoot)) {$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent}$path = join-path "$env:chobanTools" "{packageExecutable}"; if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }"""
         __set_env = """ function AddToPath($env) {$path = [Environment]::GetEnvironmentVariable("PATH", "User"); $new_path = $path+";"+$env; $addPath = [Environment]::SetEnvironmentVariable("PATH", $new_path, [EnvironmentVariableTarget]::User)}

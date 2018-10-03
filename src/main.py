@@ -50,6 +50,7 @@ parser.add_argument("--packit", action="store_true")
 parser.add_argument("--push", action="store_true")
 parser.add_argument("--authenticate", type=str, help="Your token key")
 parser.add_argument("--config", type=str, help="Configurator")
+parser.add_argument("--help_config", action='store_true', help="Configurator")
 parser.add_argument("--set", type=str, help="Configurator")
 parser.add_argument("--verbose", action="store_true",
                     help="Turning on verbose mode")
@@ -110,6 +111,9 @@ if arg.authenticate:
 
 if arg.config and not arg.set:
     cli.main().config(arg.config)
+
+if arg.help_config:
+    cli.main().confighelp()
 
 if arg.config and arg.set:
     cli.main().config(arg.config, arg.set)

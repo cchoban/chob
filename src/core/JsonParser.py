@@ -210,14 +210,8 @@ class Parser:
         :return boolean:
         """
         if self.keyExists(self.json, key):
-            if value == "true":
-                self.json[key] = True
-            elif value == "false":
-                self.json[key] = False
-            else:
-                self.json[key] = value
-
             try:
+                self.json[key] = value
                 with open(self.path, "w") as f:
                     f.write(json.dumps(self.json, indent=4, sort_keys=True))
                     f.close()

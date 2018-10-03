@@ -99,7 +99,7 @@ def is_os_64bit():
 
 def askQuestion(question):
 
-    if config.Configurator().get_key('skipQuestionConfirmations') == True:
+    if config.Configurator().get_key('skipQuestionConfirmations', True):
         infoMessage("Skipping agreements because 'skipQuestionConfirmations' is set to 'true'.")
         return True
 
