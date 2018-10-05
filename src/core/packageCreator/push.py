@@ -10,15 +10,15 @@ from sys import exit
 class main(pack.main):
 
     def __init__(self):
-        self.zip = None
+        self.json = None
         self.token = auth.main().readToken()
         self.authenticated = False
         self.packageName = None
         if self.isPackgable():
             if self.question():
-                if self.zipExists():
-                    if self.isAuthenticated():
-                        self.pushit()
+                if self.isAuthenticated():
+                    self.readScript()
+                    self.pushit()
 
     def question(self):
         ask = helpers.askQuestion(
@@ -31,13 +31,26 @@ class main(pack.main):
             else:
                 return True
 
-    def zipExists(self):
+    def get_image(self):
+        image_from_scr = self.json['server'].get('icon')
+
+        if image_from_scr:
+            path = os.path.join(os.getcwd(), image_from_scr)
+            if FileManager.Manager().fileExists(path):
+                return image_from_scr
+            else:
+                helpers.errorMessage('Could not get image "{}" in "{}"'.format(image_from_scr, path))
+                return self.detectImage()
+
+
+    def detectImage(self):
+        helpers.infoMessage('Trying to find image via detector..')
+
         for i in os.listdir(os.getcwd()):
-            FileManager.Manager().fileExists(os.getcwd() + "\\" + i)
-            if i.endswith(".zip"):
-                self.zip = i
-                self.packageName = i.split(".")[0]
-                return True
+            if i.endswith('.jpg') or i.endswith('.jpeg') or i.endswith('.png'):
+                helpers.successMessage('Found {} as image.'.format(i))
+                self.json.get('server')['icon'] = i
+                return i
 
     def isAuthenticated(self):
         if auth.main().keyExists():
@@ -45,21 +58,36 @@ class main(pack.main):
         else:
             return False
 
+    def readScript(self):
+        for i in os.listdir(os.getcwd()):
+            FileManager.Manager().fileExists(os.getcwd() + "\\" + i)
+            if i.endswith(".cb"):
+                path = os.path.join(os.getcwd(), i)
+                self.json = JsonParser.Parser(path).fileToJson()
+                self.packageName = i.split(".")[0]
+                return True
+
     def pushit(self):
 
-        zipFile = open(os.getcwd() + "\\" + self.zip, "rb")
         headers = {
             "Authorization": "Token " + self.token,
             "cache-control": "no-cache"
         }
 
+        image = open(os.getcwd() + '\\' + self.get_image(), 'rb')
         files = {
-            "package": (self.zip, zipFile)
+            'packageIcon': image
         }
 
+        dump = JsonParser.Parser().dump_json
         data = {
-            "packageName": self.packageName
+            "packageName": self.packageName,
+            "packageArgs": dump(self.json.get('packageArgs')),
+            "packageUninstallArgs": dump(self.json.get('packageUninstallArgs')),
+            "server": dump(self.json.get('server'))
         }
+
+
 
         post_url = "{}/api/push/".format(helpers.getWebsite)
         resp = http.Http(True).post(
