@@ -279,7 +279,7 @@ class Manager:
                                 stdout=DEVNULL)
 
             if extractFolder:
-                self.moveFile(os.path.join(tmp_file, extractFolder, "*"), dest)
+                self.moveFile(os.path.join(tmp_file, extractFolder), dest)
 
             helpers.successMessage(
                 "Successfully unzipped " + zip + " to " + dest)
