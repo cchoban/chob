@@ -158,12 +158,13 @@ class Manager:
                 for env in environments:
                     if not winhelpers.env_key_exists(env):
                         set_env = winhelpers.set_env(env, environments[env])
+
+                        if not set_env:
+                            helpers.infoMessage(
+                                'Could not set enviroment variable.')
                     else:
                         helpers.verboseMessage('Skipping creating an environment key for {}. Because it already exists.'.format(env))
 
-                    if not set_env:
-                        helpers.infoMessage(
-                            'Could not set enviroment variable.')
 
     def add_to_path_env(self):
         from windows import winhelpers
@@ -173,12 +174,13 @@ class Manager:
                 for env in enviroments:
                     if not winhelpers.env_path_exists(env):
                         set_env = winhelpers.add_path_env(env)
+
+                        if not set_env:
+                            helpers.infoMessage(
+                                'Could not set enviroment variable.(path)')
                     else:
                         helpers.verboseMessage('Skipping PATH:{}. Because it already exists.'.format(env))
 
-                    if not set_env:
-                        helpers.infoMessage(
-                            'Could not set enviroment variable.(path)')
 
 
     def checkForDependencies(self):
