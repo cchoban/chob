@@ -245,7 +245,6 @@ class Manager:
                 helpers.errorMessage("FileManager.extractZip: "+str(e.strerror))
             exit()
 
-
     def extract7z(self, zip, dest, extractFolder):
         from tempfile import gettempdir
         from uuid import uuid4
@@ -267,26 +266,25 @@ class Manager:
                 processArgs = helpers.getCobanBinFolder + \
                     "7za.exe x -o{0} -y {1}".format(dest, zip)
 
-
             runProcess = run(processArgs, stderr=DEVNULL,
                              stdout=DEVNULL)
 
-            if zip.endswith('.tar.gz') or zip.endswith('.tar.xz'):
-                for i in os.listdir(tmp_file):
-                    if i.endswith('.tar'):
-                        runProcess = run(
-                            "7za.exe x -o{0} -y {1}".format(tmp_file, os.path.abspath(os.path.join(tmp_file, i))))
-
+            if self.fileExists(tmp_file) and len(os.listdir(tmp_file)) > 0:
+                if zip.endswith('.tar.gz') or zip.endswith('.tar.xz'):
+                    for i in os.listdir(tmp_file):
+                        if i.endswith('.tar'):
+                            runProcess = run(
+                                "7za.exe x -o{0} -y {1}".format(tmp_file, os.path.abspath(os.path.join(tmp_file, i))))
 
             if extractFolder:
                 self.moveFile(tmp_file+"\\"+extractFolder+"\\*", dest)
 
             helpers.successMessage(
                 "Successfully unzipped " + zip + " to " + dest)
-        except WindowsError or PermissionError or FileNotFoundError as e:
+        except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("FileManager.extract7z: "+str(e.strerror))
+                helpers.errorMessage("FileManager.extract7z: "+str(e))
             exit()
 
 
