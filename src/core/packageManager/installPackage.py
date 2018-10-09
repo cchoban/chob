@@ -121,7 +121,18 @@ class main(PackageManager.Manager):
 
         for i in extensions:
             if i == self.scriptFile["fileType"]:
-                extractFolder = self.scriptFile.get('extractFolder')
+                bit_64 = self.scriptFile['extractFolder']['64bit'] if self.parser.keyExists(self.scriptFile, 'extractFolder') else None
+                bit_32 = self.scriptFile['extractFolder']['32bit'] if self.parser.keyExists(self.scriptFile, 'extractFolder') else None
+                extractFolder = None
+
+                if helpers.is_os_64bit() and bit_64:
+                    extractFolder = bit_64
+                elif helpers.is_os_64bit() and not bit_64:
+                    extractFolder = bit_32
+                elif not helpers.is_os_64bit() and bit_32:
+                    extractFolder = bit_32
+
+
                 if (self.parser.keyExists(self.scriptFile, "unzipPath")):
                     extensions[i](zipFile, self.scriptFile["unzipPath"], extractFolder)
                 else:

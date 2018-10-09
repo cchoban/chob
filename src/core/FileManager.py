@@ -254,6 +254,7 @@ class Manager:
         :param dest: Path to be extracted
         :param extractFolder: Folder to be extracted inside zip file.
         """
+
         try:
             __rand = uuid4().hex.upper()[0:6]
             tmp_file = gettempdir()+"\\"+__rand
@@ -274,10 +275,11 @@ class Manager:
                     for i in os.listdir(tmp_file):
                         if i.endswith('.tar'):
                             runProcess = run(
-                                "7za.exe x -o{0} -y {1}".format(tmp_file, os.path.abspath(os.path.join(tmp_file, i))))
+                                "7za.exe x -o{0} -y {1}".format(tmp_file, os.path.abspath(os.path.join(tmp_file, i))), stderr=DEVNULL,
+                                stdout=DEVNULL)
 
             if extractFolder:
-                self.moveFile(tmp_file+"\\"+extractFolder+"\\*", dest)
+                self.moveFile(os.path.join(tmp_file, extractFolder, "*"), dest)
 
             helpers.successMessage(
                 "Successfully unzipped " + zip + " to " + dest)
