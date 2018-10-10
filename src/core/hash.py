@@ -42,7 +42,7 @@ class check:
             if not self.hash.lower() == calculatedHash:
                 if not self.skipHashes:
                     errorMessage(
-                        "Hashes does not match with the uploaded version. If you want contiune add this argument '-skipHash'")
+                        "Hashes does not match with the uploaded version. If you want contiune add this argument '--skip-hash'")
                     return False
                 else:
                     redColor("Continues without checking hash.")

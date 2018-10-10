@@ -106,7 +106,7 @@ class Configurator():
             return True
         else:
             helpers.errorMessage(
-                'Your files are missing! Please correct this using \'chob --doctor\'')
+                'Your files are missing! Please correct this using \'chob doctor\'')
             return False
 
     def config_help(self):
