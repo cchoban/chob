@@ -1,9 +1,10 @@
-from core import PackageManager, FileManager as file
+from core import PackageManager, FileManager as file, JsonParser
 from core.cli import cli
 from core.packageManager import installPackage, removePackage
 import helpers
 from distutils.version import LooseVersion
 from sys import exit
+
 
 class main(PackageManager.Manager):
 
@@ -21,6 +22,44 @@ class main(PackageManager.Manager):
                 helpers.infoMessage("There is no update for this package right now.")
         else:
             helpers.messages("error", "isNotInstalled", self.packageName)
+
+    def check_upgrade_for_all_packages(self):
+        installed_packages = JsonParser.Parser(
+            helpers.getCobanPath + '\\packages.json').fileToJson().get('installedApps')
+        search_for_packages = []
+        online_version = {}
+        update_packages = []
+
+        for name in installed_packages:
+            search_for_packages.append(name)
+            installation_file_path = '{0}\\packages\\{1}\\{1}.cb'.format(helpers.getCobanPath, name)
+
+            if not file.Manager().fileExists(installation_file_path):
+                cli.main().downloadScript(name)
+
+            installation_file = JsonParser.Parser(installation_file_path).fileToJson()['packageArgs']
+
+            s = {
+                name: {
+                    'packageArgs': installation_file
+                }
+            }
+
+            online_version.update(s)
+
+        for installed in installed_packages:
+            for online in online_version:
+                if installed == online:
+                    latest_version = LooseVersion(
+                        online_version[online]['packageArgs'].get('version'))
+                    current_version = LooseVersion(
+                        installed_packages[installed].get('version'))
+                    if latest_version > current_version:
+                        update_packages.append(installed)
+                    else:
+                        pass
+
+        return update_packages
 
     def __checkForUpgrade(self):
         self.currentVersion = LooseVersion(helpers.installedApps()["installedApps"][self.packageName]["version"])
