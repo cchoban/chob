@@ -74,7 +74,8 @@ class main(pack.main):
             "cache-control": "no-cache"
         }
 
-        image = open(os.getcwd() + '\\' + self.get_image(), 'rb')
+        image = open(os.getcwd() + '\\' + str(self.get_image()), 'rb') if FileManager.Manager(
+        ).fileExists(os.getcwd() + '\\' + str(self.get_image())) else ""
         files = {
             'packageIcon': image
         }
