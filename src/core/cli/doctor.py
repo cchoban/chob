@@ -19,7 +19,7 @@ class doctor:
             "packages": getCobanPath + "\\packages.json",
             "symlinks": getCobanPath + "\\symlinks.json",
             'config': getCobanPath + '\\config.json',
-            'whof': getCobanPath + '\\whof.ps1',
+            'whof': getCobanPath + '\\powershell\\whof.ps1',
             'env': getCobanPath + '\\powershell\setenv.ps1',
             'repo': getCobanPath + '\\repo.json',
             'refreshenv': getCobanPath + '\\refreshenv.ps1'

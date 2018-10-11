@@ -94,7 +94,7 @@ class Manager:
         try:
             dest = helpers.getCobanBinFolder + '\\{}.ps1'.format(shortcut_name)
             if not self.fileExists(dest):
-                with open(helpers.getCobanPath+'\\whof.ps1', 'r') as f:
+                with open(helpers.getCobanPath+'\\powershell\\whof.ps1', 'r') as f:
                     content = f.read()
 
                     if '{packageExecutable}' in content:
