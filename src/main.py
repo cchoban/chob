@@ -107,7 +107,6 @@ agreement = arg.y if hasattr(arg, 'y') else False
 
 if hasattr(arg, 'install') or arg.S:
     package_name = arg.install if hasattr(arg, 'install') else arg.S
-    print(package_name)
     PackageManager.Manager(package_name, skip_hash, force, agreement).installPackage()
 
 
