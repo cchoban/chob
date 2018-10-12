@@ -10,7 +10,7 @@ class doctor:
         self.folders = {
             "packages": getCobanPath + "\\packages",
             "lib": getCobanPath + "\\lib",
-            "tools": getToolsPath,
+            "chobanapps": getToolsPath,
             'powershell': getCobanPath+ '\\powershell'
         }
 
@@ -77,7 +77,7 @@ class doctor:
         }
 
         __refreshenv = """ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") """
-        __whof = """if (!(Test-Path Variable:PSScriptRoot)) {$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent}$path = join-path "$env:chobanTools" "{packageExecutable}"; if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }"""
+        __whof = """if (!(Test-Path Variable:PSScriptRoot)) {$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent}$path = join-path "$env:chobanApps" "{packageExecutable}"; if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }"""
         __set_env = """ function AddToPath($env) {$path = [Environment]::GetEnvironmentVariable("PATH", "User"); $new_path = $path+";"+$env; $addPath = [Environment]::SetEnvironmentVariable("PATH", $new_path, [EnvironmentVariableTarget]::User)}
         function RemoveFromPath($env_value) {$path = [System.Environment]::GetEnvironmentVariable('PATH','User');$path = ($path.Split(';') | Where-Object { $_ -ne $env_value }) -join ';';[System.Environment]::SetEnvironmentVariable('PATH',$path,'User')}
         function RemoveEnv($env_name) { [Environment]::SetEnvironmentVariable($env_name,$null,"User") }

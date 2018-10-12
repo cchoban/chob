@@ -16,7 +16,7 @@ except ModuleNotFoundError as e:
 
 packageInstallationPath = os.getenv("programdata") + "\\choban\\packages\\"
 getCobanPath = os.getenv("chobanPath")
-getToolsPath = os.getenv("chobanTools")
+getToolsPath = os.getenv("chobanApps")
 getCobanBinFolder = getCobanPath + "\\lib\\"
 getWebsite = repo.repos().get('website')
 
