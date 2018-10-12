@@ -29,7 +29,7 @@ class Manager:
                 return True
             else:
                 return False
-        except FileNotFoundError as e:
+        except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.fileExists - File not found: "+str(e))
