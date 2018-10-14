@@ -123,7 +123,8 @@ class main(PackageManager.Manager):
             installedApps = helpers.installedApps()['installedApps']
             for i in installedApps:
                 if installedApps[i].get('dependencies'):
-                    if self.dependencies in installedApps[i].get('dependencies'):
+                    #FIXME: potential problems
+                    if self.dependencies == installedApps[i].get('dependencies'):
                         helpers.errorMessage('Skipping uninstalling "{}" as it uses by another package:  "{}"'.format(self.dependencies, i))
                         return False
 

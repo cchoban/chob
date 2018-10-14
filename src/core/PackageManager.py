@@ -43,6 +43,8 @@ class Manager:
 
         if isinstance(self.packageName, list):
             for i in packagename:
+                helpers.redColor('Installing '+i)
+
                 if not i in helpers.programList():
                     helpers.errorMessage(
                         "Package '{}' was not found on our servers. But you can push it your self with argument --create! ".format(
@@ -207,19 +209,19 @@ class Manager:
                     self.dependencies = i
 
                 if i in helpers.programList() and i not in helpers.installedApps()["installedApps"]:
-                    helpers.successMessage("Found dependencies: " + i)
-                    self.oldPackageName = self.packageName
-                    if isinstance(self.dependencies, list) and len(self.dependencies) > 1:
-                        self.packageName = self.dependencies
+                    helpers.successMessage("Found dependencies: "+i)
+                    #FIXME: may be a fix required
+                    # self.oldPackageName = self.packageName
+                    # if isinstance(self.dependencies, list) and len(self.dependencies) > 1:
+                    #     self.packageName = self.dependencies
                 else:
                     if not self.uninstall:
-                        helpers.infoMessage(
+                        helpers.redColor(
                             'Found {0} as dependencie(s) but it is already installed on your computer. Skipping it.'.format(
                                 i))
                         self.dependencies = []
-                        return True
                     else:
-                        helpers.infoMessage(
+                        helpers.redColor(
                             'Found {0} as dependencie(s), will be removed as it\'s not uses from another package.'.format(
                                 i))
 

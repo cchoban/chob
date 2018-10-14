@@ -51,8 +51,10 @@ class main(PackageManager.Manager):
                     else:
                         helpers.successMessage("Successfully installed "+self.packageName)
                         self.printNotesFromParser()
+                        print('\n \n')
                         self.downloadDependencies()
-                        return True
+                        #FIXME: potential problem
+                        # return True
                 else:
                     exit(
                         "This file type is not supported. Create issue if you really think it should."
