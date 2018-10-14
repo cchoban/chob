@@ -24,7 +24,10 @@ class main(PackageManager.Manager):
                     self.remove_from_path_env()
                 self.__remove_symlinks()
 
+                self.printNotesFromParser()
+
                 self.remove_dependencies()
+
         else:
             helpers.infoMessage("There is no packages with name of " + self.packageName)
             return False

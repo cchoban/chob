@@ -116,7 +116,7 @@ class Manager:
         try:
             self.scriptFile
             self.scriptFile["softwareName"]
-        except AttributeError or KeyError as e:
+        except Exception as e:
             cli.main().downloadScript(self.packageName)
             if not uninstall:
                 self.scriptFile = self.parser.fileToJson(
@@ -222,3 +222,16 @@ class Manager:
                         helpers.infoMessage(
                             'Found {0} as dependencie(s), will be removed as it\'s not uses from another package.'.format(
                                 i))
+
+    def printNotesFromParser(self):
+        notes = self.scriptFile.get('notes')
+
+        if self.parser.keyExists(self.scriptFile, 'notes'):
+            if isinstance(notes, list):
+                print('Notes from script provider: \n')
+                for msg in notes:
+                    print(msg)
+            else:
+                if helpers.is_verbose():
+                    helpers.errorMessage(
+                        '"notes" section in installation script should be list/array')

@@ -40,6 +40,7 @@ class main(PackageManager.Manager):
                         if self.valid_exit_code():
                             self.parser.addNewPackage(self.packageName, {"version":self.scriptFile['version'], 'dependencies': self.dependencies})
                             helpers.successMessage("Successfully installed "+ self.packageName)
+                            self.printNotesFromParser()
                             self.downloadDependencies()
                             return True
                         else:
@@ -49,6 +50,7 @@ class main(PackageManager.Manager):
                             return False
                     else:
                         helpers.successMessage("Successfully installed "+self.packageName)
+                        self.printNotesFromParser()
                         self.downloadDependencies()
                         return True
                 else:
