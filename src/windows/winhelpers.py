@@ -2,14 +2,12 @@ from subprocess import call, DEVNULL, PIPE
 from Logger import Logger as log
 from helpers import is_verbose, errorMessage, getCobanPath
 from os import environ, path
-import os
 
 
 def __reload_environ():
     """
     Reloads environments variables.
     """
-
     path = getCobanPath + '\\refreshenv.ps1'
     set_path = call('powershell -Command ". {}'.format(path))
 
@@ -33,6 +31,7 @@ def set_env(env_key: str, env_value: str):
             stderr=DEVNULL)
 
         if env_set == 0:
+            __reload_environ()
             return True
         else:
             return False
@@ -57,6 +56,7 @@ def remove_env(env_key: str):
                 path, env_key))
 
         if env_set == 0:
+            __reload_environ()
             return True
         else:
             return False
@@ -83,6 +83,7 @@ def remove_from_path(env_path: str):
             format(path, env_path))
 
         if set_path == 0:
+            __reload_environ()
             return True
         else:
             return False
@@ -108,6 +109,7 @@ def add_path_env(env_value: str):
                 path, env_value))
 
         if set_path == 0:
+            __reload_environ()
             return True
         else:
             return False
