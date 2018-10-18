@@ -94,26 +94,27 @@ class main(pack.main):
         resp = http.Http(True).post(
             post_url, headers=headers, files=files, data=data)
 
-        if resp.status_code == 201:
-            helpers.infoMessage(
-                "You successfully submitted your package. It is now under approvement period.")
+        if resp:
+            if resp.status_code == 201:
+                helpers.infoMessage(
+                    "You successfully submitted your package. It is now under approvement period.")
 
-        elif resp.status_code == 406:
-            helpers.errorMessage(
-                "We could not push your package. See error detail: \n {0}".format(resp.json().get('error')))
+            elif resp.status_code == 406:
+                helpers.errorMessage(
+                    "We could not push your package. See error detail: \n {0}".format(resp.json().get('error')))
 
-        elif resp.status_code == 401:
-            helpers.errorMessage('Please provide correct authentication key.')
-        else:
-            helpers.errorMessage(
-                'Something happened... Please try again later..')
-            if helpers.is_verbose():
-                errors = {
-                    'error_code': resp.status_code,
-                    'response': resp.content,
-                    'error': resp.json().get('error'),
-                    'success': resp.json().get('success')
-                }
+            elif resp.status_code == 401:
+                helpers.errorMessage('Please provide correct authentication key.')
+            else:
+                helpers.errorMessage(
+                    'Something happened... Please try again later..')
+                if helpers.is_verbose():
+                    errors = {
+                        'error_code': resp.status_code,
+                        'response': resp.content,
+                        'error': resp.json().get('error'),
+                        'success': resp.json().get('success')
+                    }
 
-                print(errors)
-                return False
+                    print(errors)
+                    return False

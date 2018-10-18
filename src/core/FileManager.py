@@ -214,7 +214,7 @@ class Manager:
             exit()
 
 
-    def extractZip(self, zip, dest, extractFolder):
+    def extractZip(self, zip, dest, extractFolder = None):
         from tempfile import gettempdir
         from uuid import uuid4
 

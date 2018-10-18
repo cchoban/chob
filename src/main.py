@@ -4,6 +4,7 @@ from core.cli import cli
 from core import PackageManager
 from sys import argv, exit
 
+
 if len(argv) == 1:
     exit("""
         Choban package manager
@@ -67,6 +68,11 @@ auth.add_argument('authenticate', type=str, help="Your API Token key to push pac
 #Push command
 push = subparser.add_parser('push')
 push.add_argument("push", action="store_true",help="Push your package via this command.")
+
+#Packs the package for testing it
+packit = subparser.add_parser('packit')
+packit.add_argument("packit", action="store_true",
+                  help="Push your package via this command.")
 
 #Clean command
 clean = subparser.add_parser('clean')
@@ -134,6 +140,9 @@ if hasattr(arg, 'create'):
 if hasattr(arg, 'push') and arg.push:
     cli.main().push()
 
+if hasattr(arg, 'packit') and arg.packit:
+    cli.main().packit()
+
 if hasattr(arg, 'authenticate'):
     cli.main().auth(arg.authenticate, arg.force)
 
@@ -149,8 +158,8 @@ if hasattr(arg, 'update') and arg.update:
 if hasattr(arg, 'doctor') and arg.doctor:
     cli.main().doctor()
 
-if hasattr(arg, 'test_package'):
-    PackageManager.Manager(arg.test_package, arg.skip_hash,
+if hasattr(arg, 'testpackage'):
+    PackageManager.Manager(arg.testpackage, arg.skip_hash,
                            arg.force, arg.y).testPackage()
 
 if arg.packages:
