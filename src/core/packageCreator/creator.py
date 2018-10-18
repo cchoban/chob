@@ -8,30 +8,32 @@ from sys import exit
 class generateNewPackage:
     def __init__(self, packageName=None, generateFlatFileOnly=False):
         self.packageName = packageName
-        self.softwareName = None
-        self.description = None
-        self.version = None
+        self.softwareName = ""
+        self.description = ""
+        self.version = ""
         self.enable64bit = False
-        self.downloadUrl = None
-        self.downloadUrl64 = None
-        self.checksum = None
-        self.checksum64 = None
-        self.checksumType = None
-        self.checksumType64 = None
-        self.fileType = None
-        self.silentArgs = None
+        self.downloadUrl = ""
+        self.downloadUrl64 = ""
+        self.checksum = ""
+        self.checksum64 = ""
+        self.checksumType = ""
+        self.checksumType64 = ""
+        self.fileType = ""
+        self.silentArgs = ""
         self.validExitCodes = []
-        self.uninstallSilenArgs = None
-        self.icon = None
-        self.unzip = None
+        self.uninstallSilenArgs = ""
+        self.icon = ""
+        self.unzip = False
         self.dict = {}
-        self.only64bit = None
+        self.only64bit = False
         self.generateFlatFileOnly = generateFlatFileOnly
         self.dependencies = []
-        self.createShortcut = None
-        self.createShortcut64 = None
-        self.author = None
-        self.lisence = None
+        self.createShortcut = {}
+        self.createShortcut64 = {}
+        self.author = ""
+        self.lisence = ""
+        self.path = []
+        self.envs = {}
 
     def name(self):
         package = input("Package Name for application. Example: google-chrome*: ")
@@ -112,8 +114,11 @@ class generateNewPackage:
 
     def isunzip(self):
         package = input("Is this application compressed with zip technologies? [Y/N]: ")
+
         if package == "y":
             self.unzip = True
+        else:
+            self.unzip = False
 
     def deps(self):
         package = input(
@@ -127,19 +132,16 @@ class generateNewPackage:
         package = input(
             "Shortcuts for {}. This will help user to run command from his command line. Example: php.exe, php.ini: ".format(self.packageName))
 
-        if len(package) > 0:
-            self.createShortcut = package.split(",")
-        else:
-            return []
+        self.createShortcut = package.split(",")
 
 
         if self.enable64bit:
             package = input(
                 "Shortcuts for {} (64-Bit). This will help user to run command from his command line. Example: php.exe, php.ini: ".format(self.packageName))
-            if len(package) > 0:
-                self.createShortcut64 = package.split(",")
-            else:
-                return []
+            self.createShortcut64 = package.split(",")
+
+        if len(package) > 0:
+            return {"32bit": [], "64bit": []}
 
     def author_page(self):
         package = input(
@@ -152,6 +154,26 @@ class generateNewPackage:
             "Package lisence for {}: ".format(self.packageName))
 
         self.lisence = package
+
+    def path_envs(self):
+        package = input('Paths to be added to PATH environment. Example: {cobanTools}\\php\: ')
+        if len(package) > 0:
+                self.path = package.split(",")
+        else:
+            return []
+
+    def environments(self):
+        package = input('Environment keys to be added. Example: NVM_SYMLINK={cobanTools}\\php: ')
+
+        if not '=' in package:
+            print('Environment keys was invalid therefore we will skip it.')
+            self.envs = {}
+            return {}
+
+        if len(package) > 0:
+            self.envs = dict(x.split('=') for x in package.split(','))
+        else:
+            return {}
 
 class generatePackage(generateNewPackage):
 
@@ -171,6 +193,8 @@ class generatePackage(generateNewPackage):
             self.deps()
             if self.unzip:
                 self.shortcut()
+                self.environments()
+                self.path_envs()
             self.author_page()
             self.package_lisence()
             if not self.unzip:
@@ -194,7 +218,11 @@ class generatePackage(generateNewPackage):
                 "fileType": self.fileType,
                 "dependencies": self.dependencies,
                 'author': self.author,
-                'lisence': self.lisence
+                'lisence': self.lisence,
+                'environments': self.envs,
+                'path_env': self.path,
+                "createShortcut": {"32bit": self.createShortcut, "64bit": self.createShortcut64}
+
             },
 
             'packageUninstallArgs': {
@@ -209,17 +237,17 @@ class generatePackage(generateNewPackage):
         if not self.unzip:
             root['packageArgs']['silentArgs'] = self.silentArgs
             root['packageArgs']['validExitCodes'] = self.validExitCodes
-
-        if self.only64bit:
-            root['packageArgs']['64bitonly'] = True
-
-        if self.unzip != None and self.unzip == True:
+        else:
             root['packageArgs']['unzip'] = True
 
             if self.createShortcut:
                 root['packageArgs']['createShortcut'] = {
                     '32bit': self.createShortcut
                 }
+
+
+        if self.only64bit:
+            root['packageArgs']['64bitonly'] = True
 
         if self.enable64bit:
             if self.unzip:
@@ -269,16 +297,3 @@ class generatePackage(generateNewPackage):
         with open(path, "w") as f:
             f.write(json.dumps(self.dict, indent=4, sort_keys=True))
             f.close()
-
-#
-# try:
-#     cls = generatePackage()
-#     cls.getAnswers()
-#     dict = cls.generateJson()
-#     cls.writeToFile(dict)
-#
-#     print(generateNewPackage().packageName)
-# except Exception as e:
-#     print(e)
-#     pass
-#

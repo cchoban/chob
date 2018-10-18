@@ -30,7 +30,7 @@ class main:
     def readToken(self):
         key = config.Configurator()
         key.get_key('auth_key')
-        self.token = key.get_key('auth_key')
+        self.token = key.get_key('auth_key').get('value')
         return self.token
 
     def printToken(self):

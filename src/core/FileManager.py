@@ -29,7 +29,7 @@ class Manager:
                 return True
             else:
                 return False
-        except FileNotFoundError as e:
+        except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.fileExists - File not found: "+str(e))
@@ -85,20 +85,20 @@ class Manager:
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.deleteFile - " + str(e))
 
-    def createSymLink(self, packageName, executable):
+    def createSymLink(self, package_name, shortcut_name, executable):
         """
         Creates symlink
         :param packageName: Name of package
         :param executable: Executable file of package to create executable powershell script
         """
         try:
-            dest = helpers.getCobanBinFolder + '\\{}.ps1'.format(packageName)
+            dest = helpers.getCobanBinFolder + '\\{}.ps1'.format(shortcut_name)
             if not self.fileExists(dest):
-                with open(helpers.getCobanPath+'\\whof.ps1', 'r') as f:
+                with open(helpers.getCobanPath+'\\powershell\\whof.ps1', 'r') as f:
                     content = f.read()
 
                     if '{packageExecutable}' in content:
-                        content = content.replace('{packageExecutable}', '{}\{}'.format(packageName, executable))
+                        content = content.replace('{packageExecutable}', '{}\{}'.format(package_name, executable))
                         with open(dest, 'w') as f:
                             f.write(content)
                             f.close()
@@ -129,41 +129,49 @@ class Manager:
     def removeDir(self, path):
         """
         Removes dir
-        :param path:
+        :param path: Path to be removed
         """
-        if self.fileExists(path):
-            try:
-                rmtree(path)
-                os.removedirs(path)
-            except FileNotFoundError or WindowsError or PermissionError or Exception as e:
-                log.new(e).logError()
-                if helpers.is_verbose():
-                    helpers.errorMessage("FileManager.removeDir: "+str(e.strerror))
-        else:
-            helpers.infoMessage(
-                "Path does not exists while trying to remove it: " + path)
+        try:
+            if self.fileExists(path):
+                try:
+                    rmtree(path)
+                    os.removedirs(path)
+                except FileNotFoundError or WindowsError or PermissionError or Exception as e:
+                    log.new(e).logError()
+                    if helpers.is_verbose():
+                        helpers.errorMessage("FileManager.removeDir: "+str(e.strerror))
+            else:
+                helpers.infoMessage(
+                    "Path does not exists while trying to remove it: " + path)
+        except Exception as e:
+            log.new(e).logError()
+            return False
 
     def moveFile(self, filePath, fileDest):
         """
         Moves file to specific directory.
-        :param filePath:
-        :param fileDest:
+        :param filePath: File to be moved from.
+        :param fileDest: File to be moved to.
         """
-
-        if self.fileExists(filePath):
+        if self.fileExists(filePath.replace('*','')):
             try:
-                move(filePath, fileDest)
+                if filePath.endswith('*'):
+                    filePath = filePath.replace('*', '')
+                    for i in os.listdir(filePath):
+                        move(os.path.join(filePath, i), fileDest)
+                else:
+                    move(filePath, fileDest)
             except WindowsError or FileNotFoundError or FileExistsError as e:
                 log.new(e).logError()
-            if helpers.is_verbose():
-                helpers.errorMessage("FileManager.moveFile: "+str(e.strerror))
-                exit()
+                if helpers.is_verbose():
+                    helpers.errorMessage("FileManager.moveFile: "+str(e.strerror))
+                    exit()
 
     def copyFile(self, filePath, fileDest):
         """
         Copys file to specific directory.
-        :param filePath:
-        :param fileDest:
+        :param filePath: File to be copied from.
+        :param fileDest: File to be copied to.
         """
 
         if self.fileExists(filePath):
@@ -174,6 +182,8 @@ class Manager:
                 if helpers.is_verbose():
                     helpers.errorMessage("FileManager.copyFile: "+str(e.strerror))
                 exit()
+
+
     def __zipdir(self, path, zip, ignoreFiles=[]):
         for file in os.listdir(path):
             if not file in ignoreFiles:
@@ -206,16 +216,30 @@ class Manager:
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.makeZip: "+str(e.strerror))
             exit()
-    def extractZip(self, zip, dest):
+
+
+    def extractZip(self, zip, dest, extractFolder = None):
+        from tempfile import gettempdir
+        from uuid import uuid4
+
         """
         Extract zip
-        :param zip:
-        :param dest:
+        :param zip: Zip file path
+        :param dest: Path to be extracted
+        :param extractFolder: Folder to be extracted inside zip file.
         """
         try:
+            __rand = uuid4().hex.upper()[0:6]
+            tmp_file = gettempdir()+"\\"+__rand
             helpers.infoMessage("Unzipping " + zip + " to " + dest)
+
             zf = zipfile.ZipFile(zip, "r")
-            zf.extractall(dest)
+            if extractFolder:
+                zf.extractall(tmp_file)
+                self.moveFile(tmp_file+"\\"+extractFolder, dest)
+            else:
+                zf.extractall(dest)
+
             zf.close()
             helpers.successMessage(
                 "Successfully unzipped " + zip + " to " + dest)
@@ -224,25 +248,51 @@ class Manager:
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.extractZip: "+str(e.strerror))
             exit()
-    def extract7z(self, zip, dest):
+
+    def extract7z(self, zip, dest, extractFolder):
+        from tempfile import gettempdir
+        from uuid import uuid4
         """
         Extract 7zip
-        :param zip:
-        :param dest:
+        :param zip: Zip file path
+        :param dest: Path to be extracted
+        :param extractFolder: Folder to be extracted inside zip file.
         """
+
         try:
-            processArgs = helpers.getCobanBinFolder + \
-                "7za.exe x -o{0} -y {1}".format(dest, zip)
+            __rand = uuid4().hex.upper()[0:6]
+            tmp_file = gettempdir()+"\\"+__rand
             helpers.infoMessage("Unzipping " + zip + " to " + dest)
+
+            if extractFolder:
+                processArgs = helpers.getCobanBinFolder + \
+                    "7za.exe x -o{0} -y {1}".format(tmp_file, zip)
+            else:
+                processArgs = helpers.getCobanBinFolder + \
+                    "7za.exe x -o{0} -y {1}".format(dest, zip)
+
             runProcess = run(processArgs, stderr=DEVNULL,
                              stdout=DEVNULL)
+
+            if self.fileExists(tmp_file) and len(os.listdir(tmp_file)) > 0:
+                if zip.endswith('.tar.gz') or zip.endswith('.tar.xz'):
+                    for i in os.listdir(tmp_file):
+                        if i.endswith('.tar'):
+                            runProcess = run(
+                                "7za.exe x -o{0} -y {1}".format(tmp_file, os.path.abspath(os.path.join(tmp_file, i))), stderr=DEVNULL,
+                                stdout=DEVNULL)
+
+            if extractFolder:
+                self.moveFile(os.path.join(tmp_file, extractFolder), dest)
+
             helpers.successMessage(
                 "Successfully unzipped " + zip + " to " + dest)
-        except WindowsError or PermissionError or FileNotFoundError as e:
+        except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("FileManager.extract7z: "+str(e.strerror))
+                helpers.errorMessage("FileManager.extract7z: "+str(e))
             exit()
+
 
     def cleanup(self, packageName=""):
         """

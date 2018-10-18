@@ -20,10 +20,11 @@ class Manager:
         self.dependencies = None
         self.uninstall = uninstall
         self.package_has_64bit = False
+        self.arches = False
 
         if not isinstance(packageName, list):
             self.packagePathWithoutExt = helpers.packageInstallationPath + \
-                packageName + "\\" + packageName
+                                         packageName + "\\" + packageName
             self.packagePathWithExt = self.packagePathWithoutExt + ".cb"
             self.packageScriptName = self.packageName + ".cb"
 
@@ -42,9 +43,12 @@ class Manager:
 
         if isinstance(self.packageName, list):
             for i in packagename:
+                helpers.redColor('Installing '+i)
+
                 if not i in helpers.programList():
                     helpers.errorMessage(
-                        "Package '{}' was not found on our servers. But you can push it your self with argument --create! ".format(i))
+                        "Package '{}' was not found on our servers. But you can push it your self with argument --create! ".format(
+                            i))
                     return False
                 self.packageName = i
                 self.packageScriptName = i + ".cb"
@@ -77,16 +81,29 @@ class Manager:
 
     def upgradePackage(self):
         from .packageManager import upgradePackage as upgrade
+
+        if not self.packageName:
+            helpers.infoMessage('Checking for upgrades..')
+            check = upgrade.main(self.packageName, self.skipHashes, self.forceInstallation,
+                                 self.skipAgreements).check_upgrade_for_all_packages()
+
+            if len(check) > 0:
+                helpers.infoMessage('An update found for "{}"'.format(
+                    ', '.join(check)))
+            else:
+                helpers.successMessage('No update found for your applications.')
+
+            if not check == True:
+                self.packageName = check
+
         for i in self.packageName:
             self.packageName = i
             self.packageScriptName = i + ".cb"
-
             upgrade.main(i, self.skipHashes, self.forceInstallation,
                          self.skipAgreements).run()
 
     def testPackage(self):
         from .packageManager import testPackage
-        # install.main(self.packageName, self.skipHashes, self.forceInstallation, self.skipAgreements).testPackage()
         testPackage.main(self.packageName, self.skipHashes,
                          self.forceInstallation, self.skipAgreements).test()
 
@@ -101,7 +118,7 @@ class Manager:
         try:
             self.scriptFile
             self.scriptFile["softwareName"]
-        except AttributeError or KeyError as e:
+        except Exception as e:
             cli.main().downloadScript(self.packageName)
             if not uninstall:
                 self.scriptFile = self.parser.fileToJson(
@@ -115,7 +132,7 @@ class Manager:
             return True
         return helpers.askQuestion("Do you want to " + action + " " + self.packageName)
 
-    def checkHash(self, sandboxed=False):
+    def checkHash(self, sandboxed=False, arches=False):
         try:
             if json.Parser().keyExists(self.scriptFile, "downloadUrl64"):
                 hashedKey = self.scriptFile["checksum64"]
@@ -123,16 +140,18 @@ class Manager:
                 hashedKey = self.scriptFile["checksum"]
 
             check = hash.check(hashedKey, self.packageName,
-                               self.skipHashes, sandboxed)
+                               self.skipHashes, sandboxed, arches)
 
-            while check == True:
+            if check:
                 return True
         except KeyError as e:
+            # TODO: add log
             pass
 
     def valid_exit_code(self):
         if not self.is_zip_package():
-            if self.exit_code in self.scriptFile["validExitCodes"] or str(self.exit_code) in self.scriptFile["validExitCodes"]:
+            if self.exit_code in self.scriptFile["validExitCodes"] or str(self.exit_code) in self.scriptFile[
+                "validExitCodes"]:
                 return True
             else:
                 return False
@@ -140,10 +159,42 @@ class Manager:
             return True
 
     def is_zip_package(self):
-        if self.parser.keyExists(self.scriptFile, 'unzip')  and self.scriptFile['unzip'] == True:
+        if self.parser.keyExists(self.scriptFile, 'unzip') and self.scriptFile['unzip'] == True:
             return True
         else:
             return False
+
+    # TODO: add comments
+    def set_envs(self):
+        from windows import winhelpers
+
+        if self.parser.keyExists(self.scriptFile, 'environments'):
+            environments = self.scriptFile['environments']
+            for env in environments:
+                if not winhelpers.env_key_exists(env):
+                    set_env = winhelpers.set_env(env, environments[env])
+
+                    if not set_env:
+                        helpers.infoMessage(
+                            'Could not set enviroment variable.')
+                else:
+                    helpers.verboseMessage(
+                        'Skipping creating an environment key for {}. Because it already exists.'.format(env))
+
+    def add_to_path_env(self):
+        from windows import winhelpers
+
+        if self.parser.keyExists(self.scriptFile, 'path_env'):
+            enviroments = self.scriptFile['path_env']
+            for env in enviroments:
+                if not winhelpers.env_path_exists(env):
+                    set_env = winhelpers.add_path_env(env)
+
+                    if not set_env:
+                        helpers.infoMessage(
+                            'Could not set enviroment variable.(path)')
+                else:
+                    helpers.verboseMessage('Skipping PATH:{}. Because it already exists.'.format(env))
 
     def checkForDependencies(self):
         js = self.scriptFile[
@@ -158,16 +209,31 @@ class Manager:
                     self.dependencies = i
 
                 if i in helpers.programList() and i not in helpers.installedApps()["installedApps"]:
-                    helpers.successMessage("Found dependencies: " + i)
-                    self.oldPackageName = self.packageName
-                    if isinstance(self.dependencies, list) and len(self.dependencies) > 1:
-                        self.packageName = self.dependencies
+                    helpers.successMessage("Found dependencies: "+i)
+                    #FIXME: may be a fix required
+                    # self.oldPackageName = self.packageName
+                    # if isinstance(self.dependencies, list) and len(self.dependencies) > 1:
+                    #     self.packageName = self.dependencies
                 else:
                     if not self.uninstall:
-                        helpers.infoMessage(
-                            'Found {0} as dependencie(s) but it is already installed on your computer. Skipping it.'.format(i))
+                        helpers.redColor(
+                            'Found {0} as dependencie(s) but it is already installed on your computer. Skipping it.'.format(
+                                i))
                         self.dependencies = []
-                        return True
                     else:
-                        helpers.infoMessage(
-                            'Found {0} as dependencie(s), will be removed as it\'s not uses from another package.' .format(i))
+                        helpers.redColor(
+                            'Found {0} as dependencie(s), will be removed as it\'s not uses from another package.'.format(
+                                i))
+
+    def printNotesFromParser(self):
+        notes = self.scriptFile.get('notes')
+
+        if self.parser.keyExists(self.scriptFile, 'notes'):
+            if isinstance(notes, list):
+                print('Notes from script provider: \n')
+                for msg in notes:
+                    print(msg)
+            else:
+                if helpers.is_verbose():
+                    helpers.errorMessage(
+                        '"notes" section in installation script should be list/array')

@@ -10,12 +10,14 @@ from sys import exit
 
 class main:
 
-    def __init__(self):
-        pass
+    def config(self, configFrom, configTo=None):
+        if not configTo:
+            return helpers.successMessage(str(config.Configurator().get_key(configFrom)))
 
-
-    def config(self, configFrom, configTo):
         return config.Configurator().setConfig(configFrom, configTo)
+
+    def confighelp(self):
+        return config.Configurator().config_help()
 
     def packageGenerator(self, packageName, generateFlatFileOnly=False):
         if generateFlatFileOnly:
@@ -50,7 +52,7 @@ class main:
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("cli.cli.update: "+str(e.strerror))
+                helpers.errorMessage("cli.cli.update: "+str(e))
 
     def doctor(self):
         doc = doctor.doctor()
@@ -105,7 +107,7 @@ class main:
                            helpers.packageInstallationPath + packageName + "\\" + packageName, "cb")
     def version(self):
         helpers.successMessage("Choban Package Manager")
-        helpers.infoMessage("Version 0.5.8.2")
+        helpers.infoMessage("Version 0.6")
 
     def server_status(self):
         resp = http.Http().get(repo.repos()["programList"])

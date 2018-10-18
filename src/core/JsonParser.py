@@ -18,7 +18,9 @@ class Parser:
         self.json = {}
         self.objects = {
             "{cobanPath}": helpers.getCobanPath,
-            "{cobanTools}": helpers.getToolsPath
+            "{cobanTools}": helpers.getToolsPath,
+            "{packageName}": self.__package_name,
+            "{packageToolsPath}": self.__package_tools_path,
         }
 
     def fileToJson(self, path=""):
@@ -210,14 +212,8 @@ class Parser:
         :return boolean:
         """
         if self.keyExists(self.json, key):
-            if value == "true":
-                self.json[key] = True
-            elif value == "false":
-                self.json[key] = False
-            else:
-                self.json[key] = value
-
             try:
+                self.json[key] = value
                 with open(self.path, "w") as f:
                     f.write(json.dumps(self.json, indent=4, sort_keys=True))
                     f.close()
@@ -233,10 +229,52 @@ class Parser:
         """Merge objects in json file."""
         objects = [obj for obj in self.objects]
         package_args = self.json["packageArgs"]
+        empty_list = []
+
         for i in package_args:
             if package_args[i] in objects:
-                package_args[i] = package_args[i].replace(
-                    package_args[i], self.objects[package_args[i]])
+                package_args[i] = package_args[i].replace(package_args[i], self.objects[package_args[i]])
+
+            if isinstance(package_args[i], dict):
+                for p in package_args[i]:
+                    if package_args[i][p] in objects:
+                        package_args[i][p] = package_args[i][p].replace(package_args[i][p], self.objects[package_args[i][p]])
+                    else:
+                        gathered_object_key = self.__search_via_regex(package_args[i][p])
+                        if gathered_object_key:
+                            package_args[i][p] = package_args[i][p].replace(gathered_object_key, self.objects[gathered_object_key])
+
+            elif isinstance(package_args[i], list):
+                for p in package_args[i]:
+                    if p in objects:
+                        package_args[i] = p.replace(p, self.objects[p])
+                    else:
+                        gathered_object_key = self.__search_via_regex(p)
+                        if gathered_object_key:
+                            package_args[i] = empty_list
+                            if hasattr(self.objects[gathered_object_key], '__call__'):
+                                empty_list.append(p.replace(gathered_object_key, self.objects[gathered_object_key]()))
+                            else:
+                                empty_list.append(p.replace(gathered_object_key, self.objects[gathered_object_key]))
+
+            else:
+                gathered_object_key = self.__search_via_regex(package_args[i])
+                if gathered_object_key:
+                    package_args[i] = package_args[i].replace(gathered_object_key, self.objects[gathered_object_key])
+
+
+    def __search_via_regex(self, string):
+        from re import search
+
+        search = search('\{([^}]+)\}', str(string))
+        if search:
+            gathered_object_key = search.group(0)
+            if gathered_object_key in self.objects:
+                return gathered_object_key
+            else:
+                return False
+        else:
+            return False
 
 
     def dump_json(self, dict: dict, beautify=False):
@@ -251,3 +289,18 @@ class Parser:
             return json.dumps(dict, indent=4, sort_keys=True)
         else:
             return json.dumps(dict)
+
+    def __package_name(self):
+        """ Returns package name to use it inside installation scripts """
+
+        if len(self.json) > 1:
+            return self.json.get('packageArgs')['packageName']
+
+    def __package_tools_path(self):
+        """ Returns 'chobanapps' path for package """
+
+        package_args = self.json['packageArgs']
+        if self.keyExists(package_args, 'unzip'):
+            if len(self.json) > 1:
+                return FileManager.os.path.join(helpers.getToolsPath, package_args.get('packageName'))
+

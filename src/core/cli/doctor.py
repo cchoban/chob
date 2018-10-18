@@ -10,7 +10,8 @@ class doctor:
         self.folders = {
             "packages": getCobanPath + "\\packages",
             "lib": getCobanPath + "\\lib",
-            "tools": getToolsPath
+            "chobanapps": getToolsPath,
+            'powershell': getCobanPath+ '\\powershell'
         }
 
         self.files = {
@@ -18,8 +19,10 @@ class doctor:
             "packages": getCobanPath + "\\packages.json",
             "symlinks": getCobanPath + "\\symlinks.json",
             'config': getCobanPath + '\\config.json',
-            'whof': getCobanPath + '\\whof.ps1',
-            'repo': getCobanPath + '\\repo.json'
+            'whof': getCobanPath + '\\powershell\\whof.ps1',
+            'env': getCobanPath + '\\powershell\setenv.ps1',
+            'repo': getCobanPath + '\\repo.json',
+            'refreshenv': getCobanPath + '\\refreshenv.ps1'
         }
 
     def createFolders(self):
@@ -60,13 +63,25 @@ class doctor:
 
     def file_contents(self):
         __config = {
-            "skipHashByDefault": False,
-            "skipQuestionConfirmations": False,
-            "auth_key": ""
+            "skipHashByDefault": {
+                'help': 'Skipping checking of hash(s) if enabled.',
+                'value': False
+            },
+            "skipQuestionConfirmations": {
+                'help': 'Skip agreements [Y/N].',
+                'value': False
+            },
+            "auth_key": {
+                'help': 'Authentication key to connect with Choban services.'
+            }
         }
 
-        __whof = """if (!(Test-Path Variable:PSScriptRoot)) {$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent}$path = join-path "$env:chobanTools" "{packageExecutable}"; if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }"""
-
+        __refreshenv = """$env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")"""
+        __whof = """if (!(Test-Path Variable:PSScriptRoot)) {$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent}$path = join-path "$env:chobanApps" "{packageExecutable}"; if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }"""
+        __set_env = """function AddToPath($env) {$path = [Environment]::GetEnvironmentVariable("PATH", "User"); $new_path = $path+";"+$env; $addPath = [Environment]::SetEnvironmentVariable("PATH", $new_path, [EnvironmentVariableTarget]::User)}
+        function RemoveFromPath($env_value) {$path = [System.Environment]::GetEnvironmentVariable('PATH','User');$path = ($path.Split(';') | Where-Object { $_ -ne $env_value }) -join ';';[System.Environment]::SetEnvironmentVariable('PATH',$path,'User')}
+        function RemoveEnv($env_name) { [Environment]::SetEnvironmentVariable($env_name,$null,"User") }
+        """
         __repo = {
             "localProgramlist": "{cobanpath}\\programList.json",
             "localInstalledApps": "{cobanpath}\\packages.json",
@@ -75,10 +90,14 @@ class doctor:
             "_website": "http://localhost:8000",
             "website": "https://choban.herokuapp.com"
         }
+
+
         files = {
             "config": JsonParser.Parser().dump_json(__config, True),
             'whof': __whof,
-            'repo': JsonParser.Parser().dump_json(__repo, True)
+            'repo': JsonParser.Parser().dump_json(__repo, True),
+            'env': __set_env,
+            'refreshenv': __refreshenv
         }
 
         return files

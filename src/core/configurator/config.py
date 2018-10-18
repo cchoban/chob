@@ -22,13 +22,31 @@ class Configurator():
         :return void
         """
         try:
+
             self.config = config
             self.set = keySet
             json = parser.Parser(self.__config_file)
             json.fileToJson()
-            change = json.change_value(config, keySet)
+            key = self.get_key(config)
 
-            return helpers.successMessage('Changed value of \'{}\' to \'{}\''.format(self.config, self.set))
+            if keySet == "true":
+                keySet = True
+                self.set = keySet
+
+            elif keySet == "false":
+                keySet = False
+                self.set = keySet
+
+
+            self.set = {
+                'value': keySet
+            }
+
+            self.set = {**key, **self.set}
+            json.change_value(config, self.set)
+
+            return helpers.successMessage('Changed value of \'{}\' to \'{}\''.format(config, self.set.get('value')))
+
         except Exception as e:
             helpers.errorMessage(
                 'An error occured while trying to set config.')
@@ -47,8 +65,8 @@ class Configurator():
         self.config = config = self.__read_config_file()
 
         if key in config:
-            if statment and isinstance(config.get(key), bool):
-                if bool(config.get(key)) == statment:
+            if statment and isinstance(config.get(key).get('value'), bool):
+                if bool(config.get(key).get('value')) == statment:
                     return True
                 else:
                     return False
@@ -88,5 +106,11 @@ class Configurator():
             return True
         else:
             helpers.errorMessage(
-                'Your files are missing! Please correct this using \'chob --doctor\'')
+                'Your files are missing! Please correct this using \'chob doctor\'')
             return False
+
+    def config_help(self):
+        conf = self.__read_config_file()
+
+        for key,value in conf.items():
+            helpers.successMessage('{} - {} \n'.format(key, value.get('help')))
