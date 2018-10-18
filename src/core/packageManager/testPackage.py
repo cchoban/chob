@@ -24,6 +24,7 @@ class main(installPackage.main):
                         helpers.successMessage(
                             "Successfull! Test was successfull, you can now push your package to our server.")
                         file.Manager().createFile(".tested", "True", True)
+                        file.Manager().removeDir('.package')
                     else:
                         helpers.errorMessage(
                             "Aborting! Program exited with unexcepted exit code: "+str(self.exit_code))

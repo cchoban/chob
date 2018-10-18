@@ -129,19 +129,23 @@ class Manager:
     def removeDir(self, path):
         """
         Removes dir
-        :param path:
+        :param path: Path to be removed
         """
-        if self.fileExists(path):
-            try:
-                rmtree(path)
-                os.removedirs(path)
-            except FileNotFoundError or WindowsError or PermissionError or Exception as e:
-                log.new(e).logError()
-                if helpers.is_verbose():
-                    helpers.errorMessage("FileManager.removeDir: "+str(e.strerror))
-        else:
-            helpers.infoMessage(
-                "Path does not exists while trying to remove it: " + path)
+        try:
+            if self.fileExists(path):
+                try:
+                    rmtree(path)
+                    os.removedirs(path)
+                except FileNotFoundError or WindowsError or PermissionError or Exception as e:
+                    log.new(e).logError()
+                    if helpers.is_verbose():
+                        helpers.errorMessage("FileManager.removeDir: "+str(e.strerror))
+            else:
+                helpers.infoMessage(
+                    "Path does not exists while trying to remove it: " + path)
+        except Exception as e:
+            log.new(e).logError()
+            return False
 
     def moveFile(self, filePath, fileDest):
         """
