@@ -87,14 +87,14 @@ class Manager:
             check = upgrade.main(self.packageName, self.skipHashes, self.forceInstallation,
                                  self.skipAgreements).check_upgrade_for_all_packages()
 
-        if len(check) > 0:
-            helpers.infoMessage('An update found for "{}"'.format(
-                ', '.join(check)))
-        else:
-            helpers.successMessage('No update found for your applications.')
+            if len(check) > 0:
+                helpers.infoMessage('An update found for "{}"'.format(
+                    ', '.join(check)))
+            else:
+                helpers.successMessage('No update found for your applications.')
 
-        if not check == True:
-            self.packageName = check
+            if not check == True:
+                self.packageName = check
 
         for i in self.packageName:
             self.packageName = i
