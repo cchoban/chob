@@ -51,6 +51,7 @@ config.add_argument("--set", type=str, help="Configurator")
 create = subparser.add_parser('create')
 create.add_argument("create", type=str, help="Generates package for you")
 create.add_argument("--flatfile", action="store_true")
+create.add_argument("--template", type=str, help="Generates package from an template from Choban website. (Package name)")
 
 #Test package command
 test_package = subparser.add_parser('testpackage')
@@ -135,7 +136,8 @@ if hasattr(arg, 'config') and hasattr(arg, 'set'):
 
 if hasattr(arg, 'create'):
     flatfile = arg.flatfile if hasattr(arg, 'flatfile') else False
-    cli.main().packageGenerator(arg.create, flatfile)
+    template = arg.template if hasattr(arg, 'template') else False
+    cli.main().packageGenerator(arg.create, flatfile, template)
 
 if hasattr(arg, 'push') and arg.push:
     cli.main().push()
