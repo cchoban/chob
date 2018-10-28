@@ -37,9 +37,6 @@ class main(PackageManager.Manager):
         reg = winregistry.Registry()
         package = reg.searchForSoftware(self.scriptFile["packageArgs"]["softwareName"])
 
-        if package == None:
-            package = reg.searchForSoftware64(self.scriptFile["packageArgs"]["softwareName"])
-
         if package:
             return package
         else:

@@ -6,6 +6,8 @@ import platform
 import sys
 from Logger import Logger as log
 from core.configurator import config
+
+
 try:
     from colorama import init, AnsiToWin32, Fore, Style
 
@@ -60,18 +62,34 @@ def messages(type, template, packageName):
 
 
 def programList():
+    """
+    Returns downloadable application list.
+    :return dict:
+    """
     return JsonParser.Parser().fileToJson(repo.repos()["localProgramlist"])
 
 
 def installedApps():
+    """
+    Returns installed softwares.
+    :return dict:
+    """
     return JsonParser.Parser().fileToJson(repo.repos()["localInstalledApps"])
 
 
 def symlinkList():
+    """
+    Return saved symlinks.
+    :return dict:
+    """
     return JsonParser.Parser().fileToJson(repo.repos()["symlink"])
 
 
 def isInstalled(packageName):
+    """
+    Checks if package is already installed.
+    :return bool:
+    """
     if packageName in installedApps()["installedApps"]:
         return True
     else:
@@ -79,6 +97,10 @@ def isInstalled(packageName):
 
 
 def has_admin():
+    """
+    Checks if user runs Choban with administration rights.
+    :return bool:
+    """
     if os.name == 'nt':
         try:
             temp = os.listdir(os.sep.join(
@@ -91,6 +113,10 @@ def has_admin():
 
 
 def is_os_64bit():
+    """
+    Checks if users computer are 64bit
+    :return bool:
+    """
     if platform.machine().endswith('64'):
         return True
     else:
@@ -98,7 +124,11 @@ def is_os_64bit():
 
 
 def askQuestion(question):
-
+    """
+    Asks question to user.
+    :param question: Question to be asked user.
+    :return bool:
+    """
     if config.Configurator().get_key('skipQuestionConfirmations', True):
         infoMessage("Skipping agreements because 'skipQuestionConfirmations' is set to 'true'.")
         return True
@@ -121,7 +151,49 @@ def askQuestion(question):
 
 
 def is_verbose():
+    """
+    Check if verbose mode is turned on.
+    :return bool:
+    """
     if "--verbose" in sys.argv:
         return True
     else:
         return False
+
+
+def slugify(s):
+    import re
+    """
+    Simplifies ugly strings into something URL-friendly.
+    """
+
+    # "[Some] _ Article's Title--"
+    # "[some] _ article's title--"
+    s = s.lower()
+
+    # "[some] _ article's_title--"
+    # "[some]___article's_title__"
+    for c in [' ', '-', '.', '/']:
+        s = s.replace(c, '_')
+
+    # "[some]___article's_title__"
+    # "some___articles_title__"
+    s = re.sub('\W', '', s)
+
+    # "some___articles_title__"
+    # "some   articles title  "
+    s = s.replace('_', ' ')
+
+    # "some   articles title  "
+    # "some articles title "
+    s = re.sub('\s+', ' ', s)
+
+    # "some articles title "
+    # "some articles title"
+    s = s.strip()
+
+    # "some articles title"
+    # "some-articles-title"
+    s = s.replace(' ', '')
+
+    return s
