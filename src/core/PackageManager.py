@@ -237,3 +237,18 @@ class Manager:
                 if helpers.is_verbose():
                     helpers.errorMessage(
                         '"notes" section in installation script should be list/array')
+
+    def aarch64Only(self, checkComputerArch=False):
+        if self.parser.keyExists(self.scriptFile, "64bitonly"):
+            if checkComputerArch:
+                if helpers.is_os_64bit():
+                    return True
+                else:
+                    return False
+            return True
+
+        return False
+
+
+
+
