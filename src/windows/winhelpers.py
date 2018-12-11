@@ -9,10 +9,7 @@ def __reload_environ():
     Reloads environments variables.
     """
     path = getCobanPath + '\\refreshenv.ps1'
-    set_path = call('powershell -Command ". {}'.format(path))
-
-
-__reload_environ()
+    set_path = call('powershell -Command ". {}'.format(path), stdout=DEVNULL, stderr=DEVNULL)
 
 
 def set_env(env_key: str, env_value: str):
