@@ -10,45 +10,45 @@ class Registry:
 
     def installedSoftware(self):
         data = {}
-        data.update(self.CurrInstaller(self.key))
-        data.update(self.CurrUninstaller(self.key))
-        data.update(self.CurrUninstaller(self.key64))
+        data.update(self.CurrInstaller(self.key) if self.CurrInstaller(self.key) else {})
+        data.update(self.CurrUninstaller(self.key) if self.CurrUninstaller(self.key) else {})
+        data.update(self.CurrUninstaller(self.key64) if self.CurrUninstaller(self.key64) else {})
 
         return data
 
     def CurrUninstaller(self, key):
         properties = {}
-        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key, 0, winreg.KEY_READ)
-        for i in range(0, winreg.QueryInfoKey(key)[0]):
-            skey_name = winreg.EnumKey(key, i)
-            skey = winreg.OpenKey(key, skey_name)
-            try:
+        try:
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key, 0, winreg.KEY_READ)
+            for i in range(0, winreg.QueryInfoKey(key)[0]):
+                skey_name = winreg.EnumKey(key, i)
+                skey = winreg.OpenKey(key, skey_name)
+
                 packageName = winreg.QueryValueEx(skey, 'DisplayName')[0]
                 packageUninstallString = winreg.QueryValueEx(skey, 'UninstallString')[0]
                 data = {
                     packageName: packageUninstallString
                 }
                 properties.update(data)
-            except OSError as e:
-                if e.errno == errno.ENOENT:
-                    # DisplayName doesn't exist in this skey
-                    pass
-            finally:
-                skey.Close()
 
-        return properties
+                skey.Close()
+                return properties
+
+        except Exception as e:
+            log.new(e).logError()
+
 
     def CurrInstaller(self, key):
         properties = {}
         key = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products"
-        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key, 0, winreg.KEY_READ)
+        try:
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key, 0, winreg.KEY_READ)
 
-        for i in range(0, winreg.QueryInfoKey(key)[0]):
-            skey_name = winreg.EnumKey(key, i)
-            skey = winreg.OpenKey(key, skey_name)
-            install_properties = winreg.OpenKey(skey, 'InstallProperties')
+            for i in range(0, winreg.QueryInfoKey(key)[0]):
+                skey_name = winreg.EnumKey(key, i)
+                skey = winreg.OpenKey(key, skey_name)
+                install_properties = winreg.OpenKey(skey, 'InstallProperties')
 
-            try:
                 packageName = winreg.QueryValueEx(install_properties, 'DisplayName')[0]
                 packageUninstallString = winreg.QueryValueEx(install_properties, 'UninstallString')[0]
                 data = {
@@ -56,14 +56,12 @@ class Registry:
                 }
                 properties.update(data)
 
-            except OSError as e:
-                if e.errno == errno.ENOENT:
-                    # DisplayName doesn't exist in this skey
-                    pass
-            finally:
                 skey.Close()
+                return properties
 
-        return properties
+        except Exception as e:
+            log.new(e).logError()
+
 
     def searchForSoftware(self, packageName):
         data = {}
