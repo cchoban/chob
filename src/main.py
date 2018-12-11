@@ -52,6 +52,8 @@ create = subparser.add_parser('create')
 create.add_argument("create", type=str, help="Generates package for you")
 create.add_argument("--flatfile", action="store_true")
 create.add_argument("--template", type=str, help="Generates package from an template from Choban website. (Package name)")
+create.add_argument("--verbose", action="store_true",
+                    help="Turning on verbose mode")
 
 #Test package command
 test_package = subparser.add_parser('testpackage')
