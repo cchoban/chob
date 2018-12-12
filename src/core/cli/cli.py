@@ -6,7 +6,6 @@ from core.configurator import config
 from Logger import Logger as log
 from . import doctor
 import re
-from sys import exit
 
 
 class main:
@@ -34,7 +33,6 @@ class main:
                 serialize = JsonParser.Parser(downloaded_path).fileToJson()
                 icon_download_url = helpers.getWebsite + serialize['server']['icon']
                 file_ext = 'png' if icon_download_url.endswith('.png') else 'jpg'
-
 
                 FileManager.Manager().moveFile(downloaded_path, dest_path + '\\' + packageName + '.cb', True)
                 http.Http().download(icon_download_url, dest_path + '\\icons\\' + packageName, file_ext)
@@ -117,8 +115,9 @@ class main:
         packageUrl = helpers.programList()[packageName] + '&download=true'
         if not FileManager.Manager().fileExists(helpers.packageInstallationPath + packageName):
             FileManager.Manager().createFolder(helpers.packageInstallationPath + packageName)
-        helpers.infoMessage(
-            "Downloading Installation Script of: " + packageName + ".cb")
+
+        if helpers.is_verbose():
+            helpers.infoMessage("Downloading Installation Script of: " + packageName + ".cb")
 
         path = helpers.packageInstallationPath + packageName + "\\" + packageName
         http.Http().download(packageUrl, path, "cb")
@@ -134,7 +133,7 @@ class main:
 
     def version(self):
         helpers.successMessage("Choban Package Manager")
-        helpers.infoMessage("Version 0.6.1")
+        helpers.infoMessage("Version 0.6.3")
 
     def server_status(self):
         resp = http.Http().get(repo.repos()["programList"])
