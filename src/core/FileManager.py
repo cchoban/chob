@@ -296,6 +296,15 @@ class Manager:
                 helpers.errorMessage("FileManager.extract7z: "+str(e))
             exit()
 
+    def renameFile(self, fromName, toName):
+        try:
+            os.rename(fromName, toName)
+
+            return True
+        except Exception as e:
+            log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage('FileManager.renameFile: '+str(e))
 
     def cleanup(self, packageName=""):
         """

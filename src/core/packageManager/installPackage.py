@@ -83,7 +83,6 @@ class main(PackageManager.Manager):
                 helpers.errorMessage("This package is only for 64-bit devices.")
                 exit()
 
-
             if self.parser.keyExists(self.scriptFile, 'arches'):
                 # TODO: add messages
                 self.arches = True
@@ -140,6 +139,13 @@ class main(PackageManager.Manager):
 
                 if (self.parser.keyExists(self.scriptFile, "createShortcut")):
                     self.__create_shorcut()
+
+                if (self.parser.keyExists(self.scriptFile, "renameFiles")):
+                    if not self.rename_files():
+                        if helpers.is_verbose():
+                            helpers.errorMessage(
+                                'Could not rename specified files. '
+                                'If you thinks this is a bug please consider open a issue on our Github page.')
 
                 # TODO: add post_install package args
                 # TODO: add run_from_tools package args
@@ -224,3 +230,20 @@ class main(PackageManager.Manager):
     def downloadDependencies(self):
         self.packageName = self.dependencies
         self.installPackage()
+
+    def rename_files(self):
+        return False
+        if isinstance(self.scriptFile.get('renameFiles'), list):
+            for i in self.scriptFile['renameFiles']:
+                firstPath = file.Manager().os().path.join(helpers.getToolsPath, self.packageName, i.split('=')[0])
+                secondPath = file.Manager().os().path.join(helpers.getToolsPath, self.packageName, i.split('=')[1])
+
+                if not file.Manager().fileExists(firstPath):
+                    return False
+
+                rename = file.Manager().renameFile(firstPath, secondPath)
+
+                if not rename:
+                    return False
+
+                return True
