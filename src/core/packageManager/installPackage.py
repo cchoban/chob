@@ -232,7 +232,6 @@ class main(PackageManager.Manager):
         self.installPackage()
 
     def rename_files(self):
-        return False
         if isinstance(self.scriptFile.get('renameFiles'), list):
             for i in self.scriptFile['renameFiles']:
                 firstPath = file.Manager().os().path.join(helpers.getToolsPath, self.packageName, i.split('=')[0])
