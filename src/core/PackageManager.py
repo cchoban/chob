@@ -134,15 +134,21 @@ class Manager:
 
     def checkHash(self, sandboxed=False, arches=False):
         try:
-            if json.Parser().keyExists(self.scriptFile, "downloadUrl64"):
-                hashedKey = self.scriptFile["checksum64"]
+            if json.Parser().keyExists(self.scriptFile, "checksum") or json.Parser().keyExists(self.scriptFile,
+                                                                                               "checksum64"):
+                if json.Parser().keyExists(self.scriptFile, "downloadUrl64"):
+                    hashedKey = self.scriptFile["checksum64"]
+                else:
+                    hashedKey = self.scriptFile["checksum"]
+
+                check = hash.check(hashedKey, self.packageName,
+                                   self.skipHashes, sandboxed, arches)
+
+                if check:
+                    return True
             else:
-                hashedKey = self.scriptFile["checksum"]
-
-            check = hash.check(hashedKey, self.packageName,
-                               self.skipHashes, sandboxed, arches)
-
-            if check:
+                if helpers.is_verbose():
+                    helpers.infoMessage('No checksum hashes available for verifying.')
                 return True
         except KeyError as e:
             # TODO: add log
