@@ -36,7 +36,7 @@ class main:
 
                 FileManager.Manager().moveFile(downloaded_path, dest_path + '\\' + packageName + '.cb', True)
                 http.Http().download(icon_download_url, dest_path + '\\icons\\' + packageName, file_ext,
-                                     verify=herlpers.sslFile)
+                                     verify=helpers.sslFile)
 
         else:
             cls = creator.generatePackage(packageName, False)
