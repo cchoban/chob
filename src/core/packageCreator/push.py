@@ -92,7 +92,7 @@ class main(pack.main):
 
         post_url = "{}/api/push/".format(helpers.getWebsite)
         resp = http.Http(True).post(
-            post_url, headers=headers, files=files, data=data)
+            post_url, headers=headers, files=files, data=data, verify=helpers.sslFile)
         error_content = resp.json() if JsonParser.Parser(resp.json()).isValid() else {'error': resp.json()}
 
         if hasattr(resp, 'status_code') and resp.status_code == 201:

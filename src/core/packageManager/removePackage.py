@@ -37,9 +37,6 @@ class main(PackageManager.Manager):
         reg = winregistry.Registry()
         package = reg.searchForSoftware(self.scriptFile["packageArgs"]["softwareName"])
 
-        if package == None:
-            package = reg.searchForSoftware64(self.scriptFile["packageArgs"]["softwareName"])
-
         if package:
             return package
         else:
@@ -64,8 +61,11 @@ class main(PackageManager.Manager):
                 self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
 
                 if self.valid_exit_code():
-                    helpers.successMessage("Successfully removed: " + self.packageName)
+                    FileManager.Manager().cleanup(self.packageName)
                     self.parser.removePackage(self.packageName)
+
+                    helpers.successMessage("Successfully removed: " + self.packageName)
+
                 else:
                     helpers.errorMessage("Uninstall process was not succeed.")
 

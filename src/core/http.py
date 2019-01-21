@@ -6,7 +6,7 @@ from tqdm import tqdm
 import helpers
 from core.cli import cli
 from sys import exit
-
+from . import FileManager as fs
 
 class Http:
     __headers = {'User-Agent': 'Googlebot/2.1',
@@ -18,7 +18,7 @@ class Http:
     def __init__(self, custom_headers=False):
         self.custom_headers=custom_headers
 
-    def download(self, url, path=gettempdir(), ext="exe"):
+    def download(self, url, path=gettempdir(), ext="exe", **args):
         """
         Downloading file from url.
         :param url: URL to download file from.
@@ -27,7 +27,7 @@ class Http:
         """
         headers = self.__headers
         try:
-            resp = requests.get(url, headers=headers, stream=True)
+            resp = requests.get(url, headers=headers, stream=True, **args)
 
             if resp.status_code == 404:
                 helpers.errorMessage('Server returned a broken link. Skipping this package as it\'s broken.')

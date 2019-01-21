@@ -65,15 +65,17 @@ class Parser:
         except Exception as e:
             return False
 
-    def rewriteJson(self):
+    def rewriteJson(self, dict_obj={}, beautify=False):
         """
         Rewrite json file with empty dict.
+
+        :param dict_obj: Dump existing json object.
         :usage JsonParser.Parser(path).rewriteJson()
 
         """
         try:
             with open(self.path, "w") as f:
-                js = json.dumps({})
+                js = self.dump_json(dict_obj, beautify)
                 f.write(js)
                 f.close()
         except OSError as e:

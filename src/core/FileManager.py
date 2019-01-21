@@ -147,11 +147,12 @@ class Manager:
             log.new(e).logError()
             return False
 
-    def moveFile(self, filePath, fileDest):
+    def moveFile(self, filePath, fileDest, force=False):
         """
         Moves file to specific directory.
         :param filePath: File to be moved from.
         :param fileDest: File to be moved to.
+        :param force: Force moving of file (Don't care if file or folder is already exists.)
         """
         if self.fileExists(filePath.replace('*','')):
             try:
@@ -160,6 +161,8 @@ class Manager:
                     for i in os.listdir(filePath):
                         move(os.path.join(filePath, i), fileDest)
                 else:
+                    if self.fileExists(fileDest) and force:
+                        self.removeDir(fileDest)
                     move(filePath, fileDest)
             except WindowsError or FileNotFoundError or FileExistsError as e:
                 log.new(e).logError()
@@ -293,6 +296,15 @@ class Manager:
                 helpers.errorMessage("FileManager.extract7z: "+str(e))
             exit()
 
+    def renameFile(self, fromName, toName):
+        try:
+            os.rename(fromName, toName)
+
+            return True
+        except Exception as e:
+            log.new(e).logError()
+            if helpers.is_verbose():
+                helpers.errorMessage('FileManager.renameFile: '+str(e))
 
     def cleanup(self, packageName=""):
         """

@@ -133,16 +133,27 @@ class Manager:
         return helpers.askQuestion("Do you want to " + action + " " + self.packageName)
 
     def checkHash(self, sandboxed=False, arches=False):
+        if self.forceInstallation:
+            return True
+
         try:
-            if json.Parser().keyExists(self.scriptFile, "downloadUrl64"):
-                hashedKey = self.scriptFile["checksum64"]
+            if json.Parser().keyExists(self.scriptFile, "checksum") or json.Parser().keyExists(self.scriptFile,
+                                                                                               "checksum64"):
+                if json.Parser().keyExists(self.scriptFile, "downloadUrl64"):
+                    hashedKey = self.scriptFile["checksum64"]
+                else:
+                    hashedKey = self.scriptFile["checksum"]
+
+                check = hash.check(hashedKey, self.packageName,
+                                   self.skipHashes, sandboxed, arches)
+
+                if check:
+                    return True
+                else:
+                    return False
             else:
-                hashedKey = self.scriptFile["checksum"]
-
-            check = hash.check(hashedKey, self.packageName,
-                               self.skipHashes, sandboxed, arches)
-
-            if check:
+                if helpers.is_verbose():
+                    helpers.infoMessage('No checksum hashes available for verifying.')
                 return True
         except KeyError as e:
             # TODO: add log
@@ -237,3 +248,18 @@ class Manager:
                 if helpers.is_verbose():
                     helpers.errorMessage(
                         '"notes" section in installation script should be list/array')
+
+    def aarch64Only(self, checkComputerArch=False):
+        if self.parser.keyExists(self.scriptFile, "64bitonly"):
+            if checkComputerArch:
+                if helpers.is_os_64bit():
+                    return True
+                else:
+                    return False
+            return True
+
+        return False
+
+
+
+

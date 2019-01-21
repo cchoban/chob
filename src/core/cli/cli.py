@@ -1,12 +1,12 @@
 import repo
 import helpers
-from core import http, FileManager
+from core import http, FileManager, JsonParser
 from core.packageCreator import creator, pack, push, auth
 from core.configurator import config
 from Logger import Logger as log
 from . import doctor
 import re
-from sys import exit
+
 
 class main:
 
@@ -19,11 +19,25 @@ class main:
     def confighelp(self):
         return config.Configurator().config_help()
 
-    def packageGenerator(self, packageName, generateFlatFileOnly=False):
-        if generateFlatFileOnly:
+    def packageGenerator(self, packageName, generateFlatFileOnly=False, template=None):
+        if generateFlatFileOnly or template:
+
             cls = creator.generatePackage(packageName, generateFlatFileOnly)
             json = cls.generateJson()
             cls.writeToFile(json)
+
+            if template:
+                self.downloadScript(template)
+                downloaded_path = '{0}\packages\{1}\{1}.cb'.format(helpers.getCobanPath, template)
+                dest_path = FileManager.Manager().os().path.join(packageName)
+                serialize = JsonParser.Parser(downloaded_path).fileToJson()
+                icon_download_url = helpers.getWebsite + serialize['server']['icon']
+                file_ext = 'png' if icon_download_url.endswith('.png') else 'jpg'
+
+                FileManager.Manager().moveFile(downloaded_path, dest_path + '\\' + packageName + '.cb', True)
+                http.Http().download(icon_download_url, dest_path + '\\icons\\' + packageName, file_ext,
+                                     verify=helpers.sslFile)
+
         else:
             cls = creator.generatePackage(packageName, False)
             cls.getAnswers()
@@ -38,7 +52,8 @@ class main:
             return push.main()
         else:
             helpers.errorMessage(
-                "You don't have authentication key. Please get one from {0}. You can activate it with --authenticate".format(helpers.getWebsite))
+                "You don't have authentication key. Please get one from {0}. You can activate it with --authenticate".format(
+                    helpers.getWebsite))
 
     def auth(self, token, force=False):
         return auth.main(token, force).init()
@@ -48,11 +63,12 @@ class main:
                             repo.repos()["programList"])
         try:
             http.Http().download(repo.repos()[
-                               "programList"], helpers.getCobanPath + "\\programList", "json")
+                                     "programList"], helpers.getCobanPath + "\\programList", "json",
+                                 verify=helpers.sslFile)
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("cli.cli.update: "+str(e))
+                helpers.errorMessage("cli.cli.update: " + str(e))
 
     def doctor(self):
         doc = doctor.doctor()
@@ -97,17 +113,29 @@ class main:
         doctor.doctor().downloadDependencies()
 
     def downloadScript(self, packageName):
-        packageUrl = helpers.programList()[packageName]+'&download=true'
-        if not FileManager.Manager().fileExists(helpers.packageInstallationPath + packageName):
-            FileManager.Manager().createFolder(helpers.packageInstallationPath + packageName)
-        helpers.infoMessage(
-            "Downloading Installation Script of: " + packageName + ".cb")
+        packageUrl = helpers.programList()[packageName] + '&download=true'
+        fs = FileManager.Manager()
+        if not fs.fileExists(helpers.packageInstallationPath + packageName):
+            fs.createFolder(helpers.packageInstallationPath + packageName)
 
-        http.Http().download(packageUrl,
-                           helpers.packageInstallationPath + packageName + "\\" + packageName, "cb")
+        if helpers.is_verbose():
+            helpers.infoMessage("Downloading Installation Script of: " + packageName + ".cb")
+
+        path = helpers.packageInstallationPath + packageName + "\\" + packageName
+        http.Http().download(packageUrl, path, "cb", verify=helpers.sslFile)
+        parser = JsonParser.Parser(path + '.cb')
+        data = parser.fileToJson()
+
+        data = {
+            'packageArgs': data['packageArgs'],
+            'packageUninstallArgs': data['packageUninstallArgs'],
+            'server': data['server']
+        }
+        parser.rewriteJson(data, True)
+
     def version(self):
         helpers.successMessage("Choban Package Manager")
-        helpers.infoMessage("Version 0.6")
+        helpers.infoMessage("Version 0.6.3")
 
     def server_status(self):
         resp = http.Http().get(repo.repos()["programList"])
