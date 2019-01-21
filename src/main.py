@@ -25,13 +25,15 @@ install.add_argument('install', help="Install package(s)",  nargs="*")
 install.add_argument('--force', action="store_true")
 install.add_argument("-y", action="store_true", help="Skips agreements")
 install.add_argument("--skip-hash", help="Skips of checking hash for files", action="store_true")
-
+install.add_argument("--verbose", action="store_true",
+                    help="Turning on verbose mode")
 
 #Uninstall command
 remove = subparser.add_parser('remove')
 remove.add_argument('remove', help="Uninstall package(s)",  nargs="*")
 remove.add_argument("-y", action="store_true", help="Skips agreements")
-
+remove.add_argument("--verbose", action="store_true",
+                    help="Turning on verbose mode")
 #Upgrade command
 upgrade = subparser.add_parser('upgrade')
 upgrade.add_argument('upgrade', help="Upgrade package(s)",  nargs="*")
@@ -39,13 +41,15 @@ upgrade.add_argument('--force', action="store_true")
 upgrade.add_argument("-y", action="store_true", help="Skips agreements")
 upgrade.add_argument(
     "--skip-hash", help="Skips of checking hash for files", action="store_true")
-
+upgrade.add_argument("--verbose", action="store_true",
+                    help="Turning on verbose mode")
 
 #Config command
 config = subparser.add_parser('config')
 config.add_argument("config", type=str, help="Configurator")
 config.add_argument("--set", type=str, help="Configurator")
-
+config.add_argument("--verbose", action="store_true",
+                    help="Turning on verbose mode")
 
 #Create command
 create = subparser.add_parser('create')
@@ -63,20 +67,24 @@ test_package.add_argument('--force', action="store_true")
 test_package.add_argument("-y", action="store_true", help="Skips agreements")
 test_package.add_argument(
     "--skip-hash", help="Skips of checking hash for files", action="store_true")
-
+test_package.add_argument("--verbose", action="store_true",
+                    help="Turning on verbose mode")
 #Authenticate command
 auth = subparser.add_parser('authenticate')
 auth.add_argument('authenticate', type=str, help="Your API Token key to push packages to our servers.")
-
+auth.add_argument("--verbose", action="store_true",
+                    help="Turning on verbose mode")
 #Push command
 push = subparser.add_parser('push')
 push.add_argument("push", action="store_true",help="Push your package via this command.")
-
+push.add_argument("--verbose", action="store_true",
+                    help="Turning on verbose mode")
 #Packs the package for testing it
 packit = subparser.add_parser('packit')
 packit.add_argument("packit", action="store_true",
                   help="Push your package via this command.")
-
+packit.add_argument("--verbose", action="store_true",
+                    help="Turning on verbose mode")
 #Clean command
 clean = subparser.add_parser('clean')
 clean.add_argument("clean", action="store_true", help="Clean cache of Choban.")
