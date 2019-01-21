@@ -1,14 +1,15 @@
-# Coban
-It's a basic package manager inspired from Arch Linux pacman, built with Python for Windows platform. You can easily install, remove, upgrade packages with only few commands.
+# Choban - Software automation tool
+It's a basic automation tool, built with Python for Windows platform. You can easily install, remove, upgrade packages with only few commands.
 
 ## What Packages Are Available?
-1. Type `main.py --packages` for a list.
-2. Type `main.py -Ss <packageName>` for searching a specific package.
+1. Type `chob packages` for a list.
+2. Type `chob search <packageName>` for searching a specific package.
+
 ## More Documentation
-It will be available soon with the first release.
+Please refer to [our documentation page.](https://choban.app/docs)
 
 ## Troubleshooting
-First, please run `main.py --update` and `main.py --doctor`.
+First, please run `chob update` and `chob doctor`.
 
 **If you don't read these it will take us far longer to help you with your problem.**
 

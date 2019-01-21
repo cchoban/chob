@@ -2,6 +2,6 @@
     "localProgramlist": "{cobanpath}\\programList.json",
     "localInstalledApps": "{cobanpath}\\packages.json",
     "symlink": "{cobanpath}\\symlinks.json",
-    "programList": "https://choban.app/api/repo/",
+    "programList": "https://choban.app/api/repo/?format=json",
     "website": "https://choban.app"
 }
