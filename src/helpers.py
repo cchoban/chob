@@ -21,6 +21,8 @@ getCobanPath = os.getenv("chobanPath")
 getToolsPath = os.getenv("chobanApps")
 getCobanBinFolder = getCobanPath + "\\lib\\"
 getWebsite = repo.repos().get('website')
+sslFile = os.path.join(getCobanPath, 'ssl.crt')
+
 
 def errorMessage(message, logging=False):
     return print(Fore.RED + "ERROR: " + message + Style.RESET_ALL, file=stream)

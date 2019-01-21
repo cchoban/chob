@@ -63,7 +63,8 @@ class main:
                             repo.repos()["programList"])
         try:
             http.Http().download(repo.repos()[
-                                     "programList"], helpers.getCobanPath + "\\programList", "json")
+                                     "programList"], helpers.getCobanPath + "\\programList", "json",
+                                 verify=helpers.sslFile)
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
@@ -113,14 +114,15 @@ class main:
 
     def downloadScript(self, packageName):
         packageUrl = helpers.programList()[packageName] + '&download=true'
-        if not FileManager.Manager().fileExists(helpers.packageInstallationPath + packageName):
-            FileManager.Manager().createFolder(helpers.packageInstallationPath + packageName)
+        fs = FileManager.Manager()
+        if not fs.fileExists(helpers.packageInstallationPath + packageName):
+            fs.createFolder(helpers.packageInstallationPath + packageName)
 
         if helpers.is_verbose():
             helpers.infoMessage("Downloading Installation Script of: " + packageName + ".cb")
 
         path = helpers.packageInstallationPath + packageName + "\\" + packageName
-        http.Http().download(packageUrl, path, "cb")
+        http.Http().download(packageUrl, path, "cb", verify=helpers.sslFile)
         parser = JsonParser.Parser(path + '.cb')
         data = parser.fileToJson()
 
