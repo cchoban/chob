@@ -35,8 +35,8 @@ class main:
                 file_ext = 'png' if icon_download_url.endswith('.png') else 'jpg'
 
                 FileManager.Manager().moveFile(downloaded_path, dest_path + '\\' + packageName + '.cb', True)
-                http.Http().download(icon_download_url, dest_path + '\\icons\\' + packageName, file_ext)
-
+                http.Http().download(icon_download_url, dest_path + '\\icons\\' + packageName, file_ext,
+                                     verify=herlpers.sslFile)
 
         else:
             cls = creator.generatePackage(packageName, False)
