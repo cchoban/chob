@@ -39,7 +39,8 @@ class main:
 
         if not self.force:
             helpers.successMessage(
-                'Your auth key is: \'{}\'. If you want to change it use --force argument'.format(key.get_key('auth_key')))
+                'Your auth key is: \'{}\'. If you want to change it use --force argument'.format(
+                    key.get_key('auth_key').get('value')))
 
     def generateKey(self):
         key = config.Configurator()
