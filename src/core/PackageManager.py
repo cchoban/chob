@@ -133,6 +133,9 @@ class Manager:
         return helpers.askQuestion("Do you want to " + action + " " + self.packageName)
 
     def checkHash(self, sandboxed=False, arches=False):
+        if self.forceInstallation:
+            return True
+
         try:
             if json.Parser().keyExists(self.scriptFile, "checksum") or json.Parser().keyExists(self.scriptFile,
                                                                                                "checksum64"):
@@ -146,6 +149,8 @@ class Manager:
 
                 if check:
                     return True
+                else:
+                    return False
             else:
                 if helpers.is_verbose():
                     helpers.infoMessage('No checksum hashes available for verifying.')
