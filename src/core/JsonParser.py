@@ -190,15 +190,15 @@ class Parser:
 
             return False
 
-    def keyExists(self, array, key):
+    def keyExists(self, dict, key):
         """Check is specified key exists in array
 
         Arguments:
-        :param array: Array to check key if it exists or not.
+        :param dict: dict to check key if it exists or not.
         :param key: Key to check if it exists in array
         :return boolean:
         """
-        if key in array:
+        if key in dict:
             return True
         else:
             return False
