@@ -10,40 +10,42 @@ class main(PackageManager.Manager):
 
     def run(self):
         cli.main().downloadScript(self.packageName)
-        self.scriptFile = self.parser.fileToJson(self.packagePathWithExt)["packageArgs"]
+        self.scriptFile = self.parser.fileToJson(
+            self.packagePathWithExt)["packageArgs"]
 
         if self.isInstalled():
             if self.__checkForUpgrade():
                 helpers.successMessage(
-                    "Upgrade found for {0}. Upgrading {0} to version {1}".format(self.packageName, self.packageVersion))
+                    "Upgrade found for {0}. Upgrading {0} to version {1}".
+                    format(self.packageName, self.packageVersion))
                 self.upgrade()
 
             else:
-                helpers.infoMessage("There is no update for this package right now.")
+                helpers.infoMessage(
+                    "There is no update for this package right now.")
         else:
             helpers.messages("error", "isNotInstalled", self.packageName)
 
     def check_upgrade_for_all_packages(self):
         installed_packages = JsonParser.Parser(
-            helpers.getCobanPath + '\\packages.json').fileToJson().get('installedApps')
+            helpers.getCobanPath +
+            '\\packages.json').fileToJson().get('installedApps')
         search_for_packages = []
         online_version = {}
         update_packages = []
 
         for name in installed_packages:
             search_for_packages.append(name)
-            installation_file_path = '{0}\\packages\\{1}\\{1}.cb'.format(helpers.getCobanPath, name)
+            installation_file_path = '{0}\\packages\\{1}\\{1}.cb'.format(
+                helpers.getCobanPath, name)
 
             if not file.Manager().fileExists(installation_file_path):
                 cli.main().downloadScript(name)
 
-            installation_file = JsonParser.Parser(installation_file_path).fileToJson()['packageArgs']
+            installation_file = JsonParser.Parser(
+                installation_file_path).fileToJson()['packageArgs']
 
-            s = {
-                name: {
-                    'packageArgs': installation_file
-                }
-            }
+            s = {name: {'packageArgs': installation_file}}
 
             online_version.update(s)
 
@@ -62,7 +64,9 @@ class main(PackageManager.Manager):
         return update_packages
 
     def __checkForUpgrade(self):
-        self.currentVersion = LooseVersion(helpers.installedApps()["installedApps"][self.packageName]["version"])
+        self.currentVersion = LooseVersion(
+            helpers.installedApps()["installedApps"][
+                self.packageName]["version"])
         self.packageVersion = LooseVersion(self.scriptFile["version"])
 
         if self.currentVersion < self.packageVersion:
@@ -71,10 +75,12 @@ class main(PackageManager.Manager):
             return False
 
     def __removePackage(self):
-        removePackage.main(self.packageName, self.skipHashes, self.forceInstallation, True).uninstaller()
+        removePackage.main(self.packageName, self.skipHashes,
+                           self.forceInstallation, True).uninstaller()
 
     def __installPackage(self):
-        installPackage.main(self.packageName, self.skipHashes, self.forceInstallation, True).installer()
+        installPackage.main(self.packageName, self.skipHashes,
+                            self.forceInstallation, True).installer()
 
     def upgrade(self):
         self.__removePackage()

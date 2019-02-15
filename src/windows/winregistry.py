@@ -4,6 +4,7 @@ from sys import exit
 
 
 class Registry:
+
     def __init__(self):
         self.key64 = r"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
         self.key = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
@@ -21,9 +22,6 @@ class Registry:
 
         return data
 
-
-
-
     def CurrUninstaller(self, key):
         """
         Looking for software installed on the system.
@@ -32,7 +30,6 @@ class Registry:
         :return dict: A list of softwares with their uninstall string.
         """
 
-
         properties = {}
         key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key, 0, winreg.KEY_READ)
         for i in range(0, winreg.QueryInfoKey(key)[0]):
@@ -40,10 +37,9 @@ class Registry:
             skey = winreg.OpenKey(key, skey_name)
             try:
                 packageName = winreg.QueryValueEx(skey, 'DisplayName')[0]
-                packageUninstallString = winreg.QueryValueEx(skey, 'UninstallString')[0]
-                data = {
-                    packageName: packageUninstallString
-                }
+                packageUninstallString = winreg.QueryValueEx(
+                    skey, 'UninstallString')[0]
+                data = {packageName: packageUninstallString}
                 properties.update(data)
             except OSError as e:
                 if e.errno == errno.ENOENT:

@@ -8,7 +8,12 @@ from sys import exit
 
 class Manager:
 
-    def __init__(self, packageName, skipHashes, force, agreements, uninstall=False):
+    def __init__(self,
+                 packageName,
+                 skipHashes,
+                 force,
+                 agreements,
+                 uninstall=False):
         self.packageName = packageName
         self.oldPackageName = None
         self.skipHashes = skipHashes
@@ -38,54 +43,63 @@ class Manager:
 
     def installPackage(self):
         from .packageManager import installPackage as install
-        packagename = self.packageName if not isinstance(self.packageName, list) else [
-            package for package in self.packageName]
+        packagename = self.packageName if not isinstance(
+            self.packageName, list) else [
+                package for package in self.packageName
+            ]
 
         if isinstance(self.packageName, list):
             for i in packagename:
-                helpers.redColor('Installing '+i)
+                helpers.redColor('Installing ' + i)
 
                 if not i in helpers.programList():
                     helpers.errorMessage(
-                        "Package '{}' was not found on our servers. But you can push it your self with argument --create! ".format(
-                            i))
+                        "Package '{}' was not found on our servers. But you can push it your self with argument --create! "
+                        .format(i))
                     return False
                 self.packageName = i
                 self.packageScriptName = i + ".cb"
 
-                install.main(self.packageName, self.skipHashes, self.forceInstallation,
+                install.main(self.packageName, self.skipHashes,
+                             self.forceInstallation,
                              self.skipAgreements).installer()
         else:
             self.packageName = packagename
             self.packageScriptName = packagename + ".cb"
-            install.main(self.packageName, self.skipHashes, self.forceInstallation,
+            install.main(self.packageName, self.skipHashes,
+                         self.forceInstallation,
                          self.skipAgreements).installer()
 
     def removePackage(self):
         self.uninstall = True
         from .packageManager import removePackage as remove
-        packagename = self.packageName if not isinstance(self.packageName, list) else [
-            package for package in self.packageName]
+        packagename = self.packageName if not isinstance(
+            self.packageName, list) else [
+                package for package in self.packageName
+            ]
         if isinstance(self.packageName, list):
             for i in packagename:
                 self.packageName = i
                 self.packageScriptName = i + ".cb"
 
-                remove.main(self.packageName, self.skipHashes, self.forceInstallation,
-                            self.skipAgreements, self.uninstall).uninstaller()
+                remove.main(self.packageName, self.skipHashes,
+                            self.forceInstallation, self.skipAgreements,
+                            self.uninstall).uninstaller()
         else:
             self.packageName = packagename
             self.packageScriptName = packagename + ".cb"
-            remove.main(self.packageName, self.skipHashes, self.forceInstallation,
-                        self.skipAgreements, self.uninstall).uninstaller()
+            remove.main(self.packageName, self.skipHashes,
+                        self.forceInstallation, self.skipAgreements,
+                        self.uninstall).uninstaller()
 
     def upgradePackage(self):
         from .packageManager import upgradePackage as upgrade
 
         if not self.packageName:
             helpers.infoMessage('Checking for upgrades..')
-            check = upgrade.main(self.packageName, self.skipHashes, self.forceInstallation,
-                                 self.skipAgreements).check_upgrade_for_all_packages()
+            check = upgrade.main(
+                self.packageName, self.skipHashes, self.forceInstallation,
+                self.skipAgreements).check_upgrade_for_all_packages()
 
             if len(check) > 0:
                 helpers.infoMessage('An update found for "{}"'.format(
@@ -130,22 +144,24 @@ class Manager:
     def agreement(self, action="install"):
         if self.skipAgreements:
             return True
-        return helpers.askQuestion("Do you want to " + action + " " + self.packageName)
+        return helpers.askQuestion("Do you want to " + action + " " +
+                                   self.packageName)
 
     def checkHash(self, sandboxed=False, arches=False):
         if self.forceInstallation:
             return True
 
         try:
-            if json.Parser().keyExists(self.scriptFile, "checksum") or json.Parser().keyExists(self.scriptFile,
-                                                                                               "checksum64"):
+            if json.Parser().keyExists(self.scriptFile,
+                                       "checksum") or json.Parser().keyExists(
+                                           self.scriptFile, "checksum64"):
                 if json.Parser().keyExists(self.scriptFile, "downloadUrl64"):
                     hashedKey = self.scriptFile["checksum64"]
                 else:
                     hashedKey = self.scriptFile["checksum"]
 
-                check = hash.check(hashedKey, self.packageName,
-                                   self.skipHashes, sandboxed, arches)
+                check = hash.check(hashedKey, self.packageName, self.skipHashes,
+                                   sandboxed, arches)
 
                 if check:
                     return True
@@ -153,7 +169,8 @@ class Manager:
                     return False
             else:
                 if helpers.is_verbose():
-                    helpers.infoMessage('No checksum hashes available for verifying.')
+                    helpers.infoMessage(
+                        'No checksum hashes available for verifying.')
                 return True
         except KeyError as e:
             # TODO: add log
@@ -161,8 +178,8 @@ class Manager:
 
     def valid_exit_code(self):
         if not self.is_zip_package():
-            if self.exit_code in self.scriptFile["validExitCodes"] or str(self.exit_code) in self.scriptFile[
-                "validExitCodes"]:
+            if self.exit_code in self.scriptFile["validExitCodes"] or str(
+                    self.exit_code) in self.scriptFile["validExitCodes"]:
                 return True
             else:
                 return False
@@ -170,7 +187,8 @@ class Manager:
             return True
 
     def is_zip_package(self):
-        if self.parser.keyExists(self.scriptFile, 'unzip') and self.scriptFile['unzip'] == True:
+        if self.parser.keyExists(self.scriptFile,
+                                 'unzip') and self.scriptFile['unzip'] == True:
             return True
         else:
             return False
@@ -190,7 +208,8 @@ class Manager:
                             'Could not set enviroment variable.')
                 else:
                     helpers.verboseMessage(
-                        'Skipping creating an environment key for {}. Because it already exists.'.format(env))
+                        'Skipping creating an environment key for {}. Because it already exists.'
+                        .format(env))
 
     def add_to_path_env(self):
         from windows import winhelpers
@@ -205,7 +224,9 @@ class Manager:
                         helpers.infoMessage(
                             'Could not set enviroment variable.(path)')
                 else:
-                    helpers.verboseMessage('Skipping PATH:{}. Because it already exists.'.format(env))
+                    helpers.verboseMessage(
+                        'Skipping PATH:{}. Because it already exists.'.format(
+                            env))
 
     def checkForDependencies(self):
         js = self.scriptFile[
@@ -214,13 +235,15 @@ class Manager:
         if self.parser.keyExists(js, "dependencies"):
             for i in js["dependencies"]:
 
-                if isinstance(js["dependencies"], list) and len(js['dependencies']) > 1:
+                if isinstance(js["dependencies"],
+                              list) and len(js['dependencies']) > 1:
                     self.dependencies.append(i)
                 else:
                     self.dependencies = i
 
-                if i in helpers.programList() and i not in helpers.installedApps()["installedApps"]:
-                    helpers.successMessage("Found dependencies: "+i)
+                if i in helpers.programList(
+                ) and i not in helpers.installedApps()["installedApps"]:
+                    helpers.successMessage("Found dependencies: " + i)
                     #FIXME: may be a fix required
                     # self.oldPackageName = self.packageName
                     # if isinstance(self.dependencies, list) and len(self.dependencies) > 1:
@@ -228,13 +251,13 @@ class Manager:
                 else:
                     if not self.uninstall:
                         helpers.redColor(
-                            'Found {0} as dependencie(s) but it is already installed on your computer. Skipping it.'.format(
-                                i))
+                            'Found {0} as dependencie(s) but it is already installed on your computer. Skipping it.'
+                            .format(i))
                         self.dependencies = []
                     else:
                         helpers.redColor(
-                            'Found {0} as dependencie(s), will be removed as it\'s not uses from another package.'.format(
-                                i))
+                            'Found {0} as dependencie(s), will be removed as it\'s not uses from another package.'
+                            .format(i))
 
     def printNotesFromParser(self):
         notes = self.scriptFile.get('notes')
@@ -247,7 +270,8 @@ class Manager:
             else:
                 if helpers.is_verbose():
                     helpers.errorMessage(
-                        '"notes" section in installation script should be list/array')
+                        '"notes" section in installation script should be list/array'
+                    )
 
     def aarch64Only(self, checkComputerArch=False):
         if self.parser.keyExists(self.scriptFile, "64bitonly"):
@@ -259,7 +283,3 @@ class Manager:
             return True
 
         return False
-
-
-
-

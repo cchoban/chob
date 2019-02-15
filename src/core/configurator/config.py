@@ -37,22 +37,20 @@ class Configurator():
                 keySet = False
                 self.set = keySet
 
-
-            self.set = {
-                'value': keySet
-            }
+            self.set = {'value': keySet}
 
             self.set = {**key, **self.set}
             json.change_value(config, self.set)
 
-            return helpers.successMessage('Changed value of \'{}\' to \'{}\''.format(config, self.set.get('value')))
+            return helpers.successMessage(
+                'Changed value of \'{}\' to \'{}\''.format(
+                    config, self.set.get('value')))
 
         except Exception as e:
-            helpers.errorMessage(
-                'An error occured while trying to set config.')
+            helpers.errorMessage('An error occured while trying to set config.')
             if helpers.is_verbose():
-                helpers.errorMessage(
-                    'Configuration.config.setConfig - ' + str(e))
+                helpers.errorMessage('Configuration.config.setConfig - ' +
+                                     str(e))
 
     def get_key(self, key, statment=None):
         """
@@ -106,11 +104,12 @@ class Configurator():
             return True
         else:
             helpers.errorMessage(
-                'Your files are missing! Please correct this using \'chob doctor\'')
+                'Your files are missing! Please correct this using \'chob doctor\''
+            )
             return False
 
     def config_help(self):
         conf = self.__read_config_file()
 
-        for key,value in conf.items():
+        for key, value in conf.items():
             helpers.successMessage('{} - {} \n'.format(key, value.get('help')))

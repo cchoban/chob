@@ -1,12 +1,10 @@
 from core import JsonParser
 import repo
-import math
 import os
 import platform
 import sys
 from Logger import Logger as log
 from core.configurator import config
-
 
 try:
     from colorama import init, AnsiToWin32, Fore, Style
@@ -21,7 +19,7 @@ getCobanPath = os.getenv("chobanPath")
 getToolsPath = os.getenv("chobanApps")
 getCobanBinFolder = getCobanPath + "\\lib\\"
 getWebsite = repo.repos().get('website')
-sslFile = os.path.join(getCobanPath, 'ssl.crt')
+sslFile = os.path.join(getCobanPath, 'ssl.pem')
 
 
 def errorMessage(message, logging=False):
@@ -31,9 +29,12 @@ def errorMessage(message, logging=False):
 def infoMessage(message):
     return print(Fore.CYAN + "INFO: " + message + Style.RESET_ALL, file=stream)
 
+
 def verboseMessage(message):
     if is_verbose():
-        return print(Fore.CYAN + "INFO: " + message + Style.RESET_ALL, file=stream)
+        return print(
+            Fore.CYAN + "INFO: " + message + Style.RESET_ALL, file=stream)
+
 
 def successMessage(message):
     return print(Fore.GREEN + message + Style.RESET_ALL, file=stream)
@@ -46,11 +47,14 @@ def redColor(message):
 def messages(type, template, packageName):
     messages = {
         "info": {
-            "alreadyInstalled": "You already installed this package. You can upgrade it by 'chob --upgrade " + packageName + ""                                                                                                        "' or by adding '--force' argument to force installation"
+            "alreadyInstalled":
+            "You already installed this package. You can upgrade it by 'chob --upgrade "
+            + packageName + ""
+            "' or by adding '--force' argument to force installation"
         },
-
         "error": {
-            "isNotInstalled": packageName + " is not installed on your computer."
+            "isNotInstalled":
+            packageName + " is not installed on your computer."
         }
     }
 
@@ -105,8 +109,9 @@ def has_admin():
     """
     if os.name == 'nt':
         try:
-            temp = os.listdir(os.sep.join(
-                [os.environ.get('SystemRoot', 'C:\\windows'), 'temp']))
+            temp = os.listdir(
+                os.sep.join(
+                    [os.environ.get('SystemRoot', 'C:\\windows'), 'temp']))
             return True
         except:
             return False
@@ -132,13 +137,15 @@ def askQuestion(question):
     :return bool:
     """
     if config.Configurator().get_key('skipQuestionConfirmations', True):
-        infoMessage("Skipping agreements because 'skipQuestionConfirmations' is set to 'true'.")
+        infoMessage(
+            "Skipping agreements because 'skipQuestionConfirmations' is set to 'true'."
+        )
         return True
 
     yes = {'yes', 'y', 'ye', ''}
     no = {'no', 'n'}
 
-    text = infoMessage(question+"? [Y/N]")
+    text = infoMessage(question + "? [Y/N]")
 
     if not "-y" in sys.argv:
         choice = input("").lower()

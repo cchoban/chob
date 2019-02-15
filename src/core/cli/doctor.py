@@ -11,7 +11,7 @@ class doctor:
             "packages": getCobanPath + "\\packages",
             "lib": getCobanPath + "\\lib",
             "chobanapps": getToolsPath,
-            'powershell': getCobanPath+ '\\powershell'
+            'powershell': getCobanPath + '\\powershell'
         }
 
         self.files = {
@@ -39,7 +39,9 @@ class doctor:
             json = JsonParser.Parser(self.files[i])
             if file.fileExists(self.files[i]) and i.endswith('.json'):
                 if not json.isValid():
-                    if askQuestion('Do you want to rewrite {} file. (You might lose your settings based on which file you rewritting.)'.format(i)):
+                    if askQuestion(
+                            'Do you want to rewrite {} file. (You might lose your settings based on which file you rewritting.)'
+                            .format(i)):
                         infoMessage("Fixed: " + i)
                         json.rewriteJson()
             else:
@@ -91,7 +93,6 @@ class doctor:
             "website": "https://choban.herokuapp.com"
         }
 
-
         files = {
             "config": JsonParser.Parser().dump_json(__config, True),
             'whof': __whof,
@@ -101,4 +102,6 @@ class doctor:
         }
 
         return files
+
+
 # TODO: add os path if choban is there or not
