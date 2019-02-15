@@ -3,7 +3,9 @@ import os
 import helpers
 from sys import exit
 
+
 class main():
+
     def __init__(self):
         self.packageName = None
         self.rawPackageName = None
@@ -12,7 +14,7 @@ class main():
             self.generateZip()
 
     def isPackgable(self):
-        if os.path.exists(path=os.getcwd()+"\\.packagable"):
+        if os.path.exists(path=os.getcwd() + "\\.packagable"):
             return True
         else:
             helpers.errorMessage(
@@ -22,21 +24,19 @@ class main():
 
     def generateZip(self):
         path = os.getcwd()
-        zipFile = self.packageName+".zip"
-        ignoreFiles = [
-            ".packagable",
-            '.package/',
-            zipFile
-        ]
+        zipFile = self.packageName + ".zip"
+        ignoreFiles = [".packagable", '.package/', zipFile]
 
-        makeZip = FileManager.Manager().makeZip(
-            path, self.packageName + ".zip", ignoreFiles)
+        makeZip = FileManager.Manager().makeZip(path, self.packageName + ".zip",
+                                                ignoreFiles)
 
         if makeZip:
-            helpers.successMessage("Packed your package at: {0}".format(
-                os.getcwd()+"\\"+zipFile))
             helpers.successMessage(
-                "You can push it by using argumant '--push' while you are in same directory.")
+                "Packed your package at: {0}".format(os.getcwd() + "\\" +
+                                                     zipFile))
+            helpers.successMessage(
+                "You can push it by using argumant '--push' while you are in same directory."
+            )
 
     def findInstallationScript(self):
         list = os.listdir(os.getcwd())

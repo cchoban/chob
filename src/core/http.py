@@ -6,17 +6,20 @@ from tqdm import tqdm
 import helpers
 from core.cli import cli
 from sys import exit
-from . import FileManager as fs
+
 
 class Http:
-    __headers = {'User-Agent': 'Googlebot/2.1',
-                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                 'Accept-Language': 'en-US,en;q=0.5',
-                 'Connection': 'keep-alive',
-                 'cache-control': 'no-cache'
-                 }
+    __headers = {
+        'User-Agent': 'Googlebot/2.1',
+        'Accept':
+        'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+        'cache-control': 'no-cache'
+    }
+
     def __init__(self, custom_headers=False):
-        self.custom_headers=custom_headers
+        self.custom_headers = custom_headers
 
     def download(self, url, path=gettempdir(), ext="exe", **args):
         """
@@ -30,27 +33,37 @@ class Http:
             resp = requests.get(url, headers=headers, stream=True, **args)
 
             if resp.status_code == 404:
-                helpers.errorMessage('Server returned a broken link. Skipping this package as it\'s broken.')
+                helpers.errorMessage(
+                    'Server returned a broken link. Skipping this package as it\'s broken.'
+                )
                 if helpers.is_verbose():
-                    helpers.errorMessage('Http.download: Server returned 404 status code ({}).'.format(url))
+                    helpers.errorMessage(
+                        'Http.download: Server returned 404 status code ({}).'.
+                        format(url))
                 exit()
             with open("{0}.{1}".format(path, ext), 'wb') as f:
-                total_size = int(resp.headers.get('content-length', 0));
+                total_size = int(resp.headers.get('content-length', 0))
                 block_size = 1024
                 wrote = 0
                 if resp:
-                    for data in tqdm(resp.iter_content(block_size), total=math.ceil(total_size//block_size) , unit='KB'):
-                        wrote = wrote  + len(data)
+                    for data in tqdm(
+                            resp.iter_content(block_size),
+                            total=math.ceil(total_size // block_size),
+                            unit='KB'):
+                        wrote = wrote + len(data)
                         f.write(data)
         except requests.exceptions.ConnectionError as e:
             log.new(e).logError()
-            helpers.errorMessage("Could not download the requested file. Please try again later.")
+            helpers.errorMessage(
+                "Could not download the requested file. Please try again later."
+            )
             sv = cli.main().server_status()
             if sv == False:
-                helpers.errorMessage("The server is not accessible at this time.")
+                helpers.errorMessage(
+                    "The server is not accessible at this time.")
             else:
                 if helpers.is_verbose():
-                    helpers.errorMessage("Http.download: "+str(e))
+                    helpers.errorMessage("Http.download: " + str(e))
                     print(sv["message"])
             exit()
 
@@ -68,7 +81,9 @@ class Http:
             return resp
         except Exception as e:
             log.new(e).logError()
-            helpers.errorMessage("Cannot request the server, for more information please use '--verbose'")
+            helpers.errorMessage(
+                "Cannot request the server, for more information please use '--verbose'"
+            )
             if helpers.is_verbose():
                 helpers.errorMessage(str(e))
 
@@ -87,7 +102,8 @@ class Http:
         except Exception as e:
             log.new(e).logError()
             helpers.errorMessage(
-                "Cannot request the server, for more information please use '--verbose'")
+                "Cannot request the server, for more information please use '--verbose'"
+            )
             if helpers.is_verbose():
                 helpers.errorMessage(str(e))
 

@@ -2,13 +2,14 @@ import os
 import helpers
 import zipfile
 from shutil import rmtree, move, copy
-from Logger import Logger
 from subprocess import run, call, DEVNULL
 from Logger import Logger as log
 from json import dumps
 from sys import exit
 
+
 class Manager:
+
     def os(self):
         """
         OS
@@ -32,8 +33,10 @@ class Manager:
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("FileManager.fileExists - File not found: "+str(e))
+                helpers.errorMessage(
+                    "FileManager.fileExists - File not found: " + str(e))
             exit()
+
     def createFolder(self, path, hidden=False):
         """
         Creates folder with specified path
@@ -47,8 +50,9 @@ class Manager:
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("FileManager.createFolder - "+str(e))
+                helpers.errorMessage("FileManager.createFolder - " + str(e))
             exit()
+
     def createFile(self, path, content="", hidden=False):
         """
         Creates file with content
@@ -66,7 +70,7 @@ class Manager:
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("FileManager.createFile - "+str(e))
+                helpers.errorMessage("FileManager.createFile - " + str(e))
 
     def deleteFile(self, path):
         """
@@ -94,11 +98,14 @@ class Manager:
         try:
             dest = helpers.getCobanBinFolder + '\\{}.ps1'.format(shortcut_name)
             if not self.fileExists(dest):
-                with open(helpers.getCobanPath+'\\powershell\\whof.ps1', 'r') as f:
+                with open(helpers.getCobanPath + '\\powershell\\whof.ps1',
+                          'r') as f:
                     content = f.read()
 
                     if '{packageExecutable}' in content:
-                        content = content.replace('{packageExecutable}', '{}\{}'.format(package_name, executable))
+                        content = content.replace(
+                            '{packageExecutable}', '{}\{}'.format(
+                                package_name, executable))
                         with open(dest, 'w') as f:
                             f.write(content)
                             f.close()
@@ -108,10 +115,8 @@ class Manager:
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage(
-                    "FileManager.createSymlink: " + str(e))
+                helpers.errorMessage("FileManager.createSymlink: " + str(e))
             return False
-
 
     def createJsonFile(self, path, withDict={}):
         """
@@ -124,7 +129,8 @@ class Manager:
         except FileNotFoundError or PermissionError or Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("FileManager.createJsonFile: "+str(e.strerror))
+                helpers.errorMessage("FileManager.createJsonFile: " +
+                                     str(e.strerror))
 
     def removeDir(self, path):
         """
@@ -139,7 +145,8 @@ class Manager:
                 except FileNotFoundError or WindowsError or PermissionError or Exception as e:
                     log.new(e).logError()
                     if helpers.is_verbose():
-                        helpers.errorMessage("FileManager.removeDir: "+str(e.strerror))
+                        helpers.errorMessage("FileManager.removeDir: " +
+                                             str(e.strerror))
             else:
                 helpers.infoMessage(
                     "Path does not exists while trying to remove it: " + path)
@@ -154,7 +161,7 @@ class Manager:
         :param fileDest: File to be moved to.
         :param force: Force moving of file (Don't care if file or folder is already exists.)
         """
-        if self.fileExists(filePath.replace('*','')):
+        if self.fileExists(filePath.replace('*', '')):
             try:
                 if filePath.endswith('*'):
                     filePath = filePath.replace('*', '')
@@ -167,7 +174,8 @@ class Manager:
             except WindowsError or FileNotFoundError or FileExistsError as e:
                 log.new(e).logError()
                 if helpers.is_verbose():
-                    helpers.errorMessage("FileManager.moveFile: "+str(e.strerror))
+                    helpers.errorMessage("FileManager.moveFile: " +
+                                         str(e.strerror))
                     exit()
 
     def copyFile(self, filePath, fileDest):
@@ -183,9 +191,9 @@ class Manager:
             except WindowsError or FileNotFoundError or FileExistsError as e:
                 log.new(e).logError()
                 if helpers.is_verbose():
-                    helpers.errorMessage("FileManager.copyFile: "+str(e.strerror))
+                    helpers.errorMessage("FileManager.copyFile: " +
+                                         str(e.strerror))
                 exit()
-
 
     def __zipdir(self, path, zip, ignoreFiles=[]):
         for file in os.listdir(path):
@@ -195,7 +203,7 @@ class Manager:
 
                 if os.path.isdir(file):
                     for oss in os.listdir(os.path.join(path, file)):
-                        zip.write(file+"\\"+oss)
+                        zip.write(file + "\\" + oss)
 
     def makeZip(self, path, zipName, ignoreFiles=[]):
         """
@@ -205,8 +213,8 @@ class Manager:
         :param ignoreFiles: Ignore specific files.
         """
         try:
-            zf = zipfile.ZipFile(path + "\\" + zipName,
-                                 "w", zipfile.ZIP_DEFLATED)
+            zf = zipfile.ZipFile(path + "\\" + zipName, "w",
+                                 zipfile.ZIP_DEFLATED)
             if len(os.listdir(path)) > 1:
                 self.__zipdir(path, zf, ignoreFiles)
             else:
@@ -217,14 +225,12 @@ class Manager:
         except OSError or PermissionError or FileNotFoundError as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("FileManager.makeZip: "+str(e.strerror))
+                helpers.errorMessage("FileManager.makeZip: " + str(e.strerror))
             exit()
 
-
-    def extractZip(self, zip, dest, extractFolder = None):
+    def extractZip(self, zip, dest, extractFolder=None):
         from tempfile import gettempdir
         from uuid import uuid4
-
         """
         Extract zip
         :param zip: Zip file path
@@ -233,23 +239,24 @@ class Manager:
         """
         try:
             __rand = uuid4().hex.upper()[0:6]
-            tmp_file = gettempdir()+"\\"+__rand
+            tmp_file = gettempdir() + "\\" + __rand
             helpers.infoMessage("Unzipping " + zip + " to " + dest)
 
             zf = zipfile.ZipFile(zip, "r")
             if extractFolder:
                 zf.extractall(tmp_file)
-                self.moveFile(tmp_file+"\\"+extractFolder, dest)
+                self.moveFile(tmp_file + "\\" + extractFolder, dest)
             else:
                 zf.extractall(dest)
 
             zf.close()
-            helpers.successMessage(
-                "Successfully unzipped " + zip + " to " + dest)
+            helpers.successMessage("Successfully unzipped " + zip + " to " +
+                                   dest)
         except WindowsError or PermissionError or FileNotFoundError as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("FileManager.extractZip: "+str(e.strerror))
+                helpers.errorMessage("FileManager.extractZip: " +
+                                     str(e.strerror))
             exit()
 
     def extract7z(self, zip, dest, extractFolder):
@@ -264,7 +271,7 @@ class Manager:
 
         try:
             __rand = uuid4().hex.upper()[0:6]
-            tmp_file = gettempdir()+"\\"+__rand
+            tmp_file = gettempdir() + "\\" + __rand
             helpers.infoMessage("Unzipping " + zip + " to " + dest)
 
             if extractFolder:
@@ -274,26 +281,28 @@ class Manager:
                 processArgs = helpers.getCobanBinFolder + \
                     "7za.exe x -o{0} -y {1}".format(dest, zip)
 
-            runProcess = run(processArgs, stderr=DEVNULL,
-                             stdout=DEVNULL)
+            runProcess = run(processArgs, stderr=DEVNULL, stdout=DEVNULL)
 
             if self.fileExists(tmp_file) and len(os.listdir(tmp_file)) > 0:
                 if zip.endswith('.tar.gz') or zip.endswith('.tar.xz'):
                     for i in os.listdir(tmp_file):
                         if i.endswith('.tar'):
                             runProcess = run(
-                                "7za.exe x -o{0} -y {1}".format(tmp_file, os.path.abspath(os.path.join(tmp_file, i))), stderr=DEVNULL,
+                                "7za.exe x -o{0} -y {1}".format(
+                                    tmp_file,
+                                    os.path.abspath(os.path.join(tmp_file, i))),
+                                stderr=DEVNULL,
                                 stdout=DEVNULL)
 
             if extractFolder:
                 self.moveFile(os.path.join(tmp_file, extractFolder), dest)
 
-            helpers.successMessage(
-                "Successfully unzipped " + zip + " to " + dest)
+            helpers.successMessage("Successfully unzipped " + zip + " to " +
+                                   dest)
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage("FileManager.extract7z: "+str(e))
+                helpers.errorMessage("FileManager.extract7z: " + str(e))
             exit()
 
     def renameFile(self, fromName, toName):
@@ -304,7 +313,7 @@ class Manager:
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
-                helpers.errorMessage('FileManager.renameFile: '+str(e))
+                helpers.errorMessage('FileManager.renameFile: ' + str(e))
 
     def cleanup(self, packageName=""):
         """

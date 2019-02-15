@@ -2,10 +2,12 @@ import json
 from . import FileManager
 import helpers
 from Logger import Logger as log
-from sys import argv, exit
+from sys import argv
+
 
 class JsonIsNotValid(Exception):
     pass
+
 
 class KeyNotFound(Exception):
     pass
@@ -33,21 +35,19 @@ class Parser:
         if _path:
             try:
                 with open(_path, "r") as f:
-
-
-                        convertToJSON = json.load(f)
-                        self.json = convertToJSON
-                        # FIXME: can make a problem
-                        if helpers.getCobanPath + "\\packages\\" in _path or ".package\\" in _path:
-                            self.compile_objects()
-                        return self.json
+                    self.load = json.load(f)
+                    convertToJSON = self.load
+                    self.json = convertToJSON
+                    if helpers.getCobanPath + "\\packages\\" in _path or ".package\\" in _path:
+                        self.compile_objects()
+                    return self.json
 
             except Exception as e:
                 helpers.errorMessage(
-                    "Could not parse JSON file while trying to convert it: " + _path, True)
+                    "Could not parse JSON file while trying to convert it: " +
+                    _path, True)
                 if helpers.is_verbose():
-                    helpers.errorMessage(
-                        "JsonParser.fileToJson - " + str(e))
+                    helpers.errorMessage("JsonParser.fileToJson - " + str(e))
                     raise JsonIsNotValid(e)
                 log.new(e).logError()
 
@@ -110,7 +110,8 @@ class Parser:
         jsonFile = helpers.getCobanPath + "\\packages.json"
         js = helpers.installedApps()
 
-        if not packageName in js["installedApps"] and not "--test-package" in argv:
+        if not packageName in js[
+                "installedApps"] and not "--test-package" in argv:
             newPackage = {
                 packageName: {
                     "version": context.get("version"),
@@ -240,16 +241,22 @@ class Parser:
 
         for i in package_args:
             if package_args[i] in objects:
-                package_args[i] = package_args[i].replace(package_args[i], self.objects[package_args[i]])
+                package_args[i] = package_args[i].replace(
+                    package_args[i], self.objects[package_args[i]])
 
             if isinstance(package_args[i], dict):
                 for p in package_args[i]:
                     if package_args[i][p] in objects:
-                        package_args[i][p] = package_args[i][p].replace(package_args[i][p], self.objects[package_args[i][p]])
+                        package_args[i][p] = package_args[i][p].replace(
+                            package_args[i][p],
+                            self.objects[package_args[i][p]])
                     else:
-                        gathered_object_key = self.__search_via_regex(package_args[i][p])
+                        gathered_object_key = self.__search_via_regex(
+                            package_args[i][p])
                         if gathered_object_key:
-                            package_args[i][p] = package_args[i][p].replace(gathered_object_key, self.objects[gathered_object_key])
+                            package_args[i][p] = package_args[i][p].replace(
+                                gathered_object_key,
+                                self.objects[gathered_object_key])
 
             elif isinstance(package_args[i], list):
                 for p in package_args[i]:
@@ -259,16 +266,23 @@ class Parser:
                         gathered_object_key = self.__search_via_regex(p)
                         if gathered_object_key:
                             package_args[i] = empty_list
-                            if hasattr(self.objects[gathered_object_key], '__call__'):
-                                empty_list.append(p.replace(gathered_object_key, self.objects[gathered_object_key]()))
+                            if hasattr(self.objects[gathered_object_key],
+                                       '__call__'):
+                                empty_list.append(
+                                    p.replace(
+                                        gathered_object_key,
+                                        self.objects[gathered_object_key]()))
                             else:
-                                empty_list.append(p.replace(gathered_object_key, self.objects[gathered_object_key]))
+                                empty_list.append(
+                                    p.replace(
+                                        gathered_object_key,
+                                        self.objects[gathered_object_key]))
 
             else:
                 gathered_object_key = self.__search_via_regex(package_args[i])
                 if gathered_object_key:
-                    package_args[i] = package_args[i].replace(gathered_object_key, self.objects[gathered_object_key])
-
+                    package_args[i] = package_args[i].replace(
+                        gathered_object_key, self.objects[gathered_object_key])
 
     def __search_via_regex(self, string):
         from re import search
@@ -282,7 +296,6 @@ class Parser:
                 return False
         else:
             return False
-
 
     def dump_json(self, dict: dict, beautify=False):
         """Converts dict to json object.
@@ -309,5 +322,5 @@ class Parser:
         package_args = self.json['packageArgs']
         if self.keyExists(package_args, 'unzip'):
             if len(self.json) > 1:
-                return FileManager.os.path.join(helpers.getToolsPath, package_args.get('packageName'))
-
+                return FileManager.os.path.join(helpers.getToolsPath,
+                                                package_args.get('packageName'))

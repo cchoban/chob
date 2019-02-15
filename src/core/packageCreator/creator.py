@@ -5,7 +5,9 @@ from core import FileManager
 import helpers
 from sys import exit
 
+
 class generateNewPackage:
+
     def __init__(self, packageName=None, generateFlatFileOnly=False):
         self.packageName = packageName
         self.softwareName = ""
@@ -36,19 +38,24 @@ class generateNewPackage:
         self.envs = {}
 
     def name(self):
-        package = input("Package Name for application. Example: google-chrome*: ")
+        package = input(
+            "Package Name for application. Example: google-chrome*: ")
         self.packageName = package
 
     def sname(self):
-        package = input("Software Name for application. Example: Google Chrome*: ")
+        package = input(
+            "Software Name for application. Example: Google Chrome*: ")
         self.softwareName = package
 
     def desc(self):
-        package = input("Description for application. This will be published on website*: ")
+        package = input(
+            "Description for application. This will be published on website*: ")
         self.description = package
 
     def ver(self):
-        package = input("Version number for application. This will be published on website*: ")
+        package = input(
+            "Version number for application. This will be published on website*: "
+        )
         self.version = package
 
     def is64bit(self):
@@ -77,10 +84,12 @@ class generateNewPackage:
 
     def ctype(self):
         if self.enable64bit:
-            checksumType64 = input("Checksum type for 64-bit application [sha256, md5]: ")
+            checksumType64 = input(
+                "Checksum type for 64-bit application [sha256, md5]: ")
             self.checksumType64 = checksumType64
 
-        checksumType = input("Checksum type for 32-bit application [sha256, md5]: ")
+        checksumType = input(
+            "Checksum type for 32-bit application [sha256, md5]: ")
         self.checksumType = checksumType
 
     def checks(self):
@@ -101,11 +110,13 @@ class generateNewPackage:
 
     def exitCodes(self):
         package = input(
-            "Exit codes for application: (We detect if program exited successfully within this codes.) Example: 0,1,2: ")
+            "Exit codes for application: (We detect if program exited successfully within this codes.) Example: 0,1,2: "
+        )
         self.validExitCodes = package.split(",")
 
     def usilenta(self):
-        package = input("Silent args for uninstallation of application. Ex: [/S]: ")
+        package = input(
+            "Silent args for uninstallation of application. Ex: [/S]: ")
         self.uninstallSilenArgs = package
 
     def packageIcon(self):
@@ -113,7 +124,8 @@ class generateNewPackage:
         self.icon = package
 
     def isunzip(self):
-        package = input("Is this application compressed with zip technologies? [Y/N]: ")
+        package = input(
+            "Is this application compressed with zip technologies? [Y/N]: ")
 
         if package == "y":
             self.unzip = True
@@ -121,8 +133,8 @@ class generateNewPackage:
             self.unzip = False
 
     def deps(self):
-        package = input(
-            "Dependencies for {}. Example: git,nodejs: ".format(self.packageName))
+        package = input("Dependencies for {}. Example: git,nodejs: ".format(
+            self.packageName))
         if len(package) > 0:
             self.dependencies = package.split(",")
         else:
@@ -130,40 +142,43 @@ class generateNewPackage:
 
     def shortcut(self):
         package = input(
-            "Shortcuts for {}. This will help user to run command from his command line. Example: php.exe, php.ini: ".format(self.packageName))
+            "Shortcuts for {}. This will help user to run command from his command line. Example: php.exe, php.ini: "
+            .format(self.packageName))
 
         self.createShortcut = package.split(",")
 
-
         if self.enable64bit:
             package = input(
-                "Shortcuts for {} (64-Bit). This will help user to run command from his command line. Example: php.exe, php.ini: ".format(self.packageName))
+                "Shortcuts for {} (64-Bit). This will help user to run command from his command line. Example: php.exe, php.ini: "
+                .format(self.packageName))
             self.createShortcut64 = package.split(",")
 
         if len(package) > 0:
             return {"32bit": [], "64bit": []}
 
     def author_page(self):
-        package = input(
-            "Author or webpage for {}: ".format(self.packageName))
+        package = input("Author or webpage for {}: ".format(self.packageName))
 
         self.author = package
 
     def package_lisence(self):
-        package = input(
-            "Package lisence for {}: ".format(self.packageName))
+        package = input("Package lisence for {}: ".format(self.packageName))
 
         self.lisence = package
 
     def path_envs(self):
-        package = input('Paths to be added to PATH environment. Example: {cobanTools}\\php\: ')
+        package = input(
+            'Paths to be added to PATH environment. Example: {cobanTools}\\php\: '
+        )
         if len(package) > 0:
-                self.path = package.split(",")
+            self.path = package.split(",")
         else:
             return []
 
     def environments(self):
-        package = input('Environment keys to be added. Example: NVM_SYMLINK={cobanTools}\\php: ')
+        package = input(
+            'Environment keys to be added. Example: NVM_SYMLINK={cobanTools}\\php: '
+        )
 
         if not '=' in package:
             print('Environment keys was invalid therefore we will skip it.')
@@ -174,6 +189,7 @@ class generateNewPackage:
             self.envs = dict(x.split('=') for x in package.split(','))
         else:
             return {}
+
 
 class generatePackage(generateNewPackage):
 
@@ -203,7 +219,6 @@ class generatePackage(generateNewPackage):
                 self.exitCodes()
             self.packageIcon()
 
-
     def generateJson(self):
 
         root = {
@@ -221,14 +236,14 @@ class generatePackage(generateNewPackage):
                 'lisence': self.lisence,
                 'environments': self.envs,
                 'path_env': self.path,
-                "createShortcut": {"32bit": self.createShortcut, "64bit": self.createShortcut64}
-
+                "createShortcut": {
+                    "32bit": self.createShortcut,
+                    "64bit": self.createShortcut64
+                }
             },
-
             'packageUninstallArgs': {
                 'silentArgs': self.uninstallSilenArgs
             },
-
             "server": {
                 "icon": self.icon
             }
@@ -245,15 +260,13 @@ class generatePackage(generateNewPackage):
                     '32bit': self.createShortcut
                 }
 
-
         if self.only64bit:
             root['packageArgs']['64bitonly'] = True
 
         if self.enable64bit:
             if self.unzip:
-                root['packageArgs']['createShortcut'].update({
-                    '64bit': self.createShortcut64
-                })
+                root['packageArgs']['createShortcut'].update(
+                    {'64bit': self.createShortcut64})
 
         if self.generateFlatFileOnly or self.enable64bit:
             dict64 = {
@@ -274,7 +287,8 @@ class generatePackage(generateNewPackage):
         path = os.getcwd()
         if not self.packageName == None:
             FileManager.Manager().createFolder(path + "\\" + self.packageName)
-            FileManager.Manager().createFolder(path + "\\" + self.packageName + "\\icons")
+            FileManager.Manager().createFolder(path + "\\" + self.packageName +
+                                               "\\icons")
         else:
             FileManager.Manager().createFolder(path + "\\package")
             FileManager.Manager().createFolder(path + "\\icons")
@@ -284,14 +298,16 @@ class generatePackage(generateNewPackage):
         if not self.packageName == None:
             path = os.getcwd() + "\\" + self.packageName + "\\"
 
-        FileManager.Manager().createFile(path + ".packagable", "Choban package manager", True)
+        FileManager.Manager().createFile(path + ".packagable",
+                                         "Choban package manager", True)
 
     def writeToFile(self, dict={}):
         self.__createPackageFolder(True)
         self.__createPackageFiles()
 
         if not self.packageName == None:
-            path = os.getcwd() + "\\{0}\\{1}.cb".format(self.packageName, self.packageName)
+            path = os.getcwd() + "\\{0}\\{1}.cb".format(self.packageName,
+                                                        self.packageName)
         else:
             path = os.getcwd() + "\\{0}.cb".format(self.packageName)
         with open(path, "w") as f:

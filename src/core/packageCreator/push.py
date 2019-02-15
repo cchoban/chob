@@ -39,9 +39,9 @@ class main(pack.main):
             if FileManager.Manager().fileExists(path):
                 return image_from_scr
             else:
-                helpers.errorMessage('Could not get image "{}" in "{}"'.format(image_from_scr, path))
+                helpers.errorMessage('Could not get image "{}" in "{}"'.format(
+                    image_from_scr, path))
                 return self.detectImage()
-
 
     def detectImage(self):
         helpers.infoMessage('Trying to find image via detector..')
@@ -74,11 +74,10 @@ class main(pack.main):
             "cache-control": "no-cache"
         }
 
-        image = open(os.getcwd() + '\\' + str(self.get_image()), 'rb') if FileManager.Manager(
-        ).fileExists(os.getcwd() + '\\' + str(self.get_image())) else ""
-        files = {
-            'packageIcon': image
-        }
+        image = open(os.getcwd() + '\\' + str(self.get_image()),
+                     'rb') if FileManager.Manager().fileExists(
+                         os.getcwd() + '\\' + str(self.get_image())) else ""
+        files = {'packageIcon': image}
 
         dump = JsonParser.Parser().dump_json
         data = {
@@ -88,20 +87,27 @@ class main(pack.main):
             "server": dump(self.json.get('server'))
         }
 
-
-
         post_url = "{}/api/push/".format(helpers.getWebsite)
         resp = http.Http(True).post(
-            post_url, headers=headers, files=files, data=data, verify=helpers.sslFile)
-        error_content = resp.json() if JsonParser.Parser(resp.json()).isValid() else {'error': resp.json()}
+            post_url,
+            headers=headers,
+            files=files,
+            data=data,
+            verify=helpers.sslFile)
+        error_content = resp.json() if JsonParser.Parser(
+            resp.json()).isValid() else {
+                'error': resp.json()
+            }
 
         if hasattr(resp, 'status_code') and resp.status_code == 201:
             helpers.infoMessage(
-                "You successfully submitted your package. It is now under approvement period.")
+                "You successfully submitted your package. It is now under approvement period."
+            )
 
         elif hasattr(resp, 'status_code') and resp.status_code == 406:
             helpers.errorMessage(
-                "We could not push your package. See error detail: \n {0}".format(error_content.get('error')))
+                "We could not push your package. See error detail: \n {0}".
+                format(error_content.get('error')))
 
         elif hasattr(resp, 'status_code') and resp.status_code == 401:
             helpers.errorMessage('Please provide correct authentication key.')
@@ -109,9 +115,9 @@ class main(pack.main):
             helpers.errorMessage(
                 'Something happened... Please try again later..')
             if helpers.is_verbose():
-                status_code = resp.status_code if hasattr(resp, 'status_code') else 'unkown'
+                status_code = resp.status_code if hasattr(
+                    resp, 'status_code') else 'unkown'
                 content = resp.content if hasattr(resp, 'content') else 'unkown'
-
 
                 errors = {
                     'error_code': status_code,
