@@ -48,6 +48,8 @@ class Manager:
                     call(["attrib", "+H", os.path.abspath(path)])
 
                 return True
+            else:
+                return False
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
@@ -68,10 +70,15 @@ class Manager:
 
                 if hidden:
                     call(["attrib", "+H", os.path.abspath(path)])
+
+                return True
+            else:
+                return False
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.createFile - " + str(e))
+            return False
 
     def deleteFile(self, path):
         """
@@ -85,10 +92,16 @@ class Manager:
                     os.remove(path)
                 else:
                     os.remove(path)
+
+                return True
+            else:
+                return False
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.deleteFile - " + str(e))
+
+            return False
 
     def createSymLink(self, package_name, shortcut_name, executable):
         """
@@ -127,11 +140,14 @@ class Manager:
         """
         try:
             self.createFile(dumps(withDict))
+
+            return True
         except FileNotFoundError or PermissionError or Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.createJsonFile: " +
                                      str(e.strerror))
+            return False
 
     def removeDir(self, path):
         """
@@ -141,16 +157,22 @@ class Manager:
         try:
             if self.fileExists(path):
                 try:
-                    rmtree(path)
+                    if len(os.listdir(path)) > 0:
+                        rmtree(path)
                     os.removedirs(path)
+
+                    return True
                 except FileNotFoundError or WindowsError or PermissionError or Exception as e:
+                    print(e)
                     log.new(e).logError()
                     if helpers.is_verbose():
                         helpers.errorMessage("FileManager.removeDir: " +
                                              str(e.strerror))
+                    return False
             else:
                 helpers.infoMessage(
                     "Path does not exists while trying to remove it: " + path)
+                return False
         except Exception as e:
             log.new(e).logError()
             return False
@@ -168,16 +190,19 @@ class Manager:
                     filePath = filePath.replace('*', '')
                     for i in os.listdir(filePath):
                         move(os.path.join(filePath, i), fileDest)
+                    return True
                 else:
                     if self.fileExists(fileDest) and force:
                         self.removeDir(fileDest)
                     move(filePath, fileDest)
+
+                    return True
             except WindowsError or FileNotFoundError or FileExistsError as e:
                 log.new(e).logError()
                 if helpers.is_verbose():
                     helpers.errorMessage("FileManager.moveFile: " +
                                          str(e.strerror))
-                    exit()
+                return False
 
     def copyFile(self, filePath, fileDest):
         """
@@ -189,12 +214,14 @@ class Manager:
         if self.fileExists(filePath):
             try:
                 copy(filePath, fileDest)
+
+                return True
             except WindowsError or FileNotFoundError or FileExistsError as e:
                 log.new(e).logError()
                 if helpers.is_verbose():
                     helpers.errorMessage("FileManager.copyFile: " +
                                          str(e.strerror))
-                exit()
+                return False
 
     def __zipdir(self, path, zip, ignoreFiles=[]):
         for file in os.listdir(path):
@@ -227,7 +254,8 @@ class Manager:
             log.new(e).logError()
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.makeZip: " + str(e.strerror))
-            exit()
+
+            return False
 
     def extractZip(self, zip, dest, extractFolder=None):
         from tempfile import gettempdir
@@ -315,6 +343,7 @@ class Manager:
             log.new(e).logError()
             if helpers.is_verbose():
                 helpers.errorMessage('FileManager.renameFile: ' + str(e))
+            return False
 
     def cleanup(self, packageName=""):
         """
