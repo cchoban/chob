@@ -35,7 +35,6 @@ class Manager:
             if helpers.is_verbose():
                 helpers.errorMessage(
                     "FileManager.fileExists - File not found: " + str(e))
-            exit()
 
     def createFolder(self, path, hidden=False):
         """
@@ -47,11 +46,13 @@ class Manager:
                 os.makedirs(path)
                 if hidden:
                     call(["attrib", "+H", os.path.abspath(path)])
+
+                return True
         except Exception as e:
             log.new(e).logError()
             if helpers.is_verbose():
                 helpers.errorMessage("FileManager.createFolder - " + str(e))
-            exit()
+            return False
 
     def createFile(self, path, content="", hidden=False):
         """
