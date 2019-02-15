@@ -29,28 +29,29 @@ class Parser:
         :param path: Json absolute path
         :return json:
         """
-
         _path = path or self.path
         if _path:
-            with open(_path, "r") as f:
+            try:
+                with open(_path, "r") as f:
 
-                try:
-                    convertToJSON = json.load(f)
-                    self.json = convertToJSON
-                    # FIXME: can make a problem
-                    if helpers.getCobanPath + "\\packages\\" in _path or ".package\\" in _path:
-                        self.compile_objects()
-                    return self.json
 
-                except Exception as e:
-                    log.new(e).logError()
+                        convertToJSON = json.load(f)
+                        self.json = convertToJSON
+                        # FIXME: can make a problem
+                        if helpers.getCobanPath + "\\packages\\" in _path or ".package\\" in _path:
+                            self.compile_objects()
+                        return self.json
+
+            except Exception as e:
+                helpers.errorMessage(
+                    "Could not parse JSON file while trying to convert it: " + _path, True)
+                if helpers.is_verbose():
                     helpers.errorMessage(
-                        "Could not parse JSON file while trying to convert it: " + _path, True)
-                    if helpers.is_verbose():
-                        helpers.errorMessage(
-                            "JsonParser.fileToJson - " + str(e))
-                        raise JsonIsNotValid(e)
-                    return False
+                        "JsonParser.fileToJson - " + str(e))
+                    raise JsonIsNotValid(e)
+                log.new(e).logError()
+
+                return False
 
     def isValid(self):
         """
@@ -124,6 +125,10 @@ class Parser:
             with open(jsonFile, "w") as f:
                 f.write(json.dumps(js))
                 f.close()
+
+                return True
+        else:
+            return True
 
     def add_new_symlink(self, packageName, dest):
         """Adds symlink desinitation to symlinks.json for removing it later
