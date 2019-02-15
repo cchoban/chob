@@ -169,18 +169,26 @@ class Parser:
         :param packageName: Package name for removing it from packages.json
         """
         jsonFile = helpers.getCobanPath + "\\packages.json"
-        with open(jsonFile, "r") as f:
-            js = json.load(f)
-            f.close()
+
         try:
+            with open(jsonFile, "r") as f:
+                js = json.load(f)
+                f.close()
+
             newDict = js["installedApps"].pop(packageName)
+
+            with open(jsonFile, "w") as f:
+                f.write(json.dumps(js))
+                f.close()
+
+            return True
+
         except ValueError as e:
             log.new(e).logError()
             if helpers.is_verbose():
                 helpers.errorMessage("JsonParser.removePackage() = " + e)
-        with open(jsonFile, "w") as f:
-            f.write(json.dumps(js))
-            f.close()
+
+            return False
 
     def keyExists(self, array, key):
         """Check is specified key exists in array
