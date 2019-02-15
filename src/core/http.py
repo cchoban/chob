@@ -52,6 +52,7 @@ class Http:
                             unit='KB'):
                         wrote = wrote + len(data)
                         f.write(data)
+                        return True
         except requests.exceptions.ConnectionError as e:
             log.new(e).logError()
             helpers.errorMessage(
@@ -65,7 +66,7 @@ class Http:
                 if helpers.is_verbose():
                     helpers.errorMessage("Http.download: " + str(e))
                     print(sv["message"])
-            exit()
+            return False
 
     def get(self, url, **args):
         """
