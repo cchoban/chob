@@ -1,11 +1,11 @@
 import unittest, os
 from tests import test_jsonparser, test_http, test_filemanager
 
-
-
-
 if __name__ == '__main__':
-    test_classes_to_run = [test_jsonparser.JsonParser, test_http.HttpTest, test_filemanager.FileManagerTest]
+    test_classes_to_run = [
+        test_jsonparser.JsonParser, test_http.HttpTest,
+        test_filemanager.FileManagerTest
+    ]
 
     loader = unittest.TestLoader()
 
@@ -18,7 +18,6 @@ if __name__ == '__main__':
 
     runner = unittest.TextTestRunner()
     results = runner.run(big_suite)
-
 
     # Cleanup test files&folders
 

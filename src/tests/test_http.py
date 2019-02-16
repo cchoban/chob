@@ -2,7 +2,10 @@ import unittest, helpers, os
 from core.http import Http
 
 test_url = 'http://www.ovh.net/files/1Mb.dat'
+
+
 class HttpTest(unittest.TestCase):
+
     def test_download(self):
         parser = Http().download(test_url, 'dat')
 

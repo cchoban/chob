@@ -3,6 +3,7 @@ from core.JsonParser import Parser
 
 
 class JsonParser(unittest.TestCase):
+
     def test_fileToJson(self):
         try:
             convert = helpers.programList()
@@ -34,7 +35,8 @@ class JsonParser(unittest.TestCase):
         self.assertEqual(remove, True)
 
     def test_keyExists(self):
-        self.assertEqual(Parser().keyExists({'selam': 'aleykumselam'}, 'selam'), True)
+        self.assertEqual(Parser().keyExists({'selam': 'aleykumselam'}, 'selam'),
+                         True)
 
     def test_is_json(self):
         parser = Parser().is_json('{"selam": "aleykumselam"}')

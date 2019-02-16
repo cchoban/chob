@@ -227,6 +227,7 @@ class Parser:
         :usage JsonParser.Parser(path).change_value(from, to)
         :return boolean:
         """
+
         if self.keyExists(self.json, key):
             try:
                 self.json[key] = value

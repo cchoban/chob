@@ -3,6 +3,8 @@ from core.FileManager import Manager
 
 test_url = 'http://www.ovh.net/files/1Mb.dat'
 fs = Manager()
+
+
 class FileManagerTest(unittest.TestCase):
 
     def test_fileExists(self):
@@ -26,7 +28,8 @@ class FileManagerTest(unittest.TestCase):
         self.assertEqual(parser, True)
 
     def test_createJsonfile(self):
-        parser = fs.createJsonFile(os.path.join('tests'), {'testbreee': 'testbree'})
+        parser = fs.createJsonFile(
+            os.path.join('tests'), {'testbreee': 'testbree'})
 
         self.assertEqual(parser, True)
 
@@ -40,23 +43,25 @@ class FileManagerTest(unittest.TestCase):
     def test_moveFile(self):
         fs.createFile(os.path.join('tests', 'testbea'))
         fs.createFolder(os.path.join('tests', 'testbeaa'))
-        parser = fs.moveFile(os.path.join('tests', 'testbea'), os.path.join('tests', 'testbeaa'))
+        parser = fs.moveFile(
+            os.path.join('tests', 'testbea'), os.path.join('tests', 'testbeaa'))
         fs.removeDir(os.path.join('tests', 'testbeaa'))
 
         self.assertEqual(parser, True)
 
-
     def test_copyFile(self):
         fs.createFile(os.path.join('tests', 'testbea'))
         fs.createFolder(os.path.join('tests', 'testbeaa'))
-        parser = fs.copyFile(os.path.join('tests', 'testbea'), os.path.join('tests', 'testbeaa'))
+        parser = fs.copyFile(
+            os.path.join('tests', 'testbea'), os.path.join('tests', 'testbeaa'))
         fs.removeDir(os.path.join('tests', 'testbeaa'))
 
         self.assertEqual(parser, True)
 
     def test_renameFile(self):
         fs.createFile(os.path.join('tests', 'testbea'))
-        parser = fs.renameFile(os.path.join('tests', 'testbea'), os.path.join('tests', 'testbea2'))
+        parser = fs.renameFile(
+            os.path.join('tests', 'testbea'), os.path.join('tests', 'testbea2'))
 
         self.assertEqual(parser, True)
         fs.deleteFile(os.path.join('tests', 'testbea2'))
