@@ -83,6 +83,8 @@ auth.add_argument(
     help="Your API Token key to push packages to our servers.")
 auth.add_argument(
     "--verbose", action="store_true", help="Turning on verbose mode")
+auth.add_argument('--force', action="store_true")
+
 #Push command
 push = subparser.add_parser('push')
 push.add_argument(
