@@ -32,21 +32,28 @@ class main:
 
             if template:
                 self.downloadScript(template)
-                downloaded_path = '{0}\packages\{1}\{1}.cb'.format(
-                    helpers.getCobanPath, template)
-                dest_path = FileManager.Manager().os().path.join(packageName)
-                serialize = JsonParser.Parser(downloaded_path).fileToJson()
-                icon_download_url = helpers.getWebsite + serialize['server'][
-                    'icon']
+                script_path = f'{helpers.getCobanPath}\\packages\\{template}\\{template}.cb'
+                package_dest_path = FileManager.os.path.join(packageName)
+
+                parser = JsonParser.Parser(script_path)
+                serializer_data = parser.fileToJson()
+
+                icon_download_url = helpers.getWebsite + serializer_data[
+                    'server']['icon']
                 file_ext = 'png' if icon_download_url.endswith(
                     '.png') else 'jpg'
 
+                parser.change_value(
+                    'server',
+                    {'icon': 'icons/{}.{}'.format(packageName, file_ext)})
+
                 FileManager.Manager().moveFile(
-                    downloaded_path, dest_path + '\\' + packageName + '.cb',
+                    script_path, package_dest_path + '\\' + packageName + '.cb',
                     True)
+
                 http.Http().download(
                     icon_download_url,
-                    dest_path + '\\icons\\' + packageName,
+                    package_dest_path + '\\icons\\' + packageName,
                     file_ext,
                     verify=helpers.sslFile)
 
