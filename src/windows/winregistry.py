@@ -16,9 +16,10 @@ class Registry:
         :return dict: A list of softwares with their uninstall string.
         """
 
-        data = {}
-        data.update(self.CurrUninstaller(self.key))
-        data.update(self.CurrUninstaller(self.key64))
+        data = {
+            **self.CurrUninstaller(self.key),
+            **self.CurrUninstaller(self.key64)
+        }
 
         return data
 
@@ -60,6 +61,7 @@ class Registry:
 
         data = {}
         for prod in self.installedSoftware():
+
             try:
                 prod_slugged = helpers.slugify(prod)
                 packageName = helpers.slugify(packageName)
@@ -73,6 +75,36 @@ class Registry:
                     }
                     data.update(newData)
                     return data
+                else:
+                    found = self.findBySimilarity(prod, prod_slugged,
+                                                  packageName)
+                    if isinstance(found, dict):
+                        return found
+
             except Exception as e:
                 log.new(e).logError()
                 pass
+
+    def findBySimilarity(self, registry_name, registry_name_slugged,
+                         package_name):
+        """
+        Choosing an application based on name similarities.
+
+        :param registry_name: Software name.
+        :param registry_name_slugged: Slluged software name.
+        :param package_name: Package name to find similarity with registry_name
+        :return:
+        """
+        from fuzzywuzzy import fuzz
+
+        similarity_ratio = fuzz.ratio(registry_name_slugged, package_name)
+        if similarity_ratio > 70:
+            if registry_name in self.installedSoftware():
+                data = {
+                    "PackageName": registry_name,
+                    "UninstallString": self.installedSoftware()[registry_name]
+                }
+
+                return data
+
+        return False
