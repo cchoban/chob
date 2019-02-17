@@ -52,7 +52,7 @@ class Http:
                             unit='KB'):
                         wrote = wrote + len(data)
                         f.write(data)
-                        return True
+                    return True
         except requests.exceptions.ConnectionError as e:
             log.new(e).logError()
             helpers.errorMessage(
