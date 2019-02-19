@@ -98,8 +98,11 @@ class Registry:
         from fuzzywuzzy import fuzz
 
         similarity_ratio = fuzz.ratio(registry_name_slugged, package_name)
+        if helpers.is_verbose():
+            print(registry_name, 'Ratio: ', similarity_ratio)
         if similarity_ratio > 70:
             if registry_name in self.installedSoftware():
+                helpers.infoMessage('Found by name similarity.')
                 data = {
                     "PackageName": registry_name,
                     "UninstallString": self.installedSoftware()[registry_name]
